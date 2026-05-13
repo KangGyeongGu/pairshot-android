@@ -36,14 +36,13 @@ import com.pairshot.core.ui.component.SettingsSectionLabel
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
+import com.pairshot.feature.settings.BuildConfig
 import com.pairshot.feature.settings.screen.SettingsScreen
 import com.pairshot.feature.settings.viewmodel.SettingsViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
 import com.pairshot.core.coupon.R as CouponR
-
-private const val PRIVACY_POLICY_URL = "https://pairshot.kangkyeonggu.com/privacy"
 
 @Composable
 fun SettingsRoute(
@@ -177,7 +176,7 @@ fun SettingsRoute(
         onPrivacyPolicyClick = {
             runCatching {
                 context.startActivity(
-                    Intent(Intent.ACTION_VIEW, PRIVACY_POLICY_URL.toUri()),
+                    Intent(Intent.ACTION_VIEW, BuildConfig.PRIVACY_POLICY_URL.toUri()),
                 )
             }
         },

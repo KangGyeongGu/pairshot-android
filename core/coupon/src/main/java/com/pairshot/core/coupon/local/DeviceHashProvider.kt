@@ -15,14 +15,17 @@ class DeviceHashProvider
     constructor(
         @ApplicationContext private val context: Context,
     ) {
+        init {
+            require(BuildConfig.COUPON_DEVICE_HASH_SALT.isNotBlank()) {
+                "COUPON_DEVICE_HASH_SALT must be configured in local.properties"
+            }
+        }
+
         @SuppressLint("HardwareIds")
         fun deviceHash(): String {
             val androidId =
                 Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID).orEmpty()
-            val salt =
-                BuildConfig.COUPON_DEVICE_HASH_SALT
-                    .ifBlank { DEFAULT_DEVICE_HASH_SALT }
-            val input = (androidId + salt).toByteArray(Charsets.UTF_8)
+            val input = (androidId + BuildConfig.COUPON_DEVICE_HASH_SALT).toByteArray(Charsets.UTF_8)
             val digest = MessageDigest.getInstance("SHA-256").digest(input)
             return digest.toHex()
         }
@@ -38,7 +41,6 @@ class DeviceHashProvider
         }
 
         private companion object {
-            const val DEFAULT_DEVICE_HASH_SALT = "pairshot-coupon-v1-device-salt"
             const val BYTE_MASK = 0xFF
             const val HIGH_NIBBLE_SHIFT = 4
             const val LOW_NIBBLE_MASK = 0x0F

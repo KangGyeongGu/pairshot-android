@@ -1,9 +1,11 @@
 package com.pairshot.core.ads.config
 
+import com.pairshot.core.ads.BuildConfig
+
 object ProductionAdsConfig : AdsConfig {
-    override val bannerAdUnitId: String = "ca-app-pub-9413236072720050/1419084565"
-    override val interstitialExportCompleteAdUnitId: String = "ca-app-pub-9413236072720050/4306243996"
-    override val appOpenAdUnitId: String = "ca-app-pub-9413236072720050/3204697110"
-    override val nativeAdUnitId: String = "ca-app-pub-9413236072720050/5695129086"
-    override val rewardedAdUnitId: String = "ca-app-pub-9413236072720050/1668254167"
+    override val bannerAdUnitId: String = BuildConfig.ADMOB_BANNER_AD_UNIT_ID
+    override val interstitialExportCompleteAdUnitId: String = BuildConfig.ADMOB_INTERSTITIAL_EXPORT_COMPLETE_AD_UNIT_ID
+    override val appOpenAdUnitId: String = BuildConfig.ADMOB_APP_OPEN_AD_UNIT_ID
+    override val nativeAdUnitId: String = BuildConfig.ADMOB_NATIVE_AD_UNIT_ID
+    override val rewardedAdUnitId: String = BuildConfig.ADMOB_REWARDED_AD_UNIT_ID
 }

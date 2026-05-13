@@ -41,6 +41,11 @@ android {
             "COUPON_DEVICE_HASH_SALT",
             "\"${localProperties["COUPON_DEVICE_HASH_SALT"] ?: ""}\"",
         )
+        buildConfigField(
+            "String",
+            "COUPON_INFO_URL",
+            "\"${localProperties["COUPON_INFO_URL"] ?: ""}\"",
+        )
     }
 
     packaging {

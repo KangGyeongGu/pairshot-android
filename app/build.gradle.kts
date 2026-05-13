@@ -53,6 +53,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["admobAppId"] =
+                localProperties.getProperty("ADMOB_TEST_APP_ID") ?: ""
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -61,6 +65,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            manifestPlaceholders["admobAppId"] =
+                localProperties.getProperty("ADMOB_APP_ID") ?: ""
         }
     }
 

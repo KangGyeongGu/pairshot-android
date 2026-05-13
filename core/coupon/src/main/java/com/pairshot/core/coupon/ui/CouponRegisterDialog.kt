@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.coupon.BuildConfig
 import com.pairshot.core.coupon.R
 import com.pairshot.core.coupon.domain.ActivationResult
 import com.pairshot.core.coupon.domain.CouponListItem
@@ -53,8 +54,6 @@ import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-
-private const val COUPON_INFO_URL = "https://pairshot.kangkyeonggu.com"
 
 private enum class RegisterMode { Input, Scanning }
 
@@ -119,7 +118,7 @@ fun CouponRegisterDialog(
                             Modifier.clickable(
                                 indication = null,
                                 interactionSource = remember { MutableInteractionSource() },
-                            ) { uriHandler.openUri(COUPON_INFO_URL) },
+                            ) { uriHandler.openUri(BuildConfig.COUPON_INFO_URL) },
                     )
                 }
             }
