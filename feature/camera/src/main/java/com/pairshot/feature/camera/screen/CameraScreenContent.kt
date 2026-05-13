@@ -52,6 +52,7 @@ data class CameraScreenCallbacks(
     val onToggleNightMode: () -> Unit,
     val onToggleHdr: () -> Unit,
     val onToggleLevel: () -> Unit,
+    val onCycleAspectRatio: () -> Unit,
     val onDismissSettings: () -> Unit,
 )
 
@@ -78,7 +79,6 @@ fun CameraScreenContent(
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
-                PairShotBannerAd(modifier = Modifier.fillMaxWidth())
                 com.pairshot.feature.camera.preview.CameraPreviewPane(
                     surfaceRequest = surfaceRequest,
                     zoomUiState = zoomUiState,
@@ -91,6 +91,7 @@ fun CameraScreenContent(
                     currentExposureIndex = settingsState.exposureIndex,
                     exposureStepNumerator = capabilities.exposureStepNumerator,
                     exposureStepDenominator = capabilities.exposureStepDenominator,
+                    selectedAspectRatio = settingsState.aspectRatio,
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     onZoomRatioChanged = callbacks.onZoomRatioChanged,
                     onPresetTapped = callbacks.onPresetTapped,
@@ -122,6 +123,14 @@ fun CameraScreenContent(
                 Spacer(modifier = Modifier.height(CameraBottomSpacer))
             }
 
+            PairShotBannerAd(
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.safeDrawing),
+            )
+
             CameraSettingsSheet(
                 visible = settingsState.showPanel,
                 settingsState = settingsState,
@@ -131,6 +140,7 @@ fun CameraScreenContent(
                 onToggleNightMode = callbacks.onToggleNightMode,
                 onToggleHdr = callbacks.onToggleHdr,
                 onToggleLevel = callbacks.onToggleLevel,
+                onCycleAspectRatio = callbacks.onCycleAspectRatio,
                 onDismiss = callbacks.onDismissSettings,
             )
 

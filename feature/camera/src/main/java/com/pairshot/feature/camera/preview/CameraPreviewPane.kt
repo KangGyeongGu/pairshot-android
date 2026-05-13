@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberUpdatedState
@@ -21,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.feature.camera.component.CameraOverlayLayer
 import com.pairshot.feature.camera.component.FocusExposureOverlay
 import com.pairshot.feature.camera.component.ZoomControls
@@ -28,6 +30,16 @@ import com.pairshot.feature.camera.component.ZoomUiState
 
 private const val FALLBACK_ASPECT_WIDTH = 3f
 private const val FALLBACK_ASPECT_HEIGHT = 4f
+private const val PORTRAIT_RATIO_4_3 = 0.75f
+private const val PORTRAIT_RATIO_16_9 = 0.5625f
+private const val PORTRAIT_RATIO_1_1 = 1f
+
+private fun AspectRatio.toPortraitDisplayRatio(): Float =
+    when (this) {
+        AspectRatio.RATIO_4_3 -> PORTRAIT_RATIO_4_3
+        AspectRatio.RATIO_16_9 -> PORTRAIT_RATIO_16_9
+        AspectRatio.RATIO_1_1 -> PORTRAIT_RATIO_1_1
+    }
 
 @Composable
 internal fun CameraPreviewPane(
@@ -43,6 +55,7 @@ internal fun CameraPreviewPane(
     exposureStepNumerator: Int,
     exposureStepDenominator: Int,
     modifier: Modifier = Modifier,
+    selectedAspectRatio: AspectRatio? = null,
     onZoomRatioChanged: (Float) -> Unit,
     onPresetTapped: (Float) -> Unit,
     onDragEnd: () -> Unit,
@@ -99,20 +112,44 @@ internal fun CameraPreviewPane(
                 } else {
                     FALLBACK_ASPECT_WIDTH / FALLBACK_ASPECT_HEIGHT
                 }
-            val requestedRatioRaw =
-                surfaceRequest?.resolution?.let { size ->
-                    if (size.height > 0) {
-                        size.width.toFloat() / size.height.toFloat()
-                    } else {
-                        containerRatio
-                    }
-                } ?: containerRatio
             val requestedRatio =
-                when {
-                    requestedRatioRaw <= 0f -> containerRatio
-                    (requestedRatioRaw > 1f) != (containerRatio > 1f) -> 1f / requestedRatioRaw
-                    else -> requestedRatioRaw
+                if (selectedAspectRatio != null) {
+                    selectedAspectRatio.toPortraitDisplayRatio()
+                } else {
+                    val raw =
+                        surfaceRequest?.resolution?.let { size ->
+                            if (size.height > 0) {
+                                size.width.toFloat() / size.height.toFloat()
+                            } else {
+                                containerRatio
+                            }
+                        } ?: containerRatio
+                    when {
+                        raw <= 0f -> containerRatio
+                        (raw > 1f) != (containerRatio > 1f) -> 1f / raw
+                        else -> raw
+                    }
                 }
+
+            if (selectedAspectRatio == AspectRatio.RATIO_1_1) {
+                val maskHeight = ((maxHeight - maxWidth) / 2).coerceAtLeast(0.dp)
+                Box(
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .height(maskHeight)
+                            .background(PairShotCameraTokens.Letterbox),
+                )
+                Box(
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(maskHeight)
+                            .background(PairShotCameraTokens.Letterbox),
+                )
+            }
 
             val previewFrameModifier =
                 if (containerRatio > requestedRatio) {

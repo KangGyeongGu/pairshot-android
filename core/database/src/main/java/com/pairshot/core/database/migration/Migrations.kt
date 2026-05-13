@@ -40,3 +40,11 @@ val MIGRATION_1_2: Migration =
             db.execSQL("PRAGMA foreign_keys=ON")
         }
     }
+
+@Suppress("MagicNumber")
+val MIGRATION_2_3: Migration =
+    object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE photo_pairs ADD COLUMN aspectRatio TEXT")
+        }
+    }

@@ -9,4 +9,5 @@ data class PhotoPair(
     val status: PairStatus = PairStatus.BEFORE_ONLY,
     val zoomLevel: Float? = null,
     val hasCombined: Boolean = false,
+    val aspectRatio: AspectRatio? = null,
 )

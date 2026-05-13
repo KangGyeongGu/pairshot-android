@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.pairshot.core.domain.pair.GetLatestBeforeThumbnailUseCase
 import com.pairshot.core.domain.pair.PhotoPairRepository
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
@@ -127,6 +128,7 @@ class CameraViewModel
             tempUri: String,
             zoomLevel: Float,
         ) {
+            val currentRatio: AspectRatio = cameraSettings.state.value.aspectRatio
             viewModelScope.launch {
                 try {
                     val pairId =
@@ -141,6 +143,7 @@ class CameraViewModel
                                 tempFileUri = tempUri,
                                 zoomLevel = zoomLevel,
                                 albumId = albumId,
+                                aspectRatio = currentRatio,
                             )
                         }
                     _events.emit(CameraEvent.PhotoSaved(pairId))
@@ -189,6 +192,8 @@ class CameraViewModel
         fun toggleNightMode(): Boolean = cameraSettings.toggleNightMode(viewModelScope)
 
         fun toggleHdr(): Boolean = cameraSettings.toggleHdr(viewModelScope)
+
+        fun cycleAspectRatio(): AspectRatio? = cameraSettings.cycleAspectRatio(viewModelScope)
 
         fun setExposureIndex(index: Int) = cameraSettings.setExposureIndex(index)
 

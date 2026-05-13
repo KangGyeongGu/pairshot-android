@@ -2,6 +2,7 @@ package com.pairshot.core.infra.camera
 
 import androidx.camera.core.SurfaceRequest
 import androidx.lifecycle.LifecycleOwner
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
@@ -26,6 +27,8 @@ interface CameraSession {
     fun setNightMode(enabled: Boolean)
 
     fun setHdrMode(enabled: Boolean)
+
+    fun setAspectRatio(ratio: AspectRatio)
 
     fun startFocusAndMetering(
         x: Float,

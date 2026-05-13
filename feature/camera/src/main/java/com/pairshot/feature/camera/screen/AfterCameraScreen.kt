@@ -98,6 +98,7 @@ internal fun AfterCameraScreen(
     val roll by sensorSession.roll.collectAsStateWithLifecycle()
     val deviceOrientation by sensorSession.deviceOrientation.collectAsStateWithLifecycle()
     val surfaceRequest by cameraSession.surfaceRequest.collectAsStateWithLifecycle()
+    val lockedAspectRatio by viewModel.lockedAspectRatio.collectAsStateWithLifecycle()
 
     val currentPair = unpairedPhotos.getOrNull(currentIndex)
     val totalCount = unpairedPhotos.size
@@ -160,8 +161,14 @@ internal fun AfterCameraScreen(
         cameraSession.setFlash(initial.flashMode)
         cameraSession.setNightMode(initial.nightModeEnabled)
         cameraSession.setHdrMode(initial.hdrEnabled)
+        cameraSession.setAspectRatio(initial.aspectRatio)
         sensorSession.bind(lifecycleOwner)
         cameraSession.bind(lifecycleOwner)
+    }
+
+    LaunchedEffect(lockedAspectRatio) {
+        viewModel.applyLockedAspectRatio(lockedAspectRatio)
+        if (lockedAspectRatio != null) cameraSession.setAspectRatio(lockedAspectRatio!!)
     }
 
     LaunchedEffect(cameraSession) {
@@ -269,7 +276,6 @@ internal fun AfterCameraScreen(
                         .fillMaxSize()
                         .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
-                PairShotBannerAd(modifier = Modifier.fillMaxWidth())
                 CameraPreviewPane(
                     surfaceRequest = surfaceRequest,
                     zoomUiState = zoomUiState,
@@ -282,6 +288,7 @@ internal fun AfterCameraScreen(
                     currentExposureIndex = settingsState.exposureIndex,
                     exposureStepNumerator = capabilities.exposureStepNumerator,
                     exposureStepDenominator = capabilities.exposureStepDenominator,
+                    selectedAspectRatio = settingsState.aspectRatio,
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     onZoomRatioChanged = { newRatio ->
                         viewModel.updateZoomRatio(newRatio)
@@ -369,6 +376,14 @@ internal fun AfterCameraScreen(
                 Spacer(modifier = Modifier.height(bottomSpacerHeight))
             }
 
+            PairShotBannerAd(
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.safeDrawing),
+            )
+
             CameraSettingsSheet(
                 visible = settingsState.showPanel,
                 settingsState = settingsState,
@@ -389,6 +404,10 @@ internal fun AfterCameraScreen(
                     if (next) cameraSession.setNightMode(false)
                 },
                 onToggleLevel = viewModel::toggleLevel,
+                onCycleAspectRatio = {
+                    val next = viewModel.cycleAspectRatio()
+                    if (next != null) cameraSession.setAspectRatio(next)
+                },
                 onDismiss = viewModel::dismissSettingsPanel,
                 overlayEnabled = overlayEnabled,
                 onToggleOverlay = viewModel::toggleOverlay,

@@ -58,6 +58,7 @@ internal fun CameraScreen(
         cameraSession.setFlash(initial.flashMode)
         cameraSession.setNightMode(initial.nightModeEnabled)
         cameraSession.setHdrMode(initial.hdrEnabled)
+        cameraSession.setAspectRatio(initial.aspectRatio)
         sensorSession.bind(lifecycleOwner)
         cameraSession.bind(lifecycleOwner)
     }
@@ -191,6 +192,10 @@ internal fun CameraScreen(
                 if (next) cameraSession.setNightMode(false)
             },
             onToggleLevel = viewModel::toggleLevel,
+            onCycleAspectRatio = {
+                val next = viewModel.cycleAspectRatio()
+                if (next != null) cameraSession.setAspectRatio(next)
+            },
             onDismissSettings = viewModel::dismissSettingsPanel,
         )
 

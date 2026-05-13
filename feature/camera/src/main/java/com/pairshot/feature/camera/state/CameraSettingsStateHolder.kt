@@ -1,6 +1,7 @@
 package com.pairshot.feature.camera.state
 
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import kotlinx.coroutines.CoroutineScope
@@ -19,8 +20,9 @@ class CameraSettingsStateHolder
         private val _state = MutableStateFlow(CameraSettingsState())
         val state: StateFlow<CameraSettingsState> = _state.asStateFlow()
 
-        suspend fun loadInitial(): InitialCameraSessionConfig {
+        suspend fun loadInitial(lockedRatio: AspectRatio? = null): InitialCameraSessionConfig {
             val settings = appSettingsRepository.getCurrent()
+            val resolvedRatio = lockedRatio ?: settings.cameraAspectRatio
             val initial =
                 CameraSettingsState(
                     gridEnabled = settings.cameraGridEnabled,
@@ -30,12 +32,15 @@ class CameraSettingsStateHolder
                             .getOrDefault(FlashMode.OFF),
                     nightModeEnabled = settings.cameraNightModeEnabled,
                     hdrEnabled = settings.cameraHdrEnabled,
+                    aspectRatio = resolvedRatio,
+                    aspectRatioLocked = lockedRatio != null,
                 )
             _state.value = initial
             return InitialCameraSessionConfig(
                 flashMode = initial.flashMode,
                 nightModeEnabled = initial.nightModeEnabled,
                 hdrEnabled = initial.hdrEnabled,
+                aspectRatio = initial.aspectRatio,
             )
         }
 
@@ -72,6 +77,29 @@ class CameraSettingsStateHolder
                     hdrEnabled = if (next) false else it.hdrEnabled,
                 )
             }
+            persist(scope)
+            return next
+        }
+
+        fun applyLockedAspectRatio(ratio: AspectRatio?) {
+            _state.update {
+                if (ratio == null) {
+                    it.copy(aspectRatioLocked = false)
+                } else {
+                    it.copy(aspectRatio = ratio, aspectRatioLocked = true)
+                }
+            }
+        }
+
+        fun cycleAspectRatio(scope: CoroutineScope): AspectRatio? {
+            if (_state.value.aspectRatioLocked) return null
+            val next =
+                when (_state.value.aspectRatio) {
+                    AspectRatio.RATIO_4_3 -> AspectRatio.RATIO_16_9
+                    AspectRatio.RATIO_16_9 -> AspectRatio.RATIO_1_1
+                    AspectRatio.RATIO_1_1 -> AspectRatio.RATIO_4_3
+                }
+            _state.update { it.copy(aspectRatio = next) }
             persist(scope)
             return next
         }
@@ -130,6 +158,9 @@ class CameraSettingsStateHolder
                 appSettingsRepository.updateCameraFlashMode(snapshot.flashMode.name)
                 appSettingsRepository.updateCameraNightMode(snapshot.nightModeEnabled)
                 appSettingsRepository.updateCameraHdr(snapshot.hdrEnabled)
+                if (!snapshot.aspectRatioLocked) {
+                    appSettingsRepository.updateCameraAspectRatio(snapshot.aspectRatio)
+                }
             }
         }
     }

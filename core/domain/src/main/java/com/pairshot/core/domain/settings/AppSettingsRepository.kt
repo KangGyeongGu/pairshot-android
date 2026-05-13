@@ -1,6 +1,7 @@
 package com.pairshot.core.domain.settings
 
 import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportPreset
 import com.pairshot.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,8 @@ interface AppSettingsRepository {
     suspend fun updateCameraNightMode(enabled: Boolean)
 
     suspend fun updateCameraHdr(enabled: Boolean)
+
+    suspend fun updateCameraAspectRatio(ratio: AspectRatio)
 
     suspend fun getLastExportPreset(): ExportPreset
 

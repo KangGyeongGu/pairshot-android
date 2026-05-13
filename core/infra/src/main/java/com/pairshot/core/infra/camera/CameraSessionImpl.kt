@@ -2,6 +2,7 @@ package com.pairshot.core.infra.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
@@ -16,6 +17,8 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.core.SurfaceRequest
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.extensions.ExtensionMode
 import androidx.camera.extensions.ExtensionsManager
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -24,6 +27,7 @@ import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.pairshot.core.infra.sensor.SensorSession
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
@@ -47,6 +51,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -77,11 +82,7 @@ class CameraSessionImpl
         private var camera: Camera? = null
         private var owner: LifecycleOwner? = null
 
-        private val imageCapture: ImageCapture =
-            ImageCapture
-                .Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build()
+        private var imageCapture: ImageCapture = buildImageCapture(AspectRatio.RATIO_4_3)
 
         private val shutterSoundPlayer = ShutterSoundPlayer(context)
 
@@ -90,6 +91,7 @@ class CameraSessionImpl
         private var nightModeEnabled: Boolean = false
         private var hdrEnabled: Boolean = false
         private var exposureIndex: Int = 0
+        private var aspectRatio: AspectRatio = AspectRatio.RATIO_4_3
 
         private var extensionsJob: Job? = null
         private var focusJob: Job? = null
@@ -160,7 +162,12 @@ class CameraSessionImpl
                     }
                 }
 
-            val preview = Preview.Builder().build()
+            val previewResolutionSelector = buildResolutionSelector(aspectRatio)
+            val preview =
+                Preview
+                    .Builder()
+                    .setResolutionSelector(previewResolutionSelector)
+                    .build()
             preview.setSurfaceProvider { request -> _surfaceRequest.value = request }
 
             applyFlashModeToImageCapture(flashMode)
@@ -248,6 +255,12 @@ class CameraSessionImpl
                                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                                     val uri =
                                         outputFileResults.savedUri ?: Uri.fromFile(tempFile)
+                                    if (aspectRatio == AspectRatio.RATIO_1_1) {
+                                        runCatching { cropSquareInPlace(tempFile) }
+                                            .onFailure { error ->
+                                                Timber.w(error, "1:1 center crop failed; keeping 4:3 capture")
+                                            }
+                                    }
                                     cont.resume(uri.toString())
                                 }
                             },
@@ -311,6 +324,13 @@ class CameraSessionImpl
             hdrEnabled = enabled
             if (enabled) nightModeEnabled = false
             scheduleRebind(debounceMs = EXTENSIONS_DEBOUNCE_MS)
+        }
+
+        override fun setAspectRatio(ratio: AspectRatio) {
+            if (aspectRatio == ratio) return
+            aspectRatio = ratio
+            imageCapture = buildImageCapture(ratio)
+            scheduleRebind(debounceMs = 0L)
         }
 
         override fun startFocusAndMetering(
@@ -420,11 +440,49 @@ class CameraSessionImpl
             scope.cancel()
         }
 
+        private fun buildImageCapture(ratio: AspectRatio): ImageCapture =
+            ImageCapture
+                .Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setResolutionSelector(buildResolutionSelector(ratio))
+                .build()
+
+        private fun buildResolutionSelector(ratio: AspectRatio): ResolutionSelector {
+            val strategy =
+                when (ratio) {
+                    AspectRatio.RATIO_4_3, AspectRatio.RATIO_1_1 ->
+                        AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
+                    AspectRatio.RATIO_16_9 ->
+                        AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
+                }
+            return ResolutionSelector
+                .Builder()
+                .setAspectRatioStrategy(strategy)
+                .build()
+        }
+
+        private fun cropSquareInPlace(file: File) {
+            val source = BitmapFactory.decodeFile(file.absolutePath) ?: return
+            val side = minOf(source.width, source.height)
+            val offsetX = (source.width - side) / 2
+            val offsetY = (source.height - side) / 2
+            val cropped = Bitmap.createBitmap(source, offsetX, offsetY, side, side)
+            try {
+                FileOutputStream(file).use { out ->
+                    cropped.compress(Bitmap.CompressFormat.JPEG, JPEG_CROP_QUALITY, out)
+                }
+            } finally {
+                if (cropped !== source) cropped.recycle()
+                source.recycle()
+            }
+        }
+
         companion object {
             private const val EXTENSIONS_DEBOUNCE_MS = 300L
             private const val FOCUS_DEBOUNCE_MS = 200L
             private const val OVERLAY_IN_SAMPLE_SIZE = 2
             private const val DEFAULT_SENSOR_ORIENTATION_DEGREES = 90
             private const val FOCUS_AUTO_CANCEL_SECONDS = 3L
+            private const val JPEG_CROP_QUALITY = 95
         }
     }

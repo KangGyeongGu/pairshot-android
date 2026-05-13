@@ -11,6 +11,7 @@ import com.pairshot.core.database.entity.toEntity
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.pair.PrunePairResult
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.rendering.FileNameGenerator
@@ -153,6 +154,7 @@ class PhotoPairRepositoryImpl
             tempFileUri: String,
             zoomLevel: Float?,
             albumId: Long?,
+            aspectRatio: AspectRatio?,
         ): Long =
             withContext(Dispatchers.IO) {
                 try {
@@ -174,6 +176,7 @@ class PhotoPairRepositoryImpl
                             beforeTimestamp = System.currentTimeMillis(),
                             status = PairStatus.BEFORE_ONLY.name,
                             zoomLevel = zoomLevel,
+                            aspectRatio = aspectRatio?.name,
                         )
                     try {
                         val pairId = photoPairDao.insert(entity)
