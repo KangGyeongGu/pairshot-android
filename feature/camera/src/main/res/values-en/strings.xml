@@ -30,6 +30,7 @@
     <string name="camera_settings_night_mode">Night mode</string>
     <string name="camera_settings_overlay">Overlay</string>
     <string name="camera_settings_level">Level</string>
+    <string name="camera_settings_aspect_ratio">Ratio</string>
     <string name="camera_settings_overlay_opacity">Overlay opacity</string>
     <string name="camera_settings_overlay_opacity_hint">75%% or lower recommended</string>
     <string name="camera_settings_sort">Preview</string>

@@ -1,5 +1,6 @@
 package com.pairshot.feature.camera.state
 
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.FlashMode
 
 data class CameraSettingsState(
@@ -10,4 +11,6 @@ data class CameraSettingsState(
     val hdrEnabled: Boolean = false,
     val exposureIndex: Int = 0,
     val showPanel: Boolean = false,
+    val aspectRatio: AspectRatio = AspectRatio.RATIO_4_3,
+    val aspectRatioLocked: Boolean = false,
 )

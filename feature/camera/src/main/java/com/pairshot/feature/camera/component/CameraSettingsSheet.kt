@@ -66,6 +66,7 @@ import com.pairshot.core.designsystem.PairShotGlassTokens
 import com.pairshot.core.designsystem.PairShotMotionTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTypographyTokens
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.SortOrder
@@ -85,6 +86,7 @@ fun CameraSettingsSheet(
     onToggleNightMode: () -> Unit,
     onToggleHdr: () -> Unit,
     onToggleLevel: () -> Unit,
+    onCycleAspectRatio: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     overlayEnabled: Boolean? = null,
@@ -145,6 +147,7 @@ fun CameraSettingsSheet(
                         onToggleNightMode = onToggleNightMode,
                         onToggleHdr = onToggleHdr,
                         onToggleLevel = onToggleLevel,
+                        onCycleAspectRatio = onCycleAspectRatio,
                         overlayEnabled = overlayEnabled,
                         onToggleOverlay = onToggleOverlay,
                         sortOrder = sortOrder,
@@ -163,8 +166,10 @@ fun CameraSettingsSheet(
                             rowItems.forEach { item ->
                                 SettingIconItem(
                                     icon = item.icon,
+                                    iconText = item.iconText,
                                     label = item.label,
                                     isActive = item.isActive,
+                                    isEnabled = item.isEnabled,
                                     onClick = item.onClick,
                                     iconFlippedVertical = item.iconFlippedVertical,
                                     modifier = Modifier.weight(1f),
@@ -191,11 +196,13 @@ fun CameraSettingsSheet(
 }
 
 private data class SettingItem(
-    val icon: ImageVector,
+    val icon: ImageVector?,
     val label: String,
     val isActive: Boolean,
     val onClick: () -> Unit,
     val iconFlippedVertical: Boolean = false,
+    val iconText: String? = null,
+    val isEnabled: Boolean = true,
 )
 
 @Composable
@@ -207,6 +214,7 @@ private fun buildSettingItems(
     onToggleNightMode: () -> Unit,
     onToggleHdr: () -> Unit,
     onToggleLevel: () -> Unit,
+    onCycleAspectRatio: () -> Unit,
     overlayEnabled: Boolean? = null,
     onToggleOverlay: (() -> Unit)? = null,
     sortOrder: SortOrder? = null,
@@ -283,6 +291,23 @@ private fun buildSettingItems(
         ),
     )
 
+    val ratioText =
+        when (state.aspectRatio) {
+            AspectRatio.RATIO_4_3 -> "4:3"
+            AspectRatio.RATIO_16_9 -> "16:9"
+            AspectRatio.RATIO_1_1 -> "1:1"
+        }
+    items.add(
+        SettingItem(
+            icon = null,
+            iconText = ratioText,
+            label = stringResource(R.string.camera_settings_aspect_ratio),
+            isActive = true,
+            isEnabled = !state.aspectRatioLocked,
+            onClick = onCycleAspectRatio,
+        ),
+    )
+
     if (sortOrder != null && onToggleSortOrder != null) {
         items.add(
             SettingItem(
@@ -300,16 +325,18 @@ private fun buildSettingItems(
 
 @Composable
 private fun SettingIconItem(
-    icon: ImageVector,
+    icon: ImageVector?,
     label: String,
     isActive: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    iconText: String? = null,
+    isEnabled: Boolean = true,
     iconFlippedVertical: Boolean = false,
 ) {
     val haptic = LocalHapticFeedback.current
-    Column(
-        modifier =
+    val clickableModifier =
+        if (isEnabled) {
             modifier.clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
@@ -317,7 +344,18 @@ private fun SettingIconItem(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onClick()
                 },
-            ),
+            )
+        } else {
+            modifier
+        }
+    val effectiveTint =
+        when {
+            !isEnabled -> PairShotCameraTokens.Foreground.copy(alpha = 0.30f)
+            isActive -> MaterialTheme.colorScheme.primary
+            else -> PairShotCameraTokens.Foreground.copy(alpha = 0.55f)
+        }
+    Column(
+        modifier = clickableModifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -327,7 +365,7 @@ private fun SettingIconItem(
                     .size(48.dp)
                     .clip(CircleShape)
                     .background(
-                        if (isActive) {
+                        if (isEnabled && isActive) {
                             PairShotCameraTokens.Foreground.copy(alpha = 0.18f)
                         } else {
                             Color.Transparent
@@ -335,20 +373,28 @@ private fun SettingIconItem(
                     ),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier =
-                    Modifier
-                        .size(24.dp)
-                        .graphicsLayer(scaleY = if (iconFlippedVertical) -1f else 1f),
-                tint = if (isActive) MaterialTheme.colorScheme.primary else PairShotCameraTokens.Foreground.copy(alpha = 0.55f),
-            )
+            if (iconText != null) {
+                Text(
+                    text = iconText,
+                    style = PairShotTypographyTokens.labelExtraSmall,
+                    color = effectiveTint,
+                )
+            } else if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .graphicsLayer(scaleY = if (iconFlippedVertical) -1f else 1f),
+                    tint = effectiveTint,
+                )
+            }
         }
         Text(
             text = label,
             style = PairShotTypographyTokens.labelExtraSmall,
-            color = if (isActive) MaterialTheme.colorScheme.primary else PairShotCameraTokens.Foreground.copy(alpha = 0.55f),
+            color = effectiveTint,
         )
     }
 }

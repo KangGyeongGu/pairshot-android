@@ -9,6 +9,7 @@ import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.pair.GetLatestBeforeThumbnailUseCase
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
@@ -64,6 +65,7 @@ data class OverlayInputs(
 )
 
 @HiltViewModel
+@Suppress("TooManyFunctions")
 class AfterCameraViewModel
     @Inject
     constructor(
@@ -218,6 +220,11 @@ class AfterCameraViewModel
             )
 
         val settingsState: StateFlow<CameraSettingsState> = cameraSettings.state
+
+        val lockedAspectRatio: StateFlow<AspectRatio?> =
+            combine(unpairedPhotos, _currentIndex) { photos, idx ->
+                photos.getOrNull(idx)?.aspectRatio
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS), null)
 
         private val _events = MutableSharedFlow<AfterCameraEvent>()
         val events: SharedFlow<AfterCameraEvent> = _events.asSharedFlow()
@@ -383,6 +390,10 @@ class AfterCameraViewModel
         fun toggleNightMode(): Boolean = cameraSettings.toggleNightMode(viewModelScope)
 
         fun toggleHdr(): Boolean = cameraSettings.toggleHdr(viewModelScope)
+
+        fun applyLockedAspectRatio(ratio: AspectRatio?) = cameraSettings.applyLockedAspectRatio(ratio)
+
+        fun cycleAspectRatio(): AspectRatio? = cameraSettings.cycleAspectRatio(viewModelScope)
 
         fun setExposureIndex(index: Int) = cameraSettings.setExposureIndex(index)
 
