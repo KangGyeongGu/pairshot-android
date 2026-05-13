@@ -1,9 +1,29 @@
+import java.util.Properties
+
 plugins {
     id("pairshot.android.feature")
 }
 
+val localProperties =
+    Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) load(file.inputStream())
+    }
+
 android {
     namespace = "com.pairshot.feature.settings"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField(
+            "String",
+            "PRIVACY_POLICY_URL",
+            "\"${localProperties.getProperty("PRIVACY_POLICY_URL") ?: ""}\"",
+        )
+    }
 }
 
 dependencies {
