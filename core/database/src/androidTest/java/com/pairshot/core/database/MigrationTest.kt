@@ -4,8 +4,10 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.pairshot.core.database.migration.MIGRATION_1_2
+import com.pairshot.core.database.migration.MIGRATION_2_3
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -109,6 +111,37 @@ class MigrationTest {
             db.query("SELECT count(*) FROM export_history WHERE pairId = 10").use { c ->
                 c.moveToFirst()
                 assertEquals(1, c.getInt(0))
+            }
+        }
+    }
+
+    /**
+     * v2 -> v3 adds nullable aspectRatio column. Schema validation must pass and existing
+     * rows must remain readable with aspectRatio defaulting to NULL.
+     */
+    @Test
+    fun migrate_2_to_3_validatesSchema() {
+        helper.createDatabase(dbName, 2).close()
+        helper.runMigrationsAndValidate(dbName, 3, true, MIGRATION_2_3).close()
+    }
+
+    @Test
+    fun migrate_2_to_3_preservesRowsWithNullAspectRatio() {
+        helper.createDatabase(dbName, 2).use { db ->
+            db.execSQL(
+                """
+                INSERT INTO photo_pairs (id, beforePhotoUri, afterPhotoUri, beforeTimestamp, afterTimestamp, status, zoomLevel)
+                VALUES (1, 'content://media/1', 'content://media/2', 1700000000000, 1700000060000, 'PAIRED', 1.0)
+                """.trimIndent(),
+            )
+        }
+        helper.runMigrationsAndValidate(dbName, 3, true, MIGRATION_2_3).use { db ->
+            db.query("SELECT id, beforePhotoUri, aspectRatio FROM photo_pairs WHERE id = 1").use { c ->
+                assertTrue(c.moveToNext())
+                assertEquals(1L, c.getLong(0))
+                assertEquals("content://media/1", c.getString(1))
+                assertNull(c.getString(2))
+                assertFalse(c.moveToNext())
             }
         }
     }

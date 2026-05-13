@@ -3,6 +3,7 @@ package com.pairshot.core.data.repository
 import com.pairshot.core.datastore.AppPreferences
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
 import com.pairshot.core.model.SortOrder
@@ -32,6 +33,8 @@ class AppSettingsRepositoryImpl
                 )
             }
 
+        // 6개 Flow 를 vararg combine 로 묶으면 Boolean / String 혼합으로 인한 타입 추론 경고가
+        // 나오므로 5-arg combine 결과를 마지막 한 Flow 와 다시 combine 해서 chain 형식 사용.
         private val cameraSettingsFlow: Flow<AppSettings> =
             combine(
                 appPreferences.cameraGridEnabled,
@@ -47,6 +50,8 @@ class AppSettingsRepositoryImpl
                     cameraNightModeEnabled = night,
                     cameraHdrEnabled = hdr,
                 )
+            }.combine(appPreferences.cameraAspectRatio) { partial, ratioName ->
+                partial.copy(cameraAspectRatio = ratioName.toAspectRatio())
             }
 
         override val settingsFlow: Flow<AppSettings> =
@@ -57,6 +62,7 @@ class AppSettingsRepositoryImpl
                     cameraFlashMode = camera.cameraFlashMode,
                     cameraNightModeEnabled = camera.cameraNightModeEnabled,
                     cameraHdrEnabled = camera.cameraHdrEnabled,
+                    cameraAspectRatio = camera.cameraAspectRatio,
                 )
             }
 
@@ -79,6 +85,8 @@ class AppSettingsRepositoryImpl
         override suspend fun updateCameraNightMode(enabled: Boolean) = appPreferences.setCameraNightMode(enabled)
 
         override suspend fun updateCameraHdr(enabled: Boolean) = appPreferences.setCameraHdr(enabled)
+
+        override suspend fun updateCameraAspectRatio(ratio: AspectRatio) = appPreferences.setCameraAspectRatio(ratio.name)
 
         override suspend fun getLastExportPreset(): ExportPreset {
             val format = appPreferences.exportFormat.first()
@@ -119,3 +127,6 @@ class AppSettingsRepositoryImpl
     }
 
 private fun String.toSortOrder(): SortOrder = runCatching { SortOrder.valueOf(this) }.getOrDefault(SortOrder.DESC)
+
+private fun String.toAspectRatio(): AspectRatio =
+    runCatching { AspectRatio.valueOf(this) }.getOrDefault(AspectRatio.RATIO_4_3)

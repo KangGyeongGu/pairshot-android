@@ -10,4 +10,5 @@ data class AppSettings(
     val cameraFlashMode: String = "OFF",
     val cameraNightModeEnabled: Boolean = false,
     val cameraHdrEnabled: Boolean = false,
+    val cameraAspectRatio: AspectRatio = AspectRatio.RATIO_4_3,
 )

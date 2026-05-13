@@ -19,7 +19,7 @@ import com.pairshot.core.database.entity.PhotoPairEntity
         PairAlbumCrossRefEntity::class,
         ExportHistoryEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

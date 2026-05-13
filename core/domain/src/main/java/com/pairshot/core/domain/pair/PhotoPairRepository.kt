@@ -1,5 +1,6 @@
 package com.pairshot.core.domain.pair
 
+import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.PhotoPair
 import kotlinx.coroutines.flow.Flow
 
@@ -24,6 +25,7 @@ interface PhotoPairRepository {
         tempFileUri: String,
         zoomLevel: Float?,
         albumId: Long? = null,
+        aspectRatio: AspectRatio? = null,
     ): Long
 
     suspend fun saveAfterPhoto(

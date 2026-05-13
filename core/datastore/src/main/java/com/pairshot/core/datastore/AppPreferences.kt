@@ -40,6 +40,7 @@ class AppPreferences
             val CAMERA_FLASH_MODE = stringPreferencesKey("camera_flash_mode")
             val CAMERA_NIGHT_MODE = booleanPreferencesKey("camera_night_mode")
             val CAMERA_HDR = booleanPreferencesKey("camera_hdr")
+            val CAMERA_ASPECT_RATIO = stringPreferencesKey("camera_aspect_ratio")
             val EXPORT_FORMAT = stringPreferencesKey("export_format")
             val EXPORT_INCLUDE_BEFORE = booleanPreferencesKey("export_include_before")
             val EXPORT_INCLUDE_AFTER = booleanPreferencesKey("export_include_after")
@@ -119,6 +120,11 @@ class AppPreferences
                 prefs[Keys.CAMERA_HDR] ?: false
             }
 
+        val cameraAspectRatio: Flow<String> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.CAMERA_ASPECT_RATIO] ?: "RATIO_4_3"
+            }
+
         suspend fun setCameraGridEnabled(enabled: Boolean) {
             context.appDataStore.edit { prefs ->
                 prefs[Keys.CAMERA_GRID_ENABLED] = enabled
@@ -146,6 +152,12 @@ class AppPreferences
         suspend fun setCameraHdr(enabled: Boolean) {
             context.appDataStore.edit { prefs ->
                 prefs[Keys.CAMERA_HDR] = enabled
+            }
+        }
+
+        suspend fun setCameraAspectRatio(ratio: String) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.CAMERA_ASPECT_RATIO] = ratio
             }
         }
 

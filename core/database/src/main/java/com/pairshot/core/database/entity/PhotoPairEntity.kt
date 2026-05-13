@@ -12,4 +12,5 @@ data class PhotoPairEntity(
     val afterTimestamp: Long? = null,
     val status: String = "BEFORE_ONLY",
     val zoomLevel: Float? = null,
+    val aspectRatio: String? = null,
 )
