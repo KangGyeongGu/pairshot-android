@@ -113,6 +113,8 @@ fun SettingsScreen(
     onOverlayEnabledChange: (Boolean) -> Unit,
     onOverlayAlphaChange: (Float) -> Unit,
     snackbarController: PairShotSnackbarController,
+    showAdsConsent: Boolean,
+    onAdsConsentClick: () -> Unit,
     highlight: SettingsHighlight? = null,
     proSubscriptionSection: @Composable () -> Unit = {},
 ) {
@@ -499,6 +501,13 @@ fun SettingsScreen(
                                         trailing = themeLabel,
                                         onClick = { showThemeDialog = true },
                                     )
+                                    if (showAdsConsent) {
+                                        SettingsDivider()
+                                        SettingsItem(
+                                            label = stringResource(R.string.settings_item_ads_consent),
+                                            onClick = onAdsConsentClick,
+                                        )
+                                    }
                                 }
                             }
 

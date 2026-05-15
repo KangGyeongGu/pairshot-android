@@ -18,6 +18,9 @@
 
     <!-- Theme -->
     <string name="settings_item_theme">System theme</string>
+
+    <!-- Ads consent (UMP) -->
+    <string name="settings_item_ads_consent">Manage ad consent</string>
     <string name="settings_dialog_theme_title">Select theme</string>
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light</string>

@@ -5,6 +5,7 @@ import com.pairshot.core.ads.controller.FullscreenAdState
 import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.NativeAdPool
 import com.pairshot.core.ads.controller.RewardedAdController
+import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
 import com.pairshot.core.domain.entitlement.ProEntitlementProvider
 import dagger.hilt.EntryPoint
@@ -16,6 +17,8 @@ import javax.inject.Provider
 @InstallIn(SingletonComponent::class)
 interface AdsEntryPoint {
     fun adsConfig(): AdsConfig
+
+    fun adsInitializer(): AdsInitializer
 
     fun proEntitlementProvider(): ProEntitlementProvider
 

@@ -18,6 +18,9 @@
 
     <!-- Theme -->
     <string name="settings_item_theme">시스템 테마</string>
+
+    <!-- Ads consent (UMP) -->
+    <string name="settings_item_ads_consent">광고 동의 변경</string>
     <string name="settings_dialog_theme_title">테마 선택</string>
     <string name="settings_theme_system">시스템 기본값</string>
     <string name="settings_theme_light">라이트</string>

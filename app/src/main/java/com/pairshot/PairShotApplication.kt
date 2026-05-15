@@ -8,7 +8,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.pairshot.core.ads.controller.AppOpenAdController
 import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.RewardedAdController
-import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.lifecycle.AppOpenAdLifecycleObserver
 import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.coupon.domain.CouponRepository
@@ -29,9 +28,6 @@ import javax.inject.Inject
 class PairShotApplication : Application() {
     @Inject
     lateinit var appSettingsRepository: AppSettingsRepository
-
-    @Inject
-    lateinit var adsInitializer: AdsInitializer
 
     @Inject
     lateinit var interstitialAdController: InterstitialAdController
@@ -66,7 +62,6 @@ class PairShotApplication : Application() {
             val name = appSettingsRepository.appThemeNameFlow.first()
             AppTheme.fromName(name).apply()
         }
-        adsInitializer.initialize(this)
         interstitialAdController.preload()
         rewardedAdController.preload()
         appOpenAdController.preload()

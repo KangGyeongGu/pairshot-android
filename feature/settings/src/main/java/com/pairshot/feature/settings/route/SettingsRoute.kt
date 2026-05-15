@@ -77,8 +77,10 @@ fun SettingsRoute(
     val rewardedAdController = remember(entryPoint) { entryPoint.rewardedAdController() }
     val settingsPremiumGate = remember(entryPoint) { entryPoint.settingsPremiumGate() }
     val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
+    val adsInitializer = remember(entryPoint) { entryPoint.adsInitializer() }
     val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
     val isAdFree by isActiveFlow.collectAsStateWithLifecycle(initialValue = false)
+    val showAdsConsent by adsInitializer.privacyOptionsRequired.collectAsStateWithLifecycle()
 
     var showCouponDialog by remember { mutableStateOf(false) }
     var showRewardedGateDialog by remember { mutableStateOf<PremiumFeature?>(null) }
@@ -216,6 +218,23 @@ fun SettingsRoute(
         onOverlayEnabledChange = viewModel::updateOverlayEnabled,
         onOverlayAlphaChange = viewModel::updateOverlayAlpha,
         snackbarController = snackbarController,
+        showAdsConsent = showAdsConsent,
+        onAdsConsentClick = {
+            activity?.let { act ->
+                adsInitializer.showPrivacyOptionsForm(act) { error ->
+                    if (error != null) {
+                        snackbarScope.launch {
+                            snackbarController.show(
+                                SnackbarEvent(
+                                    UiText.Resource(R.string.settings_pro_manage_failed),
+                                    SnackbarVariant.ERROR,
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+        },
         proSubscriptionSection = {
             ProSubscriptionSection(
                 entitlement = subscriptionState.entitlement,

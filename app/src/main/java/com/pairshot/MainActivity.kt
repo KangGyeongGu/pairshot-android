@@ -34,6 +34,7 @@ import com.pairshot.app.navigation.StartupDecisionViewModel
 import com.pairshot.app.navigation.effect.ExportShareEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
 import com.pairshot.core.ui.component.PairShotSnackbar
@@ -43,12 +44,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val SELECTION_MESSAGE_AUTO_DISMISS_MS = 2500L
 private const val SNACKBAR_OFFSET_WHEN_PROGRESS_DP = 80
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var adsInitializer: AdsInitializer
+
     private lateinit var jankStats: JankStats
     private var onStartupReady: (() -> Unit)? = null
 
@@ -58,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         splash.setKeepOnScreenCondition { !startupReady }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        adsInitializer.initialize(this)
         this.onStartupReady = { startupReady = true }
 
         val metricsStateHolder = PerformanceMetricsState.getHolderForHierarchy(window.decorView)
