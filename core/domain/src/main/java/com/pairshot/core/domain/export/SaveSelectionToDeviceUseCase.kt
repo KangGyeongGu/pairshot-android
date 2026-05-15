@@ -1,5 +1,7 @@
 package com.pairshot.core.domain.export
 
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
@@ -23,6 +25,7 @@ class SaveSelectionToDeviceUseCase
     @Inject
     constructor(
         private val exportRepository: ExportRepository,
+        private val entitlementProvider: ProEntitlementProvider,
     ) {
         suspend operator fun invoke(
             pairIds: List<Long>,
@@ -34,12 +37,20 @@ class SaveSelectionToDeviceUseCase
             require(pairIds.isNotEmpty()) { "no pairs to export" }
 
             val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig()
+            val effectiveFormat = enforceProFormat(preset.format)
 
-            return when (preset.format) {
+            return when (effectiveFormat) {
                 ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
                 ExportFormat.INDIVIDUAL -> saveIndividuals(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
             }
         }
+
+        private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
+            if (format == ExportFormat.ZIP && !entitlementProvider.current().isPaidSubscriber) {
+                ExportFormat.INDIVIDUAL
+            } else {
+                format
+            }
 
         private suspend fun saveZip(
             pairIds: List<Long>,

@@ -7,6 +7,8 @@ import com.pairshot.core.domain.album.CreateAlbumUseCase
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.PhotoPairRepository
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -73,6 +76,7 @@ sealed interface HomeEvent {
 }
 
 @HiltViewModel
+@Suppress("LongParameterList")
 class HomeViewModel
     @Inject
     constructor(
@@ -87,7 +91,18 @@ class HomeViewModel
         private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
         private val locationProvider: LocationProvider,
         private val appSettingsRepository: AppSettingsRepository,
+        entitlementProvider: ProEntitlementProvider,
     ) : ViewModel() {
+        val isProSubscriber: StateFlow<Boolean> =
+            entitlementProvider
+                .observe()
+                .map { it.isPaidSubscriber }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                    initialValue = false,
+                )
+
         private val _isRefreshing = MutableStateFlow(false)
         val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 

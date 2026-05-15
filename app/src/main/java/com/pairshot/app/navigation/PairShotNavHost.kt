@@ -200,6 +200,9 @@ fun PairShotNavHost(
                 onNavigateToCombineSettings = {
                     navController.navigate(Settings(highlight = SettingsHighlight.COMBINE))
                 },
+                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
+                onShare = onShareSelected,
+                onSaveToDevice = onSaveSelectedToDevice,
             )
         }
         composable<Settings> {
@@ -221,11 +224,13 @@ fun PairShotNavHost(
         composable<WatermarkSettings> {
             WatermarkSettingsRoute(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
             )
         }
         composable<CombineSettings> {
             CombineSettingsRoute(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
             )
         }
     }

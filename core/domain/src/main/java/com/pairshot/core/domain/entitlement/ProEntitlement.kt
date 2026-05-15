@@ -7,3 +7,6 @@ data class ProEntitlement(
 )
 
 enum class EntitlementSource { NONE, COUPON, SUBSCRIPTION }
+
+val ProEntitlement.isPaidSubscriber: Boolean
+    get() = source == EntitlementSource.SUBSCRIPTION

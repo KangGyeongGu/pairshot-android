@@ -2,6 +2,8 @@ package com.pairshot.feature.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.domain.settings.AppInfo
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.ClearCacheUseCase
@@ -57,7 +59,18 @@ class SettingsViewModel
         private val watermarkRepository: WatermarkRepository,
         private val appSettingsRepository: AppSettingsRepository,
         private val appInfo: AppInfo,
+        entitlementProvider: ProEntitlementProvider,
     ) : ViewModel() {
+        val isProSubscriber: StateFlow<Boolean> =
+            entitlementProvider
+                .observe()
+                .map { it.isPaidSubscriber }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                    initialValue = false,
+                )
+
         private val _storageState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
 
         val uiState: StateFlow<SettingsUiState> =

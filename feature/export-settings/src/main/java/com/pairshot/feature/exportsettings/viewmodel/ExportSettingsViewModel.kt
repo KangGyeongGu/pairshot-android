@@ -4,10 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.navigation.ExportSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,15 +29,28 @@ class ExportSettingsViewModel
         savedStateHandle: SavedStateHandle,
         private val appSettingsRepository: AppSettingsRepository,
         private val watermarkRepository: WatermarkRepository,
+        entitlementProvider: ProEntitlementProvider,
     ) : ViewModel() {
         val pairIds: String = savedStateHandle.toRoute<ExportSettings>().pairIds
 
         private val _preset = MutableStateFlow(ExportPreset())
         val preset: StateFlow<ExportPreset> = _preset.asStateFlow()
 
+        val isProSubscriber: StateFlow<Boolean> =
+            entitlementProvider
+                .observe()
+                .map { it.isPaidSubscriber }
+                .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+        val watermarkConfig: StateFlow<WatermarkConfig> =
+            watermarkRepository.watermarkConfigFlow.stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                WatermarkConfig(),
+            )
+
         val applyWatermark: StateFlow<Boolean> =
-            watermarkRepository.watermarkConfigFlow
-                .map { it.enabled }
+            watermarkConfig.map { it.enabled }
                 .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
         init {

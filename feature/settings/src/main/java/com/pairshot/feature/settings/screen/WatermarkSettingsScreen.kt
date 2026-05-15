@@ -42,9 +42,11 @@ import com.pairshot.core.ui.R as CoreR
 @Composable
 fun WatermarkSettingsScreen(
     watermarkConfig: WatermarkConfig,
+    isProSubscriber: Boolean,
     onWatermarkConfigChange: (WatermarkConfig) -> Unit,
     onSelectLogo: () -> Unit,
     onNavigateBack: () -> Unit,
+    onProLocked: () -> Unit,
     watermarkRenderer: WatermarkRenderer,
     previewSampleProvider: PreviewSampleProvider,
 ) {
@@ -105,9 +107,11 @@ fun WatermarkSettingsScreen(
                         SettingsDivider()
                         WatermarkTypeItem(
                             selectedType = watermarkConfig.type,
+                            isProSubscriber = isProSubscriber,
                             onTypeChange = { type ->
                                 onWatermarkConfigChange(watermarkConfig.copy(type = type))
                             },
+                            onProLocked = onProLocked,
                         )
                     }
                 }

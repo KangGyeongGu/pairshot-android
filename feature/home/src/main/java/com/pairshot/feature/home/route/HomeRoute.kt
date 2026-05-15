@@ -35,6 +35,7 @@ fun HomeRoute(
     val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val isProSubscriber by viewModel.isProSubscriber.collectAsStateWithLifecycle()
 
     var showCreateAlbumDialog by remember { mutableStateOf(false) }
 
@@ -103,5 +104,6 @@ fun HomeRoute(
         onNavigateToCamera = onNavigateToCamera,
         isRefreshing = isRefreshing,
         onRefresh = viewModel::refresh,
+        isProSubscriber = isProSubscriber,
     )
 }

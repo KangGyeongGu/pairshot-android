@@ -1,5 +1,8 @@
 package com.pairshot.feature.home.component
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -13,9 +16,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.feature.home.R
 import com.pairshot.core.ui.R as CoreR
 
@@ -25,6 +31,7 @@ fun HomeTopBar(
     selectionMode: Boolean,
     selectedCount: Int,
     allSelected: Boolean,
+    isProSubscriber: Boolean,
     onExitSelectionMode: () -> Unit,
     onToggleSelectAll: () -> Unit,
     onEnterSelectionMode: () -> Unit,
@@ -33,20 +40,20 @@ fun HomeTopBar(
 ) {
     TopAppBar(
         title = {
-            Text(
-                text =
-                    if (selectionMode) {
+            if (selectionMode) {
+                Text(
+                    text =
                         pluralStringResource(
                             R.plurals.home_topbar_selection_count,
                             selectedCount,
                             selectedCount,
-                        )
-                    } else {
-                        stringResource(R.string.home_topbar_title)
-                    },
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+                        ),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            } else {
+                BrandTitle(isProSubscriber = isProSubscriber)
+            }
         },
         navigationIcon = {
             if (selectionMode) {
@@ -95,4 +102,19 @@ fun HomeTopBar(
             ),
         modifier = modifier,
     )
+}
+
+@Composable
+private fun BrandTitle(isProSubscriber: Boolean) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = stringResource(R.string.home_topbar_title),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        if (isProSubscriber) {
+            Spacer(modifier = Modifier.width(6.dp))
+            PairShotProBadge()
+        }
+    }
 }

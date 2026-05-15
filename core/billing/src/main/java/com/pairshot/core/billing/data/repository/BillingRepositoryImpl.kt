@@ -18,13 +18,16 @@ import com.pairshot.core.billing.BillingClientHolder
 import com.pairshot.core.billing.BillingProductCatalog
 import com.pairshot.core.billing.BillingPurchaseUpdatesListener
 import com.pairshot.core.billing.BillingRepository
+import com.pairshot.core.billing.PurchaseLaunchResult
 import com.pairshot.core.billing.domain.BillingOffer
+import com.pairshot.core.billing.domain.PurchaseError
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.billing.internal.PurchaseStateMachine
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -116,7 +119,7 @@ class BillingRepositoryImpl
         override suspend fun launchPurchaseFlow(
             activity: Activity,
             offer: BillingOffer,
-        ): Result<Unit> =
+        ): PurchaseLaunchResult =
             runCatching {
                 awaitReady()
                 val productDetails =
@@ -135,9 +138,17 @@ class BillingRepositoryImpl
                             ),
                         ).build()
                 val result = holder.client.launchBillingFlow(activity, flowParams)
-                if (result.responseCode != BillingClient.BillingResponseCode.OK) {
-                    error("launchBillingFlow failed: ${result.debugMessage} (code ${result.responseCode})")
+                when (result.responseCode) {
+                    BillingClient.BillingResponseCode.OK -> PurchaseLaunchResult.Launched
+                    BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                        syncStatusFromQuery()
+                        PurchaseLaunchResult.AlreadyOwned
+                    }
+                    else -> PurchaseLaunchResult.Failed(mapBillingError(result.responseCode, result.debugMessage))
                 }
+            }.getOrElse { error ->
+                Timber.w(error, "launchPurchaseFlow threw")
+                PurchaseLaunchResult.Failed(PurchaseError.Unknown(-1, error.message.orEmpty()))
             }
 
         override fun manageSubscriptionsIntent(productId: String?): Intent {
@@ -170,28 +181,36 @@ class BillingRepositoryImpl
             val newStatus = PurchaseStateMachine.toStatus(active)
             _status.value = newStatus
             if (active != null && !active.isAcknowledged && active.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                acknowledge(active)
+                acknowledgeWithRetry(active)
             }
         }
 
         private suspend fun handlePurchase(purchase: Purchase) {
             if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) return
             if (purchase.isAcknowledged) return
-            acknowledge(purchase)
+            acknowledgeWithRetry(purchase)
         }
 
-        private suspend fun acknowledge(purchase: Purchase) {
+        private suspend fun acknowledgeWithRetry(purchase: Purchase) {
             val params =
                 AcknowledgePurchaseParams
                     .newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)
                     .build()
-            val result = holder.client.acknowledgePurchase(params)
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                Timber.i("Acknowledged ${purchase.products.firstOrNull()}")
-            } else {
-                Timber.e("Acknowledge failed: ${result.debugMessage}")
+            var delayMs = ACK_INITIAL_BACKOFF_MS
+            repeat(ACK_MAX_ATTEMPTS) { attempt ->
+                val result = holder.client.acknowledgePurchase(params)
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    Timber.i("Acknowledged ${purchase.products.firstOrNull()} (attempt ${attempt + 1})")
+                    return
+                }
+                Timber.w("Acknowledge attempt ${attempt + 1} failed: ${result.debugMessage}")
+                if (attempt < ACK_MAX_ATTEMPTS - 1) {
+                    delay(delayMs)
+                    delayMs *= 2
+                }
             }
+            Timber.e("Acknowledge gave up after $ACK_MAX_ATTEMPTS attempts")
         }
 
         private suspend fun awaitReady() {
@@ -210,16 +229,38 @@ class BillingRepositoryImpl
             } != null
         }
 
+        private fun mapBillingError(
+            code: Int,
+            debug: String,
+        ): PurchaseError =
+            when (code) {
+                BillingClient.BillingResponseCode.USER_CANCELED -> PurchaseError.UserCanceled
+                BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> PurchaseError.BillingUnavailable
+                BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> PurchaseError.ServiceDisconnected
+                BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE -> PurchaseError.ServiceUnavailable
+                BillingClient.BillingResponseCode.ITEM_UNAVAILABLE -> PurchaseError.ItemUnavailable
+                BillingClient.BillingResponseCode.DEVELOPER_ERROR -> PurchaseError.DeveloperError
+                BillingClient.BillingResponseCode.NETWORK_ERROR -> PurchaseError.NetworkError
+                else -> PurchaseError.Unknown(code, debug)
+            }
+
         private fun parseIso8601Days(period: String): Int? {
-            val match = Regex("P(?:(\\d+)W)?(?:(\\d+)D)?").matchEntire(period) ?: return null
-            val weeks = match.groupValues[1].toIntOrNull() ?: 0
-            val days = match.groupValues[2].toIntOrNull() ?: 0
-            val total = weeks * DAYS_PER_WEEK + days
+            val match = Regex("P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)W)?(?:(\\d+)D)?").matchEntire(period) ?: return null
+            val (y, m, w, d) = match.destructured
+            val years = y.toIntOrNull() ?: 0
+            val months = m.toIntOrNull() ?: 0
+            val weeks = w.toIntOrNull() ?: 0
+            val days = d.toIntOrNull() ?: 0
+            val total = years * DAYS_PER_YEAR + months * DAYS_PER_MONTH + weeks * DAYS_PER_WEEK + days
             return total.takeIf { it > 0 }
         }
 
         private companion object {
             const val CONNECT_TIMEOUT_MS = 8_000L
             const val DAYS_PER_WEEK = 7
+            const val DAYS_PER_MONTH = 30
+            const val DAYS_PER_YEAR = 365
+            const val ACK_MAX_ATTEMPTS = 3
+            const val ACK_INITIAL_BACKOFF_MS = 1_000L
         }
     }

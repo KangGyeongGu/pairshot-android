@@ -3,12 +3,15 @@ package com.pairshot.feature.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pairshot.core.domain.combine.CombineSettingsRepository
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.WatermarkConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +24,18 @@ class CombineSettingsViewModel
     constructor(
         private val combineSettingsRepository: CombineSettingsRepository,
         watermarkRepository: WatermarkRepository,
+        entitlementProvider: ProEntitlementProvider,
     ) : ViewModel() {
+        val isProSubscriber: StateFlow<Boolean> =
+            entitlementProvider
+                .observe()
+                .map { it.isPaidSubscriber }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                    initialValue = false,
+                )
+
         val combineConfig: StateFlow<CombineConfig> =
             combineSettingsRepository.configFlow.stateIn(
                 scope = viewModelScope,

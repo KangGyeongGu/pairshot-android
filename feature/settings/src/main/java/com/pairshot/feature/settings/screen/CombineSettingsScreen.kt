@@ -90,6 +90,7 @@ import com.pairshot.core.ui.component.SettingsSliderItem
 import com.pairshot.core.ui.component.SettingsSwitchItem
 import com.pairshot.feature.settings.R
 import com.pairshot.feature.settings.component.PositionPicker3x3Row
+import com.pairshot.feature.settings.component.ProLockedSwitchItem
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
@@ -119,8 +120,10 @@ private const val ASPECT_RATIO_VERTICAL = 0.5f
 fun CombineSettingsScreen(
     combineConfig: CombineConfig,
     watermarkConfig: WatermarkConfig,
+    isProSubscriber: Boolean,
     onCombineConfigChange: (CombineConfig) -> Unit,
     onNavigateBack: () -> Unit,
+    onProLocked: () -> Unit,
 ) {
     var borderColorPickerVisible by remember { mutableStateOf(false) }
     var labelTextColorPickerVisible by remember { mutableStateOf(false) }
@@ -281,17 +284,26 @@ fun CombineSettingsScreen(
                     Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
                 }
 
+                val labelSectionsVisible = combineConfig.labelEnabled && isProSubscriber
+
                 item(key = "card_label_text") {
                     SettingsCard {
-                        SettingsSwitchItem(
-                            label = stringResource(R.string.combine_item_label_use),
-                            checked = combineConfig.labelEnabled,
-                            onCheckedChange = { checked ->
-                                onCombineConfigChange(combineConfig.copy(labelEnabled = checked))
-                            },
-                        )
+                        if (isProSubscriber) {
+                            SettingsSwitchItem(
+                                label = stringResource(R.string.combine_item_label_use),
+                                checked = combineConfig.labelEnabled,
+                                onCheckedChange = { checked ->
+                                    onCombineConfigChange(combineConfig.copy(labelEnabled = checked))
+                                },
+                            )
+                        } else {
+                            ProLockedSwitchItem(
+                                label = stringResource(R.string.combine_item_label_use),
+                                onClick = onProLocked,
+                            )
+                        }
                         AnimatedVisibility(
-                            visible = combineConfig.labelEnabled,
+                            visible = labelSectionsVisible,
                             enter = expandVertically(),
                             exit = shrinkVertically(),
                         ) {
@@ -339,7 +351,7 @@ fun CombineSettingsScreen(
 
                 item(key = "label_label_mode") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -353,7 +365,7 @@ fun CombineSettingsScreen(
 
                 item(key = "card_label_position") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -400,7 +412,7 @@ fun CombineSettingsScreen(
 
                 item(key = "label_label_bg") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -414,7 +426,7 @@ fun CombineSettingsScreen(
 
                 item(key = "card_label_bg") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {

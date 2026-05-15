@@ -18,9 +18,11 @@ import dagger.hilt.android.EntryPointAccessors
 @Composable
 fun WatermarkSettingsRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToPaywall: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
+    val isProSubscriber by viewModel.isProSubscriber.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val entryPoint =
@@ -42,9 +44,11 @@ fun WatermarkSettingsRoute(
 
     WatermarkSettingsScreen(
         watermarkConfig = watermarkConfig,
+        isProSubscriber = isProSubscriber,
         onWatermarkConfigChange = viewModel::updateWatermarkConfig,
         onSelectLogo = { logoPickerLauncher.launch(arrayOf("image/*")) },
         onNavigateBack = onNavigateBack,
+        onProLocked = onNavigateToPaywall,
         watermarkRenderer = watermarkRenderer,
         previewSampleProvider = previewSampleProvider,
     )

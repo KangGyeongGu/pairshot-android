@@ -7,6 +7,7 @@ import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.domain.entitlement.EntitlementSource
 import com.pairshot.core.domain.entitlement.ProEntitlement
 import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -54,9 +55,9 @@ class SubscriptionSettingsViewModel
         fun restore() {
             viewModelScope.launch {
                 billingRepository.refresh()
-                val active = entitlementProvider.current().isActive
+                val subscribed = entitlementProvider.current().isPaidSubscriber
                 _events.tryEmit(
-                    if (active) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
+                    if (subscribed) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
                 )
             }
         }

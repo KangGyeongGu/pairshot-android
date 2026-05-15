@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType
@@ -96,7 +98,9 @@ internal fun WatermarkTextSection(
 @Composable
 internal fun WatermarkTypeItem(
     selectedType: WatermarkType,
+    isProSubscriber: Boolean,
     onTypeChange: (WatermarkType) -> Unit,
+    onProLocked: () -> Unit,
 ) {
     Row(
         modifier =
@@ -117,6 +121,7 @@ internal fun WatermarkTypeItem(
         Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
             WatermarkType.entries.forEach { type ->
                 val isSelected = type == selectedType
+                val isLocked = type == WatermarkType.LOGO && !isProSubscriber
                 Box(
                     modifier =
                         Modifier
@@ -127,30 +132,37 @@ internal fun WatermarkTypeItem(
                                 } else {
                                     Color.Transparent
                                 },
-                            ).clickable { onTypeChange(type) }
-                            .padding(
+                            ).clickable {
+                                if (isLocked) onProLocked() else onTypeChange(type)
+                            }.padding(
                                 horizontal = PairShotSpacing.itemGap,
                                 vertical = PairShotSpacing.iconTextGap,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text =
-                            when (type) {
-                                WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
-                                WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
-                            },
-                        style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
-                        color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text =
+                                when (type) {
+                                    WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
+                                    WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
+                                },
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                ),
+                            color =
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                        )
+                        if (isLocked) {
+                            Spacer(modifier = Modifier.width(PairShotSpacing.iconTextGap))
+                            PairShotProBadge()
+                        }
+                    }
                 }
             }
         }

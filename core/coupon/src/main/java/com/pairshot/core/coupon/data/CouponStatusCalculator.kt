@@ -34,7 +34,7 @@ object CouponStatusCalculator {
         return if (nowMillis < stored.expiresAtEpochMillis) {
             CouponStatus.Active(coupon = coupon, expiresAtEpochMillis = stored.expiresAtEpochMillis)
         } else {
-            CouponStatus.Expired(coupon = coupon)
+            CouponStatus.Expired(coupon = coupon, expiresAtEpochMillis = stored.expiresAtEpochMillis)
         }
     }
 

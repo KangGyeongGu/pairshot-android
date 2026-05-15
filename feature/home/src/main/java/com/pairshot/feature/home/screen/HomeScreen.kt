@@ -79,6 +79,7 @@ fun HomeScreen(
     onNavigateToCamera: () -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    isProSubscriber: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
@@ -107,6 +108,7 @@ fun HomeScreen(
                 selectionMode = inSelectionMode,
                 selectedCount = currentSelectedCount,
                 allSelected = allSelected,
+                isProSubscriber = isProSubscriber,
                 onExitSelectionMode =
                     if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,

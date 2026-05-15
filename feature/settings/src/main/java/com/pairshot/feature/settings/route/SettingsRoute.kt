@@ -57,6 +57,7 @@ fun SettingsRoute(
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
     val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
     val activationState by couponViewModel.activationState.collectAsStateWithLifecycle()
+    val couponStatus by couponViewModel.status.collectAsStateWithLifecycle()
     val myCoupons by couponViewModel.myCoupons.collectAsStateWithLifecycle()
     val myCouponsLoading by couponViewModel.myCouponsLoading.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionViewModel.state.collectAsStateWithLifecycle()
@@ -218,6 +219,7 @@ fun SettingsRoute(
         proSubscriptionSection = {
             ProSubscriptionSection(
                 entitlement = subscriptionState.entitlement,
+                couponStatus = couponStatus,
                 onLearnMore = onNavigateToPaywall,
                 onManageSubscription = {
                     val productId = (subscriptionState.subscriptionStatus as? SubscriptionStatus.Active)?.productId

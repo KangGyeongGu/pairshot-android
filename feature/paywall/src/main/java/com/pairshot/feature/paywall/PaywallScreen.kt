@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -33,10 +33,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -47,21 +48,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pairshot.core.billing.domain.BillingOffer
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
+import com.pairshot.core.ui.component.PairShotSnackbarController
+import com.pairshot.core.ui.component.PairShotSnackbarHost
 import java.text.NumberFormat
 import java.util.Currency
 
 private val LOGO_SIZE = 56.dp
-private val LOGO_CORNER = 14.dp
-private val LOGO_BORDER_WIDTH = 1.dp
+private val LOGO_CORNER = 12.dp
+private val LOGO_SHADOW_ELEVATION = 10.dp
 private val PLAN_CARD_CORNER = 16.dp
 private val PLAN_CARD_PADDING = 20.dp
-private const val LOGO_BORDER_ALPHA_START = 0.6f
-private const val LOGO_BORDER_ALPHA_END = 0.15f
+private const val LOGO_SHADOW_AMBIENT_ALPHA = 0.18f
+private const val LOGO_SHADOW_SPOT_ALPHA = 0.28f
 private const val MONTHS_PER_YEAR = 12L
 private const val MICROS_PER_UNIT = 1_000_000.0
 private const val CONTINUE_FREE_ALPHA = 0.9f
 private const val LEGAL_ALPHA = 0.65f
+private const val DISCLOSURE_ALPHA = 0.6f
 private const val PREVIEW_MONTHLY_MICROS = 4_500_000_000L
 private const val PREVIEW_YEARLY_MICROS = 43_200_000_000L
 private const val PREVIEW_TRIAL_DAYS = 14
@@ -79,66 +84,100 @@ fun PaywallScreen(
     onRetryLoad: () -> Unit,
     termsUrl: String,
     privacyUrl: String,
+    snackbarController: PairShotSnackbarController = remember { PairShotSnackbarController() },
 ) {
     val uriHandler = LocalUriHandler.current
     if (!dismissible) BackHandler { }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .systemBarsPadding(),
-    ) {
-        TopBar(dismissible = dismissible, onDismiss = onDismiss)
-
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding()) {
         Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-            Hero()
+            TopBar(dismissible = dismissible, onDismiss = onDismiss)
 
-            Spacer(modifier = Modifier.height(44.dp))
-            ValueProp(stringResource(R.string.paywall_value_unlimited))
-            Spacer(modifier = Modifier.height(14.dp))
-            ValueProp(stringResource(R.string.paywall_value_no_ads))
-            Spacer(modifier = Modifier.height(14.dp))
-            ValueProp(stringResource(R.string.paywall_value_pro_features))
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp),
+            ) {
+                Spacer(modifier = Modifier.height(32.dp))
+                Hero()
 
-            Spacer(modifier = Modifier.height(44.dp))
-            PlanSection(
-                state = state,
-                onStartTrial = onStartTrial,
-                onPurchaseYearly = onPurchaseYearly,
-                onPurchaseMonthly = onPurchaseMonthly,
-                onRetryLoad = onRetryLoad,
-            )
+                Spacer(modifier = Modifier.height(44.dp))
+                ValueProp(stringResource(R.string.paywall_value_unlimited))
+                Spacer(modifier = Modifier.height(14.dp))
+                ValueProp(stringResource(R.string.paywall_value_no_ads))
+                Spacer(modifier = Modifier.height(14.dp))
+                ValueProp(stringResource(R.string.paywall_value_pro_features))
 
-            Spacer(modifier = Modifier.height(20.dp))
-            if (!dismissible) {
-                CenteredTextLink(
-                    text = stringResource(R.string.paywall_continue_free),
-                    onClick = onContinueFree,
-                    alpha = CONTINUE_FREE_ALPHA,
+                Spacer(modifier = Modifier.height(44.dp))
+                PlanSection(
+                    state = state,
+                    onStartTrial = onStartTrial,
+                    onPurchaseYearly = onPurchaseYearly,
+                    onPurchaseMonthly = onPurchaseMonthly,
+                    onRetryLoad = onRetryLoad,
                 )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                if (!dismissible) {
+                    CenteredTextLink(
+                        text = stringResource(R.string.paywall_continue_free),
+                        onClick = onContinueFree,
+                        alpha = CONTINUE_FREE_ALPHA,
+                    )
+                }
+                CenteredTextLink(
+                    text = stringResource(R.string.paywall_restore),
+                    onClick = onRestore,
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                DisclosureBlock()
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            CenteredTextLink(
-                text = stringResource(R.string.paywall_restore),
-                onClick = onRestore,
+
+            LegalRow(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                onOpenTerms = { uriHandler.openUri(termsUrl) },
+                onOpenPrivacy = { uriHandler.openUri(privacyUrl) },
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        LegalRow(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            onOpenTerms = { uriHandler.openUri(termsUrl) },
-            onOpenPrivacy = { uriHandler.openUri(privacyUrl) },
+        PairShotSnackbarHost(
+            controller = snackbarController,
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = PairShotSpacing.snackbarTopOffset),
         )
-        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+@Composable
+private fun DisclosureBlock() {
+    val color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DISCLOSURE_ALPHA)
+    val style = MaterialTheme.typography.labelSmall
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = stringResource(R.string.paywall_disclosure_auto_renew),
+            style = style,
+            color = color,
+        )
+        Text(
+            text = stringResource(R.string.paywall_disclosure_withdrawal),
+            style = style,
+            color = color,
+        )
+        Text(
+            text = stringResource(R.string.paywall_disclosure_minor),
+            style = style,
+            color = color,
+        )
     }
 }
 
@@ -181,18 +220,11 @@ private fun Hero() {
             modifier =
                 Modifier
                     .size(LOGO_SIZE)
-                    .clip(RoundedCornerShape(LOGO_CORNER))
-                    .border(
-                        width = LOGO_BORDER_WIDTH,
-                        brush =
-                            Brush.linearGradient(
-                                colors =
-                                    listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = LOGO_BORDER_ALPHA_START),
-                                        MaterialTheme.colorScheme.outline.copy(alpha = LOGO_BORDER_ALPHA_END),
-                                    ),
-                            ),
+                    .shadow(
+                        elevation = LOGO_SHADOW_ELEVATION,
                         shape = RoundedCornerShape(LOGO_CORNER),
+                        ambientColor = Color.Black.copy(alpha = LOGO_SHADOW_AMBIENT_ALPHA),
+                        spotColor = Color.Black.copy(alpha = LOGO_SHADOW_SPOT_ALPHA),
                     ),
         )
         Spacer(modifier = Modifier.height(12.dp))

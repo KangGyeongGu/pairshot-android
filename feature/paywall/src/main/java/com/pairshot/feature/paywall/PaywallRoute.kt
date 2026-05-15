@@ -10,6 +10,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.billing.domain.PurchaseError
+import com.pairshot.core.ui.component.PairShotSnackbarController
+import com.pairshot.core.ui.component.SnackbarEvent
+import com.pairshot.core.ui.component.SnackbarVariant
+import com.pairshot.core.ui.text.UiText
 import dagger.hilt.android.EntryPointAccessors
 
 private const val TERMS_URL = "https://pairshot.kangkyeonggu.com/terms"
@@ -25,6 +30,7 @@ fun PaywallRoute(
     val activity = LocalActivity.current
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarController = remember { PairShotSnackbarController() }
 
     val fullscreenAdState =
         remember(context) {
@@ -44,9 +50,30 @@ fun PaywallRoute(
         viewModel.events.collect { event ->
             when (event) {
                 PaywallEvent.EntitlementGranted -> onEntitled()
-                PaywallEvent.PurchaseFailed -> Unit
+                PaywallEvent.AlreadyOwned -> {
+                    snackbarController.show(
+                        SnackbarEvent(
+                            UiText.Resource(R.string.paywall_already_owned),
+                            SnackbarVariant.SUCCESS,
+                        ),
+                    )
+                    onEntitled()
+                }
+                is PaywallEvent.PurchaseFailed ->
+                    snackbarController.show(
+                        SnackbarEvent(
+                            UiText.Resource(purchaseFailedStringRes(event.reason)),
+                            SnackbarVariant.ERROR,
+                        ),
+                    )
                 PaywallEvent.RestoreSuccess -> onEntitled()
-                PaywallEvent.RestoreEmpty -> Unit
+                PaywallEvent.RestoreEmpty ->
+                    snackbarController.show(
+                        SnackbarEvent(
+                            UiText.Resource(R.string.paywall_restore_no_subscription),
+                            SnackbarVariant.WARNING,
+                        ),
+                    )
                 PaywallEvent.ContinuedFree -> onEntitled()
             }
         }
@@ -62,7 +89,23 @@ fun PaywallRoute(
         onContinueFree = viewModel::continueFree,
         onRestore = viewModel::restore,
         onRetryLoad = viewModel::loadOffers,
+        snackbarController = snackbarController,
         termsUrl = TERMS_URL,
         privacyUrl = PRIVACY_URL,
     )
 }
+
+private fun purchaseFailedStringRes(error: PurchaseError): Int =
+    when (error) {
+        PurchaseError.BillingUnavailable -> R.string.paywall_purchase_failed_billing_unavailable
+        PurchaseError.ServiceDisconnected,
+        PurchaseError.ServiceUnavailable,
+        -> R.string.paywall_purchase_failed_service_disconnected
+        PurchaseError.NetworkError -> R.string.paywall_purchase_failed_network
+        PurchaseError.ItemUnavailable -> R.string.paywall_purchase_failed_item_unavailable
+        PurchaseError.AlreadyOwned,
+        PurchaseError.UserCanceled,
+        PurchaseError.DeveloperError,
+        is PurchaseError.Unknown,
+        -> R.string.paywall_purchase_failed_generic
+    }

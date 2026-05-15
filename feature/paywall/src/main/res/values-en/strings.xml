@@ -9,12 +9,12 @@
 
     <string name="paywall_plan_yearly_title">Yearly</string>
     <string name="paywall_plan_yearly_price">%1$s/year</string>
-    <string name="paywall_plan_yearly_subtitle">%1$s/month equivalent</string>
+    <string name="paywall_plan_yearly_subtitle">%1$s/month equivalent · Auto-renews</string>
     <string name="paywall_plan_yearly_badge">Save 20%</string>
 
     <string name="paywall_plan_monthly_title">Monthly</string>
     <string name="paywall_plan_monthly_price">%1$s/month</string>
-    <string name="paywall_plan_monthly_trial_note">2-week free trial, then billed · Cancel anytime</string>
+    <string name="paywall_plan_monthly_trial_note">2-week free trial, then auto-renews · Cancel anytime</string>
 
     <string name="paywall_continue_free">Continue with free version (5 pairs/day, ads shown)</string>
 
@@ -26,10 +26,20 @@
     <string name="paywall_load_failed">Could not load products. Please try again.</string>
     <string name="paywall_load_failed_retry">Try again</string>
     <string name="paywall_close_content_description">Close</string>
-    <string name="paywall_purchase_failed">Could not start purchase. Please try again.</string>
+
+    <string name="paywall_purchase_failed_generic">Could not start purchase. Please try again.</string>
+    <string name="paywall_purchase_failed_billing_unavailable">Google Play billing is unavailable. Check your account and payment method.</string>
+    <string name="paywall_purchase_failed_service_disconnected">Cannot reach Google Play. Please try again shortly.</string>
+    <string name="paywall_purchase_failed_network">Check your network connection and try again.</string>
+    <string name="paywall_purchase_failed_item_unavailable">This product is currently unavailable.</string>
+    <string name="paywall_already_owned">You already have an active subscription. It has been restored.</string>
 
     <string name="paywall_restore_no_subscription">No active subscription found.</string>
     <string name="paywall_restore_success">Subscription restored.</string>
 
     <string name="paywall_logo_content_description">PairShot logo</string>
+
+    <string name="paywall_disclosure_auto_renew">Subscription auto-renews each billing cycle unless cancelled at least 24 hours before renewal in Google Play.</string>
+    <string name="paywall_disclosure_withdrawal">Right of withdrawal may be limited once digital content delivery begins. Refunds follow Google Play\'s refund policy.</string>
+    <string name="paywall_disclosure_minor">A minor who made a purchase without legal guardian consent may cancel through the guardian.</string>
 </resources>

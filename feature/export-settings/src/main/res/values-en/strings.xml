@@ -18,4 +18,6 @@
     <string name="export_watermark_apply">Apply watermark option</string>
     <string name="export_combine_apply">Apply combine option</string>
 
+    <string name="export_warning_required">Setup required</string>
+
 </resources>

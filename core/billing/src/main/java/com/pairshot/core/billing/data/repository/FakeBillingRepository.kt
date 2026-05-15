@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.pairshot.core.billing.BillingProductCatalog
 import com.pairshot.core.billing.BillingRepository
+import com.pairshot.core.billing.PurchaseLaunchResult
 import com.pairshot.core.billing.domain.BillingOffer
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import kotlinx.coroutines.delay
@@ -57,10 +58,10 @@ class FakeBillingRepository
         override suspend fun launchPurchaseFlow(
             activity: Activity,
             offer: BillingOffer,
-        ): Result<Unit> {
+        ): PurchaseLaunchResult {
             delay(PURCHASE_DELAY_MS)
             _status.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
-            return Result.success(Unit)
+            return PurchaseLaunchResult.Launched
         }
 
         override fun manageSubscriptionsIntent(productId: String?): Intent = Intent()

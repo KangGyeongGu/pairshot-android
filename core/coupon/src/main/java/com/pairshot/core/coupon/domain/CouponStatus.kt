@@ -10,5 +10,6 @@ sealed interface CouponStatus {
 
     data class Expired(
         val coupon: Coupon,
+        val expiresAtEpochMillis: Long,
     ) : CouponStatus
 }

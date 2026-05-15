@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pairshot.core.billing.BillingProductCatalog
 import com.pairshot.core.billing.BillingRepository
+import com.pairshot.core.billing.PurchaseLaunchResult
 import com.pairshot.core.billing.domain.BillingOffer
+import com.pairshot.core.billing.domain.PurchaseError
 import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.entitlement.isPaidSubscriber
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,7 +33,9 @@ data class PaywallUiState(
 sealed interface PaywallEvent {
     data object EntitlementGranted : PaywallEvent
 
-    data object PurchaseFailed : PaywallEvent
+    data class PurchaseFailed(val reason: PurchaseError) : PaywallEvent
+
+    data object AlreadyOwned : PaywallEvent
 
     data object RestoreSuccess : PaywallEvent
 
@@ -89,8 +94,14 @@ class PaywallViewModel
             offer: BillingOffer,
         ) {
             viewModelScope.launch {
-                billingRepository.launchPurchaseFlow(activity, offer).onFailure {
-                    _events.tryEmit(PaywallEvent.PurchaseFailed)
+                when (val result = billingRepository.launchPurchaseFlow(activity, offer)) {
+                    PurchaseLaunchResult.Launched -> Unit
+                    PurchaseLaunchResult.AlreadyOwned -> _events.tryEmit(PaywallEvent.AlreadyOwned)
+                    is PurchaseLaunchResult.Failed -> {
+                        if (result.error !is PurchaseError.UserCanceled) {
+                            _events.tryEmit(PaywallEvent.PurchaseFailed(result.error))
+                        }
+                    }
                 }
             }
         }
@@ -98,9 +109,9 @@ class PaywallViewModel
         fun restore() {
             viewModelScope.launch {
                 billingRepository.refresh()
-                val active = entitlementProvider.current().isActive
+                val subscribed = entitlementProvider.current().isPaidSubscriber
                 _events.tryEmit(
-                    if (active) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
+                    if (subscribed) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
                 )
             }
         }
@@ -115,7 +126,7 @@ class PaywallViewModel
         private fun observeEntitlement() {
             viewModelScope.launch {
                 entitlementProvider.observe().collect { entitlement ->
-                    if (entitlement.isActive) {
+                    if (entitlement.isPaidSubscriber) {
                         appSettingsRepository.markOnboardingPaywallShown()
                         _events.tryEmit(PaywallEvent.EntitlementGranted)
                     }

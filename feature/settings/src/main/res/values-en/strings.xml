@@ -127,14 +127,20 @@
     <string name="settings_section_pro_subscription">Subscription</string>
     <string name="settings_pro_title">PairShot Pro</string>
     <string name="settings_pro_free_title">PairShot Pro</string>
-    <string name="settings_pro_free_subtitle">Unlimited pairs · No ads · Advanced combine/watermark</string>
+    <string name="settings_pro_value_unlimited">Unlimited pair creation</string>
+    <string name="settings_pro_value_no_ads">Remove all ads</string>
+    <string name="settings_pro_value_pro_features">Full access to combine and watermark features</string>
     <string name="settings_pro_learn_more">Learn more</string>
 
     <string name="settings_pro_badge_active">Active</string>
     <string name="settings_pro_badge_coupon">Coupon</string>
 
-    <string name="settings_pro_coupon_expires">Expires: %1$s</string>
+    <string name="settings_pro_coupon_expires">Expires %1$s</string>
     <string name="settings_pro_coupon_unlimited">Unlimited access</string>
+
+    <string name="settings_pro_membership">Membership</string>
+    <string name="settings_pro_membership_free">Free</string>
+    <string name="settings_pro_membership_pro">Pro</string>
 
     <string name="settings_pro_manage_subscription">Manage subscription</string>
     <string name="settings_pro_restore">Restore purchases</string>

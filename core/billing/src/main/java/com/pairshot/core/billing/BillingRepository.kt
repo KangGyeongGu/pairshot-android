@@ -7,6 +7,14 @@ import com.pairshot.core.billing.domain.PurchaseError
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import kotlinx.coroutines.flow.StateFlow
 
+sealed interface PurchaseLaunchResult {
+    data object Launched : PurchaseLaunchResult
+
+    data object AlreadyOwned : PurchaseLaunchResult
+
+    data class Failed(val error: PurchaseError) : PurchaseLaunchResult
+}
+
 interface BillingRepository {
     val subscriptionStatus: StateFlow<SubscriptionStatus>
 
@@ -19,7 +27,7 @@ interface BillingRepository {
     suspend fun launchPurchaseFlow(
         activity: Activity,
         offer: BillingOffer,
-    ): Result<Unit>
+    ): PurchaseLaunchResult
 
     fun manageSubscriptionsIntent(productId: String? = null): Intent
 }
