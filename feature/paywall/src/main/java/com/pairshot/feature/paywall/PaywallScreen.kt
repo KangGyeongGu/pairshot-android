@@ -62,6 +62,9 @@ private const val MONTHS_PER_YEAR = 12L
 private const val MICROS_PER_UNIT = 1_000_000.0
 private const val CONTINUE_FREE_ALPHA = 0.9f
 private const val LEGAL_ALPHA = 0.65f
+private const val PREVIEW_MONTHLY_MICROS = 4_500_000_000L
+private const val PREVIEW_YEARLY_MICROS = 43_200_000_000L
+private const val PREVIEW_TRIAL_DAYS = 14
 
 @Composable
 fun PaywallScreen(
@@ -155,7 +158,10 @@ private fun TopBar(
                 onClick = onDismiss,
                 modifier = Modifier.align(Alignment.CenterStart),
             ) {
-                Icon(imageVector = Icons.Outlined.Close, contentDescription = "닫기")
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = stringResource(R.string.paywall_close_content_description),
+                )
             }
         }
     } else {
@@ -232,7 +238,7 @@ private fun PlanSection(
         else -> {
             val yearly = state.yearlyOffer
             val trial = state.trialOffer
-            val monthlyBase = state.monthlyOffer ?: trial
+            val monthlyBase = state.monthlyOffer
 
             if (yearly != null) {
                 PlanCard(
@@ -384,7 +390,9 @@ private fun ErrorBlock(onRetryLoad: () -> Unit) {
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedButton(onClick = onRetryLoad) { Text(text = "다시 시도") }
+        OutlinedButton(onClick = onRetryLoad) {
+            Text(text = stringResource(R.string.paywall_load_failed_retry))
+        }
     }
 }
 
@@ -474,9 +482,9 @@ private fun PreviewPaywallHard() {
             state =
                 PaywallUiState(
                     loading = false,
-                    trialOffer = sampleOffer("monthly", "₩4,500", 4_500_000_000L, trial = 14),
-                    monthlyOffer = sampleOffer("monthly", "₩4,500", 4_500_000_000L),
-                    yearlyOffer = sampleOffer("yearly", "₩43,200", 43_200_000_000L),
+                    trialOffer = sampleOffer("monthly", "₩4,500", PREVIEW_MONTHLY_MICROS, trial = PREVIEW_TRIAL_DAYS),
+                    monthlyOffer = sampleOffer("monthly", "₩4,500", PREVIEW_MONTHLY_MICROS),
+                    yearlyOffer = sampleOffer("yearly", "₩43,200", PREVIEW_YEARLY_MICROS),
                 ),
             dismissible = false,
             onDismiss = {},
@@ -501,9 +509,9 @@ private fun PreviewPaywallDismissible() {
             state =
                 PaywallUiState(
                     loading = false,
-                    trialOffer = sampleOffer("monthly", "₩4,500", 4_500_000_000L, trial = 14),
-                    monthlyOffer = sampleOffer("monthly", "₩4,500", 4_500_000_000L),
-                    yearlyOffer = sampleOffer("yearly", "₩43,200", 43_200_000_000L),
+                    trialOffer = sampleOffer("monthly", "₩4,500", PREVIEW_MONTHLY_MICROS, trial = PREVIEW_TRIAL_DAYS),
+                    monthlyOffer = sampleOffer("monthly", "₩4,500", PREVIEW_MONTHLY_MICROS),
+                    yearlyOffer = sampleOffer("yearly", "₩43,200", PREVIEW_YEARLY_MICROS),
                 ),
             dismissible = true,
             onDismiss = {},

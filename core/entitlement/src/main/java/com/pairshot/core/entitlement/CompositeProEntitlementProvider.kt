@@ -37,7 +37,7 @@ class CompositeProEntitlementProvider
             val now = System.currentTimeMillis()
             return when {
                 sub is SubscriptionStatus.Active ->
-                    ProEntitlement(true, EntitlementSource.SUBSCRIPTION, sub.expiryEpochMs)
+                    ProEntitlement(true, EntitlementSource.SUBSCRIPTION, null)
 
                 CouponStatusCalculator.isActive(coupon, now) ->
                     ProEntitlement(true, EntitlementSource.COUPON, CouponStatusCalculator.expiresAt(coupon, now))

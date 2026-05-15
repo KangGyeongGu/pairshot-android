@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraManager
 import android.net.Uri
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
@@ -33,6 +31,7 @@ import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
 import com.pairshot.core.model.ZoomRange
+import com.pairshot.core.rendering.Camera2SensorOrientation
 import com.pairshot.core.rendering.ExifBitmapLoader
 import com.pairshot.core.rendering.OverlayTransformCalculator
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -66,6 +65,7 @@ class CameraSessionImpl
         @ApplicationContext private val context: Context,
         private val sensorSession: SensorSession,
         private val exifBitmapLoader: ExifBitmapLoader,
+        private val camera2SensorOrientation: Camera2SensorOrientation,
     ) : CameraSession {
         private val _surfaceRequest = MutableStateFlow<SurfaceRequest?>(null)
         override val surfaceRequest: StateFlow<SurfaceRequest?> = _surfaceRequest.asStateFlow()
@@ -254,15 +254,18 @@ class CameraSessionImpl
                                 }
 
                                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                    val uri =
-                                        outputFileResults.savedUri ?: Uri.fromFile(tempFile)
-                                    if (aspectRatio == AspectRatio.RATIO_1_1) {
-                                        runCatching { cropSquareInPlace(tempFile) }
-                                            .onFailure { error ->
-                                                Timber.w(error, "1:1 center crop failed; keeping 4:3 capture")
+                                    scope.launch {
+                                        val uri = outputFileResults.savedUri ?: Uri.fromFile(tempFile)
+                                        if (aspectRatio == AspectRatio.RATIO_1_1) {
+                                            withContext(Dispatchers.IO) {
+                                                runCatching { cropSquareInPlace(tempFile) }
+                                                    .onFailure { error ->
+                                                        Timber.w(error, "1:1 center crop failed; keeping 4:3 capture")
+                                                    }
                                             }
+                                        }
+                                        cont.resume(uri.toString())
                                     }
-                                    cont.resume(uri.toString())
                                 }
                             },
                         )
@@ -362,30 +365,7 @@ class CameraSessionImpl
         }
 
         override fun sensorRotationDegrees(facing: LensFacing): Int =
-            camera?.cameraInfo?.sensorRotationDegrees
-                ?: sensorRotationDegreesFromCamera2(facing)
-
-        private fun sensorRotationDegreesFromCamera2(facing: LensFacing): Int {
-            val cameraManager =
-                context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
-                    ?: return DEFAULT_SENSOR_ORIENTATION_DEGREES
-            val targetFacing =
-                if (facing == LensFacing.BACK) {
-                    CameraCharacteristics.LENS_FACING_BACK
-                } else {
-                    CameraCharacteristics.LENS_FACING_FRONT
-                }
-            return runCatching {
-                val id =
-                    cameraManager.cameraIdList.firstOrNull { id ->
-                        val chars = cameraManager.getCameraCharacteristics(id)
-                        chars.get(CameraCharacteristics.LENS_FACING) == targetFacing
-                    } ?: return@runCatching DEFAULT_SENSOR_ORIENTATION_DEGREES
-                cameraManager
-                    .getCameraCharacteristics(id)
-                    .get(CameraCharacteristics.SENSOR_ORIENTATION) ?: DEFAULT_SENSOR_ORIENTATION_DEGREES
-            }.getOrDefault(DEFAULT_SENSOR_ORIENTATION_DEGREES)
-        }
+            camera?.cameraInfo?.sensorRotationDegrees ?: camera2SensorOrientation.degrees(facing)
 
         override suspend fun readBeforeRotation(
             beforePhotoUri: String,
@@ -490,7 +470,6 @@ class CameraSessionImpl
             private const val EXTENSIONS_DEBOUNCE_MS = 300L
             private const val FOCUS_DEBOUNCE_MS = 200L
             private const val OVERLAY_IN_SAMPLE_SIZE = 2
-            private const val DEFAULT_SENSOR_ORIENTATION_DEGREES = 90
             private const val FOCUS_AUTO_CANCEL_SECONDS = 3L
             private const val JPEG_CROP_QUALITY = 95
 

@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.entitlement.EntitlementSource
 import com.pairshot.core.domain.entitlement.ProEntitlement
@@ -30,7 +29,6 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ProSubscriptionSection(
     entitlement: ProEntitlement,
-    subscriptionStatus: SubscriptionStatus,
     onLearnMore: () -> Unit,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
@@ -43,7 +41,6 @@ fun ProSubscriptionSection(
         EntitlementSource.NONE -> FreeBlock(onLearnMore = onLearnMore, onPromoCode = onPromoCode)
         EntitlementSource.SUBSCRIPTION ->
             SubscriptionBlock(
-                expiryEpochMs = entitlement.expiresAtEpochMs ?: (subscriptionStatus as? SubscriptionStatus.Active)?.expiryEpochMs,
                 onManageSubscription = onManageSubscription,
                 onRestore = onRestore,
                 onPromoCode = onPromoCode,
@@ -97,7 +94,6 @@ private fun FreeBlock(
 
 @Composable
 private fun SubscriptionBlock(
-    expiryEpochMs: Long?,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onPromoCode: () -> Unit,
@@ -105,7 +101,6 @@ private fun SubscriptionBlock(
     SettingsCard {
         SettingsItem(
             label = stringResource(R.string.settings_pro_manage_subscription),
-            trailing = expiryEpochMs?.let { formatDate(it) },
             onClick = onManageSubscription,
         )
         SettingsDivider()

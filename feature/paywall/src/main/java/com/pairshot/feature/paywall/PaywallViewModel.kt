@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.pairshot.core.billing.BillingProductCatalog
 import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.billing.domain.BillingOffer
-import com.pairshot.core.billing.domain.isPro
 import com.pairshot.core.domain.entitlement.ProEntitlementProvider
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,9 +98,9 @@ class PaywallViewModel
         fun restore() {
             viewModelScope.launch {
                 billingRepository.refresh()
-                val isPro = billingRepository.subscriptionStatus.value.isPro
+                val active = entitlementProvider.current().isActive
                 _events.tryEmit(
-                    if (isPro) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
+                    if (active) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
                 )
             }
         }

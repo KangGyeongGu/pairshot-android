@@ -46,6 +46,7 @@ class AppOpenAdController
         @Volatile
         private var firstForegroundFired: Boolean = false
 
+
         fun preload() {
             scope.launch { loadInternal() }
         }

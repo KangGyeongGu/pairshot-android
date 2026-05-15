@@ -22,7 +22,7 @@ object CouponStatusCalculator {
                         CouponDuration.Preset.Unlimited
                     } else {
                         CouponDuration.fromDays(
-                            ((stored.expiresAtEpochMillis - nowMillis) / MILLIS_PER_DAY).coerceAtLeast(0L),
+                            ((stored.expiresAtEpochMillis - nowMillis) / MILLIS_PER_DAY).coerceAtLeast(1L),
                         )
                     },
                 activatedAtEpochMillis = stored.firstActivatedAtEpochMillis,

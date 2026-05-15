@@ -133,8 +133,6 @@
     <string name="settings_pro_badge_active">활성</string>
     <string name="settings_pro_badge_coupon">쿠폰 무료</string>
 
-    <string name="settings_pro_next_renewal">다음 결제: %1$s</string>
-    <string name="settings_pro_active_generic">구독 활성</string>
     <string name="settings_pro_coupon_expires">만료일: %1$s</string>
     <string name="settings_pro_coupon_unlimited">무제한 이용</string>
 

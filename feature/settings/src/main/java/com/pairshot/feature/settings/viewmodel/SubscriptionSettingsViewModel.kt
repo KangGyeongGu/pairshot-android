@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.billing.domain.SubscriptionStatus
-import com.pairshot.core.billing.domain.isPro
 import com.pairshot.core.domain.entitlement.EntitlementSource
 import com.pairshot.core.domain.entitlement.ProEntitlement
 import com.pairshot.core.domain.entitlement.ProEntitlementProvider
@@ -34,7 +33,7 @@ sealed interface SubscriptionSettingsEvent {
 class SubscriptionSettingsViewModel
     @Inject
     constructor(
-        entitlementProvider: ProEntitlementProvider,
+        private val entitlementProvider: ProEntitlementProvider,
         private val billingRepository: BillingRepository,
     ) : ViewModel() {
         val state: StateFlow<SubscriptionSettingsState> =
@@ -55,9 +54,9 @@ class SubscriptionSettingsViewModel
         fun restore() {
             viewModelScope.launch {
                 billingRepository.refresh()
-                val isPro = billingRepository.subscriptionStatus.value.isPro
+                val active = entitlementProvider.current().isActive
                 _events.tryEmit(
-                    if (isPro) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
+                    if (active) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
                 )
             }
         }

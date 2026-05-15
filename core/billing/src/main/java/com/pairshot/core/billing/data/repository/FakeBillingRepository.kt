@@ -59,14 +59,7 @@ class FakeBillingRepository
             offer: BillingOffer,
         ): Result<Unit> {
             delay(PURCHASE_DELAY_MS)
-            val now = System.currentTimeMillis()
-            val window = if (offer.basePlanId == BillingProductCatalog.BASE_PLAN_YEARLY) YEARLY_WINDOW_MS else MONTHLY_WINDOW_MS
-            _status.value =
-                SubscriptionStatus.Active(
-                    productId = offer.productId,
-                    expiryEpochMs = now + window,
-                    autoRenew = true,
-                )
+            _status.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
             return Result.success(Unit)
         }
 
@@ -78,8 +71,5 @@ class FakeBillingRepository
             const val TRIAL_DAYS = 14
             const val MONTHLY_PRICE_MICROS = 4_500_000_000L
             const val YEARLY_PRICE_MICROS = 43_200_000_000L
-            const val DAY_MS = 24L * 60 * 60 * 1000
-            const val MONTHLY_WINDOW_MS = 30L * DAY_MS
-            const val YEARLY_WINDOW_MS = 365L * DAY_MS
         }
     }

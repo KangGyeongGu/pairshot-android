@@ -24,6 +24,8 @@
 
     <string name="paywall_loading">Loading products…</string>
     <string name="paywall_load_failed">Could not load products. Please try again.</string>
+    <string name="paywall_load_failed_retry">Try again</string>
+    <string name="paywall_close_content_description">Close</string>
     <string name="paywall_purchase_failed">Could not start purchase. Please try again.</string>
 
     <string name="paywall_restore_no_subscription">No active subscription found.</string>

@@ -133,8 +133,6 @@
     <string name="settings_pro_badge_active">Active</string>
     <string name="settings_pro_badge_coupon">Coupon</string>
 
-    <string name="settings_pro_next_renewal">Next billing: %1$s</string>
-    <string name="settings_pro_active_generic">Subscription active</string>
     <string name="settings_pro_coupon_expires">Expires: %1$s</string>
     <string name="settings_pro_coupon_unlimited">Unlimited access</string>
 

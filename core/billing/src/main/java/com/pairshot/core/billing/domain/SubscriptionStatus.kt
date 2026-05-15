@@ -7,7 +7,6 @@ sealed interface SubscriptionStatus {
 
     data class Active(
         val productId: String,
-        val expiryEpochMs: Long,
         val autoRenew: Boolean,
     ) : SubscriptionStatus
 }

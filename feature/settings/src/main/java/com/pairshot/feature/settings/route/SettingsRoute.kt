@@ -218,7 +218,6 @@ fun SettingsRoute(
         proSubscriptionSection = {
             ProSubscriptionSection(
                 entitlement = subscriptionState.entitlement,
-                subscriptionStatus = subscriptionState.subscriptionStatus,
                 onLearnMore = onNavigateToPaywall,
                 onManageSubscription = {
                     val productId = (subscriptionState.subscriptionStatus as? SubscriptionStatus.Active)?.productId

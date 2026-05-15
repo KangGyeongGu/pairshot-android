@@ -210,10 +210,16 @@ class BillingRepositoryImpl
             } != null
         }
 
-        private fun parseIso8601Days(period: String): Int? =
-            Regex("P(\\d+)D").matchEntire(period)?.groupValues?.get(1)?.toIntOrNull()
+        private fun parseIso8601Days(period: String): Int? {
+            val match = Regex("P(?:(\\d+)W)?(?:(\\d+)D)?").matchEntire(period) ?: return null
+            val weeks = match.groupValues[1].toIntOrNull() ?: 0
+            val days = match.groupValues[2].toIntOrNull() ?: 0
+            val total = weeks * DAYS_PER_WEEK + days
+            return total.takeIf { it > 0 }
+        }
 
         private companion object {
             const val CONNECT_TIMEOUT_MS = 8_000L
+            const val DAYS_PER_WEEK = 7
         }
     }

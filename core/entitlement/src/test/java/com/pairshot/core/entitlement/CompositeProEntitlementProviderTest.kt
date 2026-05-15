@@ -43,7 +43,7 @@ class CompositeProEntitlementProviderTest {
     fun `active subscription yields SUBSCRIPTION`() =
         runTest {
             every { couponPreferences.state } returns flowOf(null)
-            subFlow.value = SubscriptionStatus.Active("pro", 1_000L, autoRenew = true)
+            subFlow.value = SubscriptionStatus.Active("pro", autoRenew = true)
             provider().observe().test {
                 val result = awaitItem()
                 assertEquals(EntitlementSource.SUBSCRIPTION, result.source)
@@ -71,10 +71,67 @@ class CompositeProEntitlementProviderTest {
         runTest {
             every { couponPreferences.state } returns
                 flowOf(StoredCouponState("c1", 100L, expiresAtEpochMillis = null))
-            subFlow.value = SubscriptionStatus.Active("pro", 1_000L, autoRenew = true)
+            subFlow.value = SubscriptionStatus.Active("pro", autoRenew = true)
             provider().observe().test {
                 val result = awaitItem()
                 assertEquals(EntitlementSource.SUBSCRIPTION, result.source)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `expired coupon without subscription yields NONE`() =
+        runTest {
+            val past = System.currentTimeMillis() - 60_000L
+            every { couponPreferences.state } returns
+                flowOf(StoredCouponState("c1", 100L, expiresAtEpochMillis = past))
+            subFlow.value = SubscriptionStatus.Inactive
+            provider().observe().test {
+                val result = awaitItem()
+                assertEquals(EntitlementSource.NONE, result.source)
+                assertFalse(result.isActive)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `coupon expiry propagated to ProEntitlement expiresAtEpochMs`() =
+        runTest {
+            val future = System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000
+            every { couponPreferences.state } returns
+                flowOf(StoredCouponState("c1", 100L, expiresAtEpochMillis = future))
+            subFlow.value = SubscriptionStatus.Inactive
+            provider().observe().test {
+                val result = awaitItem()
+                assertEquals(EntitlementSource.COUPON, result.source)
+                assertEquals(future, result.expiresAtEpochMs)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `subscription expiresAtEpochMs is null - not computable client-side`() =
+        runTest {
+            every { couponPreferences.state } returns flowOf(null)
+            subFlow.value = SubscriptionStatus.Active("pro", autoRenew = true)
+            provider().observe().test {
+                val result = awaitItem()
+                assertEquals(EntitlementSource.SUBSCRIPTION, result.source)
+                assertEquals(null, result.expiresAtEpochMs)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `subscription state change emits new ProEntitlement`() =
+        runTest {
+            every { couponPreferences.state } returns flowOf(null)
+            subFlow.value = SubscriptionStatus.Inactive
+            val provider = provider()
+            provider.observe().test {
+                assertEquals(EntitlementSource.NONE, awaitItem().source)
+                subFlow.value = SubscriptionStatus.Active("pro", autoRenew = true)
+                assertEquals(EntitlementSource.SUBSCRIPTION, awaitItem().source)
                 cancelAndIgnoreRemainingEvents()
             }
         }
