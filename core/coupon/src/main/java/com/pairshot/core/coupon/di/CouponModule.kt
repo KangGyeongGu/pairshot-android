@@ -2,12 +2,10 @@ package com.pairshot.core.coupon.di
 
 import com.pairshot.core.coupon.config.BuildConfigCouponApiConfig
 import com.pairshot.core.coupon.config.CouponApiConfig
-import com.pairshot.core.coupon.data.CouponAdFreeStatusProvider
 import com.pairshot.core.coupon.data.repository.CouponRepositoryImpl
 import com.pairshot.core.coupon.domain.CouponRepository
 import com.pairshot.core.coupon.remote.CouponActivationApi
 import com.pairshot.core.coupon.remote.KtorCouponActivationApi
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -28,8 +26,4 @@ abstract class CouponModule {
     @Binds
     @Singleton
     abstract fun bindCouponRepository(impl: CouponRepositoryImpl): CouponRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindAdFreeStatusProvider(impl: CouponAdFreeStatusProvider): AdFreeStatusProvider
 }

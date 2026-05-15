@@ -123,4 +123,25 @@
     <string name="settings_dialog_prefix_required">Please enter a prefix</string>
     <string name="settings_dialog_reset_default">Reset to default</string>
 
+    <!-- Pro Subscription Section -->
+    <string name="settings_section_pro_subscription">Subscription</string>
+    <string name="settings_pro_title">PairShot Pro</string>
+    <string name="settings_pro_free_title">PairShot Pro</string>
+    <string name="settings_pro_free_subtitle">Unlimited pairs · No ads · Advanced combine/watermark</string>
+    <string name="settings_pro_learn_more">Learn more</string>
+
+    <string name="settings_pro_badge_active">Active</string>
+    <string name="settings_pro_badge_coupon">Coupon</string>
+
+    <string name="settings_pro_next_renewal">Next billing: %1$s</string>
+    <string name="settings_pro_active_generic">Subscription active</string>
+    <string name="settings_pro_coupon_expires">Expires: %1$s</string>
+    <string name="settings_pro_coupon_unlimited">Unlimited access</string>
+
+    <string name="settings_pro_manage_subscription">Manage subscription</string>
+    <string name="settings_pro_restore">Restore purchases</string>
+    <string name="settings_item_promo_code">Enter promo code</string>
+    <string name="settings_pro_restore_success">Subscription restored.</string>
+    <string name="settings_pro_restore_empty">No active subscription found.</string>
+    <string name="settings_pro_manage_failed">Could not open subscription page.</string>
 </resources>

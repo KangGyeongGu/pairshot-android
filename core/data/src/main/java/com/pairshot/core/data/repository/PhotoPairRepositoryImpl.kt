@@ -150,6 +150,8 @@ class PhotoPairRepositoryImpl
 
         override fun countAll(): Flow<Int> = photoPairDao.countAll()
 
+        override fun countCreatedSince(sinceEpochMs: Long): Flow<Int> = photoPairDao.countCreatedSince(sinceEpochMs)
+
         override suspend fun saveBeforePhoto(
             tempFileUri: String,
             zoomLevel: Float?,

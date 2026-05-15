@@ -136,6 +136,8 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ads"))
     implementation(project(":core:coupon"))
+    implementation(project(":core:billing"))
+    implementation(project(":core:entitlement"))
 
     implementation(project(":feature:camera"))
     implementation(project(":feature:settings"))
@@ -143,6 +145,7 @@ dependencies {
     implementation(project(":feature:album"))
     implementation(project(":feature:pair-preview"))
     implementation(project(":feature:export-settings"))
+    implementation(project(":feature:paywall"))
 
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)

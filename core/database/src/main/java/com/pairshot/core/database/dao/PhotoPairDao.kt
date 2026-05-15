@@ -46,6 +46,9 @@ interface PhotoPairDao {
     @Query("SELECT COUNT(*) FROM photo_pairs")
     fun countAll(): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM photo_pairs WHERE beforeTimestamp >= :sinceEpochMs")
+    fun countCreatedSince(sinceEpochMs: Long): Flow<Int>
+
     @Query("SELECT MAX(id) FROM photo_pairs")
     suspend fun getMaxId(): Long?
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.GetLatestBeforeThumbnailUseCase
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.model.AspectRatio
@@ -54,6 +55,7 @@ class CameraViewModel
         private val photoPairRepository: PhotoPairRepository,
         private val getLatestBeforeThumbnailUseCase: GetLatestBeforeThumbnailUseCase,
         private val cameraSettings: CameraSettingsStateHolder,
+        private val canCreatePairUseCase: CanCreatePairUseCase,
     ) : ViewModel() {
         private val cameraRoute = savedStateHandle.toRoute<Camera>()
         private val albumId: Long? = cameraRoute.albumId
@@ -84,6 +86,13 @@ class CameraViewModel
         private var observePairsJob: Job? = null
 
         suspend fun loadInitialSettings(): InitialCameraSessionConfig = cameraSettings.loadInitial()
+
+        suspend fun canCreatePair(): CanCreatePairUseCase.Result =
+            if (replaceBeforeForPairId != null) {
+                CanCreatePairUseCase.Result.Allowed
+            } else {
+                canCreatePairUseCase()
+            }
 
         fun onCameraZoomCapabilities(
             min: Float,

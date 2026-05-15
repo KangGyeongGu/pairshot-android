@@ -26,6 +26,7 @@ import com.pairshot.core.navigation.Home
 import com.pairshot.core.navigation.License
 import com.pairshot.core.navigation.PairPicker
 import com.pairshot.core.navigation.PairPreview
+import com.pairshot.core.navigation.Paywall
 import com.pairshot.core.navigation.Settings
 import com.pairshot.core.navigation.SettingsHighlight
 import com.pairshot.core.navigation.WatermarkSettings
@@ -36,6 +37,7 @@ import com.pairshot.feature.camera.route.CameraRoute
 import com.pairshot.feature.exportsettings.route.ExportSettingsRoute
 import com.pairshot.feature.home.route.HomeRoute
 import com.pairshot.feature.pairpreview.route.PairPreviewRoute
+import com.pairshot.feature.paywall.PaywallRoute
 import com.pairshot.feature.settings.route.CombineSettingsRoute
 import com.pairshot.feature.settings.route.SettingsRoute
 import com.pairshot.feature.settings.route.WatermarkSettingsRoute
@@ -47,6 +49,7 @@ fun PairShotNavHost(
     onDestinationChanged: (String) -> Unit = {},
     onShareSelected: (Set<Long>) -> Unit = {},
     onSaveSelectedToDevice: (Set<Long>) -> Unit = {},
+    startDestination: Any = Camera(),
 ) {
     DisposableEffect(navController) {
         val listener =
@@ -62,7 +65,7 @@ fun PairShotNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Camera(),
+        startDestination = startDestination,
         modifier =
             Modifier
                 .fillMaxSize()
@@ -136,6 +139,33 @@ fun PairShotNavHost(
                         }
                     }
                 },
+                onNavigateToPaywall = {
+                    navController.navigate(Paywall(dismissible = true))
+                },
+            )
+        }
+        composable<Paywall> { entry ->
+            val paywall: Paywall = entry.toRoute()
+            PaywallRoute(
+                dismissible = paywall.dismissible,
+                onDismiss = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(Camera()) {
+                            popUpTo<Paywall> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                onEntitled = {
+                    if (paywall.dismissible) {
+                        navController.popBackStack()
+                    } else {
+                        navController.navigate(Camera()) {
+                            popUpTo<Paywall> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                },
             )
         }
         composable<AfterCamera> {
@@ -179,6 +209,7 @@ fun PairShotNavHost(
                 onNavigateToLicense = { navController.navigate(License) },
                 onNavigateToWatermarkSettings = { navController.navigate(WatermarkSettings) },
                 onNavigateToCombineSettings = { navController.navigate(CombineSettings) },
+                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
                 highlight = settings.highlight,
             )
         }

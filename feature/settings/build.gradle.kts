@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":core:ads"))
     implementation(project(":core:ads-ui"))
     implementation(project(":core:coupon"))
+    implementation(project(":core:billing"))
 
     implementation(libs.appcompat)
 }

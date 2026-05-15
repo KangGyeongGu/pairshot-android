@@ -25,6 +25,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import com.pairshot.core.infra.sensor.SensorSession
 import com.pairshot.core.model.AspectRatio
@@ -462,6 +463,9 @@ class CameraSessionImpl
         }
 
         private fun cropSquareInPlace(file: File) {
+            val originalExif = ExifInterface(file.absolutePath)
+            val preserved = PRESERVED_EXIF_TAGS.associateWith { originalExif.getAttribute(it) }
+
             val source = BitmapFactory.decodeFile(file.absolutePath) ?: return
             val side = minOf(source.width, source.height)
             val offsetX = (source.width - side) / 2
@@ -471,6 +475,11 @@ class CameraSessionImpl
                 FileOutputStream(file).use { out ->
                     cropped.compress(Bitmap.CompressFormat.JPEG, JPEG_CROP_QUALITY, out)
                 }
+                val newExif = ExifInterface(file.absolutePath)
+                preserved.forEach { (tag, value) ->
+                    if (value != null) newExif.setAttribute(tag, value)
+                }
+                newExif.saveAttributes()
             } finally {
                 if (cropped !== source) cropped.recycle()
                 source.recycle()
@@ -484,5 +493,29 @@ class CameraSessionImpl
             private const val DEFAULT_SENSOR_ORIENTATION_DEGREES = 90
             private const val FOCUS_AUTO_CANCEL_SECONDS = 3L
             private const val JPEG_CROP_QUALITY = 95
+
+            private val PRESERVED_EXIF_TAGS =
+                listOf(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.TAG_DATETIME,
+                    ExifInterface.TAG_DATETIME_ORIGINAL,
+                    ExifInterface.TAG_DATETIME_DIGITIZED,
+                    ExifInterface.TAG_MAKE,
+                    ExifInterface.TAG_MODEL,
+                    ExifInterface.TAG_FOCAL_LENGTH,
+                    ExifInterface.TAG_F_NUMBER,
+                    ExifInterface.TAG_ISO_SPEED,
+                    ExifInterface.TAG_EXPOSURE_TIME,
+                    ExifInterface.TAG_FLASH,
+                    ExifInterface.TAG_WHITE_BALANCE,
+                    ExifInterface.TAG_GPS_LATITUDE,
+                    ExifInterface.TAG_GPS_LATITUDE_REF,
+                    ExifInterface.TAG_GPS_LONGITUDE,
+                    ExifInterface.TAG_GPS_LONGITUDE_REF,
+                    ExifInterface.TAG_GPS_ALTITUDE,
+                    ExifInterface.TAG_GPS_ALTITUDE_REF,
+                    ExifInterface.TAG_GPS_TIMESTAMP,
+                    ExifInterface.TAG_GPS_DATESTAMP,
+                )
         }
     }

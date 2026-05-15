@@ -124,6 +124,10 @@ class AppSettingsRepositoryImpl
         override val appThemeNameFlow: Flow<String> = appPreferences.appTheme
 
         override suspend fun updateAppThemeName(name: String) = appPreferences.setAppTheme(name)
+
+        override suspend fun isOnboardingPaywallShown(): Boolean = appPreferences.onboardingPaywallShown.first()
+
+        override suspend fun markOnboardingPaywallShown() = appPreferences.setOnboardingPaywallShown(true)
     }
 
 private fun String.toSortOrder(): SortOrder = runCatching { SortOrder.valueOf(this) }.getOrDefault(SortOrder.DESC)

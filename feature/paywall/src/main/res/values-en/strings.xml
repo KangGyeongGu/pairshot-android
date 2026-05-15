@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="paywall_title">PairShot Pro</string>
+    <string name="paywall_subtitle">Effortless before/after photo management.</string>
+
+    <string name="paywall_value_unlimited">Unlimited pair creation</string>
+    <string name="paywall_value_no_ads">Remove all ads</string>
+    <string name="paywall_value_pro_features">Full access to combine and watermark features</string>
+
+    <string name="paywall_plan_yearly_title">Yearly</string>
+    <string name="paywall_plan_yearly_price">%1$s/year</string>
+    <string name="paywall_plan_yearly_subtitle">%1$s/month equivalent</string>
+    <string name="paywall_plan_yearly_badge">Save 20%</string>
+
+    <string name="paywall_plan_monthly_title">Monthly</string>
+    <string name="paywall_plan_monthly_price">%1$s/month</string>
+    <string name="paywall_plan_monthly_trial_note">2-week free trial, then billed · Cancel anytime</string>
+
+    <string name="paywall_continue_free">Continue with free version (5 pairs/day, ads shown)</string>
+
+    <string name="paywall_restore">Restore purchases</string>
+    <string name="paywall_terms">Terms</string>
+    <string name="paywall_privacy">Privacy</string>
+
+    <string name="paywall_loading">Loading products…</string>
+    <string name="paywall_load_failed">Could not load products. Please try again.</string>
+    <string name="paywall_purchase_failed">Could not start purchase. Please try again.</string>
+
+    <string name="paywall_restore_no_subscription">No active subscription found.</string>
+    <string name="paywall_restore_success">Subscription restored.</string>
+
+    <string name="paywall_logo_content_description">PairShot logo</string>
+</resources>

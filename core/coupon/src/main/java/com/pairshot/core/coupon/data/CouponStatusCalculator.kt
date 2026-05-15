@@ -5,7 +5,7 @@ import com.pairshot.core.coupon.domain.CouponDuration
 import com.pairshot.core.coupon.domain.CouponStatus
 import com.pairshot.core.coupon.local.StoredCouponState
 
-internal object CouponStatusCalculator {
+object CouponStatusCalculator {
     private const val MILLIS_PER_DAY: Long = 24L * 60L * 60L * 1000L
 
     fun toStatus(
@@ -38,8 +38,13 @@ internal object CouponStatusCalculator {
         }
     }
 
-    fun isAdFree(
+    fun isActive(
         stored: StoredCouponState?,
         nowMillis: Long,
     ): Boolean = toStatus(stored, nowMillis) is CouponStatus.Active
+
+    fun expiresAt(
+        stored: StoredCouponState?,
+        nowMillis: Long,
+    ): Long? = (toStatus(stored, nowMillis) as? CouponStatus.Active)?.expiresAtEpochMillis
 }

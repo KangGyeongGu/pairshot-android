@@ -30,6 +30,7 @@ import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
 import com.pairshot.feature.home.R
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -88,17 +89,15 @@ fun HomePairGridSection(
                 )
             }
         }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint?.adFreeStatusProvider() }
+    val entitlementProvider = remember(entryPoint) { entryPoint?.proEntitlementProvider() }
     val poolProvider = remember(entryPoint) { entryPoint?.nativeAdPoolProvider() }
+    val isActiveFlow = remember(entitlementProvider) { entitlementProvider?.observe()?.map { it.isActive } }
 
     val isAdFree: Boolean? =
         if (isInspection) {
             true
         } else {
-            adFreeStatusProvider
-                ?.observeIsAdFree()
-                ?.collectAsStateWithLifecycle(initialValue = null)
-                ?.value
+            isActiveFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
         }
 
     val nativeAdPool = remember(poolProvider) { poolProvider?.get() }

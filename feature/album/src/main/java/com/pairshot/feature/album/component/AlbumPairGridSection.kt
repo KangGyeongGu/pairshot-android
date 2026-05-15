@@ -23,6 +23,7 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun AlbumPairGridSection(
@@ -51,12 +52,10 @@ fun AlbumPairGridSection(
                 AdsEntryPoint::class.java,
             )
         }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint.adFreeStatusProvider() }
+    val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
     val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
-
-    val isAdFree: Boolean? by adFreeStatusProvider
-        .observeIsAdFree()
-        .collectAsStateWithLifecycle(initialValue = null)
+    val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
+    val isAdFree: Boolean? by isActiveFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val nativeAdPool = remember(poolProvider) { poolProvider.get() }
     DisposableEffect(nativeAdPool) {

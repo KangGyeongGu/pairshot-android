@@ -131,7 +131,7 @@ class LayerDependencyTest {
             .should()
             .dependOnClassesThat()
             .resideInAPackage("com.pairshot.core.ads..")
-            .because("Coupon module must not directly depend on Ads module — share AdFreeStatusProvider only")
+            .because("Coupon module must not directly depend on Ads module")
 
     @ArchTest
     val `L-10 Ads should only depend on Domain among core modules`: ArchRule =

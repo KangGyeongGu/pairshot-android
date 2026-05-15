@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.SnackbarEvent
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 internal fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToPaywall: () -> Unit,
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -157,8 +159,15 @@ internal fun CameraScreen(
             onToggleSettings = { viewModel.toggleSettingsPanel() },
             onShutter = {
                 if (isSaving) return@CameraScreenCallbacks
-                showBlackout = true
                 scope.launch {
+                    when (viewModel.canCreatePair()) {
+                        is CanCreatePairUseCase.Result.LimitReached -> {
+                            onNavigateToPaywall()
+                            return@launch
+                        }
+                        CanCreatePairUseCase.Result.Allowed -> Unit
+                    }
+                    showBlackout = true
                     viewModel.startCapturing()
                     val captureResult = cameraSession.capture()
                     val tempUri = captureResult.getOrNull()

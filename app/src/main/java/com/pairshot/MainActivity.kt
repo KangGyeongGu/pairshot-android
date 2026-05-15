@@ -30,6 +30,7 @@ import androidx.metrics.performance.PerformanceMetricsState
 import com.pairshot.app.navigation.PairShotNavHost
 import com.pairshot.app.navigation.SelectionActionViewModel
 import com.pairshot.app.navigation.SelectionMessage
+import com.pairshot.app.navigation.StartupDecisionViewModel
 import com.pairshot.app.navigation.effect.ExportShareEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
 import com.pairshot.core.ads.di.AdsEntryPoint
@@ -49,11 +50,15 @@ private const val SNACKBAR_OFFSET_WHEN_PROGRESS_DP = 80
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var jankStats: JankStats
+    private var onStartupReady: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splash = installSplashScreen()
+        var startupReady = false
+        splash.setKeepOnScreenCondition { !startupReady }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        this.onStartupReady = { startupReady = true }
 
         val metricsStateHolder = PerformanceMetricsState.getHolderForHierarchy(window.decorView)
         jankStats =
@@ -74,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                         onRouteChanged = { route ->
                             metricsStateHolder.state?.putState("screen", route)
                         },
+                        onStartupReady = { onStartupReady?.invoke() },
                     )
                 }
             }
@@ -92,10 +98,20 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-private fun AppRootContent(onRouteChanged: (String) -> Unit) {
+private fun AppRootContent(
+    onRouteChanged: (String) -> Unit,
+    onStartupReady: () -> Unit,
+) {
     val selectionVm: SelectionActionViewModel = hiltViewModel()
+    val startupVm: StartupDecisionViewModel = hiltViewModel()
+    val initialRoute by startupVm.initialRoute.collectAsStateWithLifecycle()
     val progress by selectionVm.progress.collectAsStateWithLifecycle()
     var selectionMessage by remember { mutableStateOf<SelectionMessage?>(null) }
+
+    LaunchedEffect(initialRoute) {
+        if (initialRoute != null) onStartupReady()
+    }
+    val resolvedRoute = initialRoute ?: return
 
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -145,6 +161,7 @@ private fun AppRootContent(onRouteChanged: (String) -> Unit) {
             onDestinationChanged = onRouteChanged,
             onShareSelected = selectionVm::shareSelection,
             onSaveSelectedToDevice = saveSelectedToDevice,
+            startDestination = resolvedRoute,
         )
 
         progress?.let { p ->

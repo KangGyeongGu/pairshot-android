@@ -7,8 +7,9 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.pairshot.core.ads.config.AdsConfig
+import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
 import com.pairshot.core.domain.premium.PremiumFeature
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,8 @@ class RewardedAdController
     constructor(
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
-        private val adFreeStatusProvider: AdFreeStatusProvider,
+        private val adsInitializer: AdsInitializer,
+        private val entitlementProvider: ProEntitlementProvider,
         private val gate: SettingsPremiumGate,
         private val fullscreenAdState: FullscreenAdState,
     ) {
@@ -38,9 +40,7 @@ class RewardedAdController
         private var currentAd: RewardedAd? = null
 
         fun preload() {
-            scope.launch {
-                if (!adFreeStatusProvider.currentIsAdFree()) loadInternal()
-            }
+            scope.launch { loadInternal() }
         }
 
         fun showIfAvailable(
@@ -55,7 +55,7 @@ class RewardedAdController
                     return@launch
                 }
 
-                if (adFreeStatusProvider.currentIsAdFree()) {
+                if (entitlementProvider.current().isActive) {
                     gate.unlock(feature)
                     onReward()
                     return@launch
@@ -95,13 +95,13 @@ class RewardedAdController
                             currentAd = null
                             showing.set(false)
                             if (rewarded) onReward() else onSkip()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShowFailed = {
                             currentAd = null
                             showing.set(false)
                             onSkip()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShown = { currentAd = null },
                     )
@@ -116,14 +116,15 @@ class RewardedAdController
                     currentAd = null
                     showing.set(false)
                     onSkip()
-                    loadInternal()
+                    scope.launch { loadInternal() }
                 }
             }
         }
 
-        private fun loadInternal() {
+        private suspend fun loadInternal() {
             if (currentAd != null) return
             if (!loading.compareAndSet(false, true)) return
+            adsInitializer.awaitReady()
             val request = AdRequest.Builder().build()
             RewardedAd.load(
                 context,

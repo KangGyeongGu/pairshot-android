@@ -7,7 +7,8 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.pairshot.core.ads.config.AdsConfig
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
+import com.pairshot.core.ads.initializer.AdsInitializer
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +25,8 @@ class InterstitialAdController
     constructor(
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
-        private val adFreeStatusProvider: AdFreeStatusProvider,
+        private val adsInitializer: AdsInitializer,
+        private val entitlementProvider: ProEntitlementProvider,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -37,9 +39,7 @@ class InterstitialAdController
         private var lastShownAt: Long = 0L
 
         fun preload() {
-            scope.launch {
-                if (!adFreeStatusProvider.currentIsAdFree()) loadInternal()
-            }
+            scope.launch { loadInternal() }
         }
 
         fun showIfAvailable(
@@ -47,7 +47,7 @@ class InterstitialAdController
             onFinished: () -> Unit,
         ) {
             scope.launch {
-                if (adFreeStatusProvider.currentIsAdFree()) {
+                if (entitlementProvider.current().isActive) {
                     onFinished()
                     return@launch
                 }
@@ -84,12 +84,12 @@ class InterstitialAdController
                             currentAd = null
                             lastShownAt = System.currentTimeMillis()
                             onFinished()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShowFailed = {
                             currentAd = null
                             onFinished()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShown = { currentAd = null },
                     )
@@ -99,14 +99,15 @@ class InterstitialAdController
                         fullscreenAdState.markDismissed()
                         currentAd = null
                         onFinished()
-                        loadInternal()
+                        scope.launch { loadInternal() }
                     }
             }
         }
 
-        private fun loadInternal() {
+        private suspend fun loadInternal() {
             if (currentAd != null) return
             if (!loading.compareAndSet(false, true)) return
+            adsInitializer.awaitReady()
             val request = AdRequest.Builder().build()
             InterstitialAd.load(
                 context,

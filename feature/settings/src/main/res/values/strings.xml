@@ -123,4 +123,25 @@
     <string name="settings_dialog_prefix_required">접두어를 입력해주세요</string>
     <string name="settings_dialog_reset_default">기본값으로 초기화</string>
 
+    <!-- Pro Subscription Section -->
+    <string name="settings_section_pro_subscription">구독</string>
+    <string name="settings_pro_title">PairShot Pro</string>
+    <string name="settings_pro_free_title">PairShot Pro</string>
+    <string name="settings_pro_free_subtitle">무제한 페어 · 광고 없음 · 합성 워터마크 옵션</string>
+    <string name="settings_pro_learn_more">Pro 알아보기</string>
+
+    <string name="settings_pro_badge_active">활성</string>
+    <string name="settings_pro_badge_coupon">쿠폰 무료</string>
+
+    <string name="settings_pro_next_renewal">다음 결제: %1$s</string>
+    <string name="settings_pro_active_generic">구독 활성</string>
+    <string name="settings_pro_coupon_expires">만료일: %1$s</string>
+    <string name="settings_pro_coupon_unlimited">무제한 이용</string>
+
+    <string name="settings_pro_manage_subscription">구독 관리</string>
+    <string name="settings_pro_restore">구매 복원</string>
+    <string name="settings_item_promo_code">프로모션 코드 등록</string>
+    <string name="settings_pro_restore_success">구독이 복원되었습니다.</string>
+    <string name="settings_pro_restore_empty">활성 구독을 찾지 못했습니다.</string>
+    <string name="settings_pro_manage_failed">구독 관리 페이지를 열 수 없습니다.</string>
 </resources>

@@ -65,6 +65,7 @@ fun PairShotNativeAdCard(
                 update = { view ->
                     bindNativeAd(view, nativeAd)
                 },
+                onRelease = { view -> view.destroy() },
             )
 
             Text(
@@ -264,8 +265,8 @@ private fun bindNativeAd(
     adView.setNativeAd(nativeAd)
 }
 
-private const val NATIVE_AD_ASPECT_RATIO = 3f
-private const val NATIVE_MEDIA_WEIGHT = 1.2f
+private const val NATIVE_AD_ASPECT_RATIO = 2.4f
+private const val NATIVE_MEDIA_WEIGHT = 1.4f
 private const val NATIVE_TEXT_COLUMN_WEIGHT = 2f
 private const val NATIVE_SPACER_WEIGHT = 1f
 private const val NATIVE_TEXT_LEFT_MARGIN_DP = 10

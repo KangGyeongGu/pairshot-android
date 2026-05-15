@@ -56,3 +56,8 @@ data object CombineSettings
 
 @Serializable
 data object License
+
+@Serializable
+data class Paywall(
+    val dismissible: Boolean = true,
+)

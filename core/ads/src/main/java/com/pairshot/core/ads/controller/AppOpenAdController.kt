@@ -6,7 +6,9 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.pairshot.core.ads.config.AdsConfig
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
+import com.pairshot.core.ads.initializer.AdsInitializer
+import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.settings.AppSettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,9 @@ class AppOpenAdController
     constructor(
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
-        private val adFreeStatusProvider: AdFreeStatusProvider,
+        private val adsInitializer: AdsInitializer,
+        private val entitlementProvider: ProEntitlementProvider,
+        private val appSettingsRepository: AppSettingsRepository,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -43,18 +47,18 @@ class AppOpenAdController
         private var firstForegroundFired: Boolean = false
 
         fun preload() {
-            scope.launch {
-                if (!adFreeStatusProvider.currentIsAdFree()) loadInternal()
-            }
+            scope.launch { loadInternal() }
         }
 
         fun onForeground(activity: Activity) {
             scope.launch {
-                if (adFreeStatusProvider.currentIsAdFree()) return@launch
+                if (entitlementProvider.current().isActive) return@launch
                 if (fullscreenAdState.isShowing()) return@launch
                 if (isWithinCooldown()) return@launch
 
                 val isColdStart = consumeColdStartFlag()
+                if (isColdStart && !appSettingsRepository.isOnboardingPaywallShown()) return@launch
+
                 val ad = ensureAdLoaded(isColdStart) ?: return@launch
 
                 if (isAdExpired()) {
@@ -124,12 +128,13 @@ class AppOpenAdController
             lastShownAt = System.currentTimeMillis()
             currentAd = null
             loadTimestamp = 0L
-            loadInternal()
+            scope.launch { loadInternal() }
         }
 
-        private fun loadInternal() {
+        private suspend fun loadInternal() {
             if (currentAd != null) return
             if (!loading.compareAndSet(false, true)) return
+            adsInitializer.awaitReady()
             val request = AdRequest.Builder().build()
             AppOpenAd.load(
                 context,
@@ -143,7 +148,7 @@ class AppOpenAdController
                     }
 
                     override fun onAdFailedToLoad(error: LoadAdError) {
-                        Timber.tag(TAG).w("load failed: %s", error.message)
+                        Timber.tag(TAG).w("load failed: code=%d %s", error.code, error.message)
                         currentAd = null
                         loadTimestamp = 0L
                         loading.set(false)
@@ -156,7 +161,7 @@ class AppOpenAdController
             const val TAG = "AppOpenAdCtrl"
             const val COOLDOWN_MS = 60_000L
             const val AD_EXPIRATION_MS = 4 * 60 * 60 * 1000L
-            const val COLD_START_WAIT_MS = 3000L
+            const val COLD_START_WAIT_MS = 6000L
             const val POLL_INTERVAL_MS = 100L
         }
     }

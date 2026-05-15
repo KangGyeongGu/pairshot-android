@@ -10,6 +10,7 @@ import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.RewardedAdController
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.lifecycle.AppOpenAdLifecycleObserver
+import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.coupon.domain.CouponRepository
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
@@ -48,6 +49,9 @@ class PairShotApplication : Application() {
     lateinit var couponRepository: CouponRepository
 
     @Inject
+    lateinit var billingRepository: BillingRepository
+
+    @Inject
     lateinit var syncMissingSourcesUseCase: SyncMissingSourcesUseCase
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -67,6 +71,7 @@ class PairShotApplication : Application() {
         rewardedAdController.preload()
         appOpenAdController.preload()
         appOpenAdLifecycleObserver.register(this)
+        billingRepository.start()
         applicationScope.launch {
             runCatching { withContext(Dispatchers.IO) { couponRepository.retryPendingIfAny() } }
         }
@@ -107,6 +112,10 @@ class PairShotApplication : Application() {
                     applicationScope.launch {
                         runCatching { withContext(Dispatchers.IO) { syncMissingSourcesUseCase() } }
                             .onFailure { Timber.w(it, "syncMissingSources failed on app foreground") }
+                    }
+                    applicationScope.launch {
+                        runCatching { billingRepository.refresh() }
+                            .onFailure { Timber.w(it, "billing refresh failed on app foreground") }
                     }
                 }
             },

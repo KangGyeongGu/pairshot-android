@@ -15,6 +15,7 @@ import com.pairshot.feature.camera.viewmodel.CameraViewModel
 @Composable
 fun CameraRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToPaywall: () -> Unit,
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
     Box(
@@ -27,6 +28,7 @@ fun CameraRoute(
             CameraScreen(
                 viewModel = viewModel,
                 onNavigateBack = onNavigateBack,
+                onNavigateToPaywall = onNavigateToPaywall,
             )
         }
     }

@@ -91,8 +91,8 @@ private const val JPEG_QUALITY_BEST = 95
 private const val HIGHLIGHT_PULSE_ON_MS = 600L
 private const val HIGHLIGHT_PULSE_OFF_MS = 400L
 private const val HIGHLIGHT_COLOR_ALPHA = 0.3f
-private const val HIGHLIGHT_WATERMARK_INDEX = 6
-private const val HIGHLIGHT_COMBINE_INDEX = 9
+private const val HIGHLIGHT_WATERMARK_INDEX = 3
+private const val HIGHLIGHT_COMBINE_INDEX = 6
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +114,7 @@ fun SettingsScreen(
     onOverlayAlphaChange: (Float) -> Unit,
     snackbarController: PairShotSnackbarController,
     highlight: SettingsHighlight? = null,
-    couponSection: @Composable () -> Unit = {},
+    proSubscriptionSection: @Composable () -> Unit = {},
 ) {
     val haptic = LocalHapticFeedback.current
     var showClearCacheDialog by remember { mutableStateOf(false) }
@@ -295,41 +295,8 @@ fun SettingsScreen(
                                     vertical = PairShotSpacing.cardPadding,
                                 ),
                         ) {
-                            item(key = "label_general") {
-                                SettingsSectionLabel(label = stringResource(R.string.settings_section_general))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
-                            }
-
-                            item(key = "card_general") {
-                                SettingsCard {
-                                    val languageLabel =
-                                        when (currentLocale) {
-                                            AppLocale.SYSTEM -> stringResource(R.string.settings_language_system)
-                                            AppLocale.KOREAN -> stringResource(R.string.settings_language_korean)
-                                            AppLocale.ENGLISH -> stringResource(R.string.settings_language_english)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_language),
-                                        trailing = languageLabel,
-                                        onClick = { showLanguageDialog = true },
-                                    )
-                                    SettingsDivider()
-                                    val themeLabel =
-                                        when (currentTheme) {
-                                            AppTheme.SYSTEM -> stringResource(R.string.settings_theme_system)
-                                            AppTheme.LIGHT -> stringResource(R.string.settings_theme_light)
-                                            AppTheme.DARK -> stringResource(R.string.settings_theme_dark)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_theme),
-                                        trailing = themeLabel,
-                                        onClick = { showThemeDialog = true },
-                                    )
-                                }
-                            }
-
-                            item(key = "gap_general") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                            item(key = "section_pro_subscription") {
+                                proSubscriptionSection()
                             }
 
                             item(key = "label_capture") {
@@ -416,7 +383,7 @@ fun SettingsScreen(
                                 }
                             }
 
-                            item(key = "gap_1") {
+                            item(key = "gap_capture") {
                                 Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
                             }
 
@@ -478,7 +445,7 @@ fun SettingsScreen(
                                 }
                             }
 
-                            item(key = "gap_2") {
+                            item(key = "gap_watermark") {
                                 Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
                             }
 
@@ -502,8 +469,41 @@ fun SettingsScreen(
                                 Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
                             }
 
-                            item(key = "section_coupon") {
-                                couponSection()
+                            item(key = "label_general") {
+                                SettingsSectionLabel(label = stringResource(R.string.settings_section_general))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                            }
+
+                            item(key = "card_general") {
+                                SettingsCard {
+                                    val languageLabel =
+                                        when (currentLocale) {
+                                            AppLocale.SYSTEM -> stringResource(R.string.settings_language_system)
+                                            AppLocale.KOREAN -> stringResource(R.string.settings_language_korean)
+                                            AppLocale.ENGLISH -> stringResource(R.string.settings_language_english)
+                                        }
+                                    SettingsItem(
+                                        label = stringResource(R.string.settings_item_language),
+                                        trailing = languageLabel,
+                                        onClick = { showLanguageDialog = true },
+                                    )
+                                    SettingsDivider()
+                                    val themeLabel =
+                                        when (currentTheme) {
+                                            AppTheme.SYSTEM -> stringResource(R.string.settings_theme_system)
+                                            AppTheme.LIGHT -> stringResource(R.string.settings_theme_light)
+                                            AppTheme.DARK -> stringResource(R.string.settings_theme_dark)
+                                        }
+                                    SettingsItem(
+                                        label = stringResource(R.string.settings_item_theme),
+                                        trailing = themeLabel,
+                                        onClick = { showThemeDialog = true },
+                                    )
+                                }
+                            }
+
+                            item(key = "gap_general") {
+                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
                             }
 
                             item(key = "label_storage_info") {

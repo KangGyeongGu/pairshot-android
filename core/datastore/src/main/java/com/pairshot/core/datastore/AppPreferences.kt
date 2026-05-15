@@ -49,6 +49,7 @@ class AppPreferences
             val HOME_SORT_ORDER = stringPreferencesKey("home_sort_order")
             val ALBUM_SORT_ORDER = stringPreferencesKey("album_sort_order")
             val APP_THEME = stringPreferencesKey("app_theme")
+            val ONBOARDING_PAYWALL_SHOWN = booleanPreferencesKey("onboarding_paywall_shown")
         }
 
         val jpegQuality: Flow<Int> =
@@ -256,6 +257,17 @@ class AppPreferences
         suspend fun setAppTheme(theme: String) {
             context.appDataStore.edit { prefs ->
                 prefs[Keys.APP_THEME] = theme
+            }
+        }
+
+        val onboardingPaywallShown: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.ONBOARDING_PAYWALL_SHOWN] ?: false
+            }
+
+        suspend fun setOnboardingPaywallShown(shown: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.ONBOARDING_PAYWALL_SHOWN] = shown
             }
         }
     }

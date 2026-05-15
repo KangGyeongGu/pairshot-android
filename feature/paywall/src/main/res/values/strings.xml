@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="paywall_title">PairShot Pro</string>
+    <string name="paywall_subtitle">전·후 사진 관리를 손쉽게.</string>
+
+    <string name="paywall_value_unlimited">페어 무제한 생성</string>
+    <string name="paywall_value_no_ads">전체 광고 제거</string>
+    <string name="paywall_value_pro_features">합성·워터마크 모든 기능 액세스</string>
+
+    <string name="paywall_plan_yearly_title">연간 구독</string>
+    <string name="paywall_plan_yearly_price">%1$s/년</string>
+    <string name="paywall_plan_yearly_subtitle">2주 무료체험 후 결제 · %1$s 원/월</string>
+    <string name="paywall_plan_yearly_badge">20% 할인</string>
+
+    <string name="paywall_plan_monthly_title">월간 구독</string>
+    <string name="paywall_plan_monthly_price">%1$s/월</string>
+    <string name="paywall_plan_monthly_trial_note">2주 무료체험 후 결제 · 언제든 취소</string>
+
+    <string name="paywall_continue_free">무료 버전으로 계속 (페어 5개/일, 광고 표시)</string>
+
+    <string name="paywall_restore">구매 복원</string>
+    <string name="paywall_terms">이용약관</string>
+    <string name="paywall_privacy">개인정보처리방침</string>
+
+    <string name="paywall_loading">상품 정보 불러오는 중…</string>
+    <string name="paywall_load_failed">상품 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</string>
+    <string name="paywall_purchase_failed">결제를 시작할 수 없습니다. 다시 시도해주세요.</string>
+
+    <string name="paywall_restore_no_subscription">활성 구독을 찾지 못했습니다.</string>
+    <string name="paywall_restore_success">구독이 복원되었습니다.</string>
+
+    <string name="paywall_logo_content_description">PairShot 로고</string>
+</resources>

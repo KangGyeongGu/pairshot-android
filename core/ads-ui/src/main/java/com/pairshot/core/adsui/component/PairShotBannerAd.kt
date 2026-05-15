@@ -32,6 +32,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.di.AdsEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 val DefaultAdaptiveBannerFallbackHeight: Dp = 62.dp
@@ -54,11 +55,9 @@ fun PairShotBannerAd(
             )
         }
     val adsConfig = remember(entryPoint) { entryPoint.adsConfig() }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint.adFreeStatusProvider() }
-
-    val isAdFree: Boolean? by adFreeStatusProvider
-        .observeIsAdFree()
-        .collectAsStateWithLifecycle(initialValue = null)
+    val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
+    val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
+    val isAdFree: Boolean? by isActiveFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
