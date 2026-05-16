@@ -60,4 +60,7 @@ data object License
 @Serializable
 data class Paywall(
     val dismissible: Boolean = true,
+    val trigger: PaywallTrigger = PaywallTrigger.NONE,
 )
+
+enum class PaywallTrigger { NONE, DAILY_LIMIT, FEATURE_LOCKED }

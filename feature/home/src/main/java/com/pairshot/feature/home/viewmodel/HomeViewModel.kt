@@ -8,6 +8,7 @@ import com.pairshot.core.domain.album.DeleteAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
 import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.PhotoPairRepository
@@ -90,8 +91,12 @@ class HomeViewModel
         private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
         private val locationProvider: LocationProvider,
         private val appSettingsRepository: AppSettingsRepository,
+        private val canCreatePairUseCase: CanCreatePairUseCase,
         membershipProvider: MembershipProvider,
     ) : ViewModel() {
+        suspend fun isCameraEntryAllowed(): Boolean =
+            canCreatePairUseCase() is CanCreatePairUseCase.Result.Allowed
+
         val isProSubscriber: StateFlow<Boolean> =
             membershipProvider
                 .observe()

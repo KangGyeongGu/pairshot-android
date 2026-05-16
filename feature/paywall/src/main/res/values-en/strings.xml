@@ -39,6 +39,10 @@
 
     <string name="paywall_logo_content_description">PairShot logo</string>
 
+    <!-- Pro hint snackbar (shown when paywall is triggered) -->
+    <string name="pro_hint_daily_limit">You\'ve reached today\'s free limit</string>
+    <string name="pro_hint_feature_locked">Subscribe to Pro to unlock this feature</string>
+
     <string name="paywall_disclosure_auto_renew">Subscription auto-renews each billing cycle unless cancelled at least 24 hours before renewal in Google Play.</string>
     <string name="paywall_disclosure_withdrawal">Right of withdrawal may be limited once digital content delivery begins. Refunds follow Google Play\'s refund policy.</string>
     <string name="paywall_disclosure_minor">A minor who made a purchase without legal guardian consent may cancel through the guardian.</string>

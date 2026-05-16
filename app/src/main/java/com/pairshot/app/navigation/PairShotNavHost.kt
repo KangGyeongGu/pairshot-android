@@ -95,6 +95,9 @@ fun PairShotNavHost(
                 },
                 onNavigateToAlbumDetail = { albumId -> navController.navigate(AlbumDetail(albumId)) },
                 onNavigateToCamera = { navController.navigate(Camera()) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
                 onNavigateToSettings = { navController.navigate(Settings()) },
                 onNavigateToExportSettings = { ids ->
                     navController.navigate(ExportSettings(ids.joinToString(",")))
@@ -139,8 +142,8 @@ fun PairShotNavHost(
                         }
                     }
                 },
-                onNavigateToPaywall = {
-                    navController.navigate(Paywall(dismissible = true))
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
                 },
             )
         }
@@ -148,6 +151,7 @@ fun PairShotNavHost(
             val paywall: Paywall = entry.toRoute()
             PaywallRoute(
                 dismissible = paywall.dismissible,
+                trigger = paywall.trigger,
                 onDismiss = {
                     if (!navController.popBackStack()) {
                         navController.navigate(Camera()) {
@@ -200,7 +204,9 @@ fun PairShotNavHost(
                 onNavigateToCombineSettings = {
                     navController.navigate(Settings(highlight = SettingsHighlight.COMBINE))
                 },
-                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
                 onShare = onShareSelected,
                 onSaveToDevice = onSaveSelectedToDevice,
             )
@@ -224,13 +230,17 @@ fun PairShotNavHost(
         composable<WatermarkSettings> {
             WatermarkSettingsRoute(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
             )
         }
         composable<CombineSettings> {
             CombineSettingsRoute(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToPaywall = { navController.navigate(Paywall(dismissible = true)) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
             )
         }
     }

@@ -56,6 +56,12 @@ private fun ExportFormatRadioItem(
     locked: Boolean,
     onClick: () -> Unit,
 ) {
+    val labelColor =
+        if (locked) {
+            MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_LABEL_ALPHA)
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
     Row(
         modifier =
             Modifier
@@ -68,7 +74,7 @@ private fun ExportFormatRadioItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = labelColor,
             modifier = Modifier.weight(1f),
         )
         if (locked) {
@@ -82,3 +88,5 @@ private fun ExportFormatRadioItem(
         )
     }
 }
+
+private const val DISABLED_LABEL_ALPHA = 0.38f

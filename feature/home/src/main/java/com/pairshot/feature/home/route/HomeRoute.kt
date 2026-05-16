@@ -5,12 +5,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.feature.home.screen.HomeScreen
 import com.pairshot.feature.home.viewmodel.HomeEvent
 import com.pairshot.feature.home.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(
@@ -19,12 +22,14 @@ fun HomeRoute(
     onNavigateToBeforeRetake: (Long) -> Unit,
     onNavigateToAlbumDetail: (Long) -> Unit,
     onNavigateToCamera: () -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToExportSettings: (Set<Long>) -> Unit,
     onShareSelected: (Set<Long>) -> Unit,
     onSaveToDevice: (Set<Long>) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val scope = rememberCoroutineScope()
     val mode by viewModel.mode.collectAsStateWithLifecycle()
     val pairs by viewModel.pairs.collectAsStateWithLifecycle()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
@@ -101,7 +106,15 @@ fun HomeRoute(
         },
         onFetchLocation = viewModel::fetchCurrentLocation,
         onNavigateToSettings = onNavigateToSettings,
-        onNavigateToCamera = onNavigateToCamera,
+        onNavigateToCamera = {
+            scope.launch {
+                if (viewModel.isCameraEntryAllowed()) {
+                    onNavigateToCamera()
+                } else {
+                    onNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                }
+            }
+        },
         isRefreshing = isRefreshing,
         onRefresh = viewModel::refresh,
         isProSubscriber = isProSubscriber,

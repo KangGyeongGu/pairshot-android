@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.feature.exportsettings.screen.ExportSettingsScreen
 import com.pairshot.feature.exportsettings.viewmodel.ExportSettingsViewModel
 
@@ -13,7 +14,7 @@ fun ExportSettingsRoute(
     onNavigateBack: () -> Unit,
     onNavigateToWatermarkSettings: () -> Unit,
     onNavigateToCombineSettings: () -> Unit,
-    onNavigateToPaywall: () -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     onShare: (Set<Long>) -> Unit,
     onSaveToDevice: (Set<Long>) -> Unit,
     viewModel: ExportSettingsViewModel = hiltViewModel(),
@@ -49,7 +50,7 @@ fun ExportSettingsRoute(
         onNavigateBack = onNavigateBack,
         onNavigateToWatermarkSettings = onNavigateToWatermarkSettings,
         onNavigateToCombineSettings = onNavigateToCombineSettings,
-        onProLocked = onNavigateToPaywall,
+        onProLocked = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
         onShare = { onShare(pairIdSet) },
         onSaveToDevice = { onSaveToDevice(pairIdSet) },
     )

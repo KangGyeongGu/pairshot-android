@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.billing.domain.PurchaseError
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
@@ -25,12 +26,28 @@ fun PaywallRoute(
     dismissible: Boolean,
     onDismiss: () -> Unit,
     onEntitled: () -> Unit,
+    trigger: PaywallTrigger = PaywallTrigger.NONE,
     viewModel: PaywallViewModel = hiltViewModel(),
 ) {
     val activity = LocalActivity.current
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
+
+    LaunchedEffect(trigger) {
+        val messageRes =
+            when (trigger) {
+                PaywallTrigger.DAILY_LIMIT -> R.string.pro_hint_daily_limit
+                PaywallTrigger.FEATURE_LOCKED -> R.string.pro_hint_feature_locked
+                PaywallTrigger.NONE -> return@LaunchedEffect
+            }
+        snackbarController.show(
+            SnackbarEvent(
+                UiText.Resource(messageRes),
+                SnackbarVariant.PRO_HINT,
+            ),
+        )
+    }
 
     val fullscreenAdState =
         remember(context) {

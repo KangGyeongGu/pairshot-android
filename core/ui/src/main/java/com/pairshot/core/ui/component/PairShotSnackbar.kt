@@ -32,6 +32,7 @@ private const val DOT_SUCCESS_ARGB = 0xFF30D158L
 private const val DOT_INFO_ARGB = 0xFF0A84FFL
 private const val DOT_WARNING_ARGB = 0xFFFF9F0AL
 private const val DOT_ERROR_ARGB = 0xFFFF453AL
+private const val DOT_PRO_ARGB = 0xFFFFD60AL
 private const val WARNING_HAPTIC_GAP_MS = 120L
 private const val ERROR_HAPTIC_GAP_MS = 90L
 private const val SNACKBAR_CORNER_RADIUS_DP = 999
@@ -44,6 +45,7 @@ private fun dotColor(variant: SnackbarVariant): Color =
         SnackbarVariant.INFO -> Color(DOT_INFO_ARGB)
         SnackbarVariant.WARNING -> Color(DOT_WARNING_ARGB)
         SnackbarVariant.ERROR -> Color(DOT_ERROR_ARGB)
+        SnackbarVariant.PRO_HINT -> Color(DOT_PRO_ARGB)
     }
 
 @Composable
@@ -126,6 +128,10 @@ private suspend fun performSnackbarHaptic(
             delay(ERROR_HAPTIC_GAP_MS)
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             delay(ERROR_HAPTIC_GAP_MS)
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+
+        SnackbarVariant.PRO_HINT -> {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }

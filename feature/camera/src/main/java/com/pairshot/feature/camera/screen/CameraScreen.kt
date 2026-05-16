@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.domain.pair.CanCreatePairUseCase
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.SnackbarEvent
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 internal fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToPaywall: () -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -162,7 +163,7 @@ internal fun CameraScreen(
                 scope.launch {
                     when (viewModel.canCreatePair()) {
                         is CanCreatePairUseCase.Result.LimitReached -> {
-                            onNavigateToPaywall()
+                            onNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
                             return@launch
                         }
                         CanCreatePairUseCase.Result.Allowed -> Unit
