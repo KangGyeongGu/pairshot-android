@@ -35,9 +35,7 @@ android {
 
     signingConfigs {
         create("release") {
-            // CI / 키스토어 미보유 환경에서는 build.gradle.kts 평가 단계가 NPE 로
-            // 실패하지 않도록 키스토어 정보가 모두 갖춰진 경우에만 설정한다.
-            // release 빌드를 실제로 시도하면 미설정 사실이 그 시점에 명확히 드러남.
+
             val keystorePath = System.getenv("KEYSTORE_PATH")
                 ?: localProperties.getProperty("KEYSTORE_PATH")
             if (keystorePath != null) {

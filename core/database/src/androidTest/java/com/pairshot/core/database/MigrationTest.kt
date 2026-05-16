@@ -24,22 +24,14 @@ class MigrationTest {
             PairShotDatabase::class.java,
         )
 
-    /**
-     * Catches the v1.1.5 class of bug — any schema mismatch (column type / nullability /
-     * affinity / pk position) between the migrated DB and the entity-bundle expectation
-     * makes runMigrationsAndValidate throw.
-     */
+    
     @Test
     fun migrate_1_to_2_validatesSchema() {
         helper.createDatabase(dbName, 1).close()
         helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2).close()
     }
 
-    /**
-     * Verifies photo_pairs rows survive the table-rebuild migration, including the
-     * formerly-NOT-NULL beforePhotoUri (which must remain readable) and the nullable
-     * afterPhotoUri/zoomLevel/afterTimestamp.
-     */
+    
     @Test
     fun migrate_1_to_2_preservesPhotoPairs() {
         helper.createDatabase(dbName, 1).use { db ->
@@ -75,11 +67,7 @@ class MigrationTest {
         }
     }
 
-    /**
-     * Verifies the FK-referencing tables (pair_album_cross_ref, export_history) keep
-     * their rows pointing at the rebuilt photo_pairs by id.  Catches regressions where
-     * DROP+RENAME accidentally cascade-deletes dependent rows.
-     */
+    
     @Test
     fun migrate_1_to_2_preservesForeignKeyRows() {
         helper.createDatabase(dbName, 1).use { db ->
@@ -115,10 +103,7 @@ class MigrationTest {
         }
     }
 
-    /**
-     * v2 -> v3 adds nullable aspectRatio column. Schema validation must pass and existing
-     * rows must remain readable with aspectRatio defaulting to NULL.
-     */
+    
     @Test
     fun migrate_2_to_3_validatesSchema() {
         helper.createDatabase(dbName, 2).close()

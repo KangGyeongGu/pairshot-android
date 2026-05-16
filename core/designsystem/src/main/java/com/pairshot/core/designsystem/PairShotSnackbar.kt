@@ -2,7 +2,7 @@ package com.pairshot.core.designsystem
 
 import androidx.compose.ui.unit.dp
 
-/** Snackbar layout dimensions. */
+
 object PairShotSnackbarTokens {
     val horizontalPadding = 16.dp
     val verticalPadding = 14.dp

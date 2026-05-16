@@ -173,5 +173,5 @@ private tailrec fun Context.asActivityOrNull(): Activity? =
 
 private const val TAG = "PairShotBannerAd"
 
-/** Max height (dp) for inline adaptive banner. Server returns size up to this; we reserve the max. */
+
 private const val BANNER_MAX_HEIGHT_DP = 60

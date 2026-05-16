@@ -33,8 +33,6 @@ class AppSettingsRepositoryImpl
                 )
             }
 
-        // 6개 Flow 를 vararg combine 로 묶으면 Boolean / String 혼합으로 인한 타입 추론 경고가
-        // 나오므로 5-arg combine 결과를 마지막 한 Flow 와 다시 combine 해서 chain 형식 사용.
         private val cameraSettingsFlow: Flow<AppSettings> =
             combine(
                 appPreferences.cameraGridEnabled,
