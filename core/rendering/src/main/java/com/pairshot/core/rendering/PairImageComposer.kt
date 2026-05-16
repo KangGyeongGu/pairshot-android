@@ -37,6 +37,7 @@ private const val LABEL_HPAD_FACTOR = 0.75f
 private const val LABEL_MARGIN_FACTOR = 0.4f
 private const val LABEL_MIN_FONT_PX = 10f
 private const val BORDER_SLOT_COUNT = 3
+private const val REFERENCE_IMAGE_DIM_PX = 3000
 
 private data class LayoutPlacement(
     val canvasWidth: Int,
@@ -147,12 +148,19 @@ class PairImageComposer
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig,
             jpegQuality: Int,
+            profile: RenderProfile = RenderProfile.FULL,
         ) = withContext(Dispatchers.Default) {
+            val inputMaxPx =
+                if (profile.maxOutputPx > 0) profile.maxOutputPx / INPUT_DOWNSAMPLE_DIVISOR else 0
             val source =
                 withContext(Dispatchers.IO) {
-                    exifBitmapLoader.loadBitmapWithExifCorrection(sourceUri)
+                    if (inputMaxPx > 0) {
+                        exifBitmapLoader.loadBitmapDownscaled(sourceUri, inputMaxPx)
+                    } else {
+                        exifBitmapLoader.loadBitmapWithExifCorrection(sourceUri)
+                    }
                 }
-            val composed = composeSingleInternal(source, isBefore, combineConfig, watermarkConfig)
+            val composed = composeSingleInternal(source, isBefore, combineConfig, watermarkConfig, profile)
             try {
                 withContext(Dispatchers.IO) {
                     FileOutputStream(destFile).use { out ->
@@ -169,11 +177,13 @@ class PairImageComposer
             isBefore: Boolean,
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig,
+            profile: RenderProfile,
         ): Bitmap {
             val wmSource = applyWatermarkIfEnabled(source, watermarkConfig)
             if (wmSource !== source && !source.isRecycled) source.recycle()
 
-            val border = resolveBorderPx(combineConfig, RenderProfile.FULL)
+            val referenceDim = minOf(wmSource.width, wmSource.height)
+            val border = resolveBorderPx(combineConfig, referenceDim)
             val canvasWidth = wmSource.width + border * 2
             val canvasHeight = wmSource.height + border * 2
             val canvasBitmap =
@@ -187,12 +197,12 @@ class PairImageComposer
             canvas.drawBitmap(wmSource, border.toFloat(), border.toFloat(), null)
 
             if (combineConfig.labelEnabled) {
-                drawSingleLabel(canvas, isBefore, combineConfig, wmSource, border)
+                drawSingleLabel(canvas, isBefore, combineConfig, wmSource, border, referenceDim)
             }
 
             if (!wmSource.isRecycled) wmSource.recycle()
 
-            return canvasBitmap
+            return downscaleIfNeeded(canvasBitmap, profile.maxOutputPx)
         }
 
         private fun drawSingleLabel(
@@ -201,11 +211,10 @@ class PairImageComposer
             combineConfig: CombineConfig,
             image: Bitmap,
             border: Int,
+            referenceImageDim: Int,
         ) {
             val isFree = combineConfig.labelPositionMode == LabelPositionMode.FREE
-            val density = context.resources.displayMetrics.density
-            val cornerPx =
-                if (isFree) combineConfig.labelBgCornerDp * density * RenderProfile.FULL.borderScale else 0f
+            val cornerPx = resolveCornerPx(combineConfig, referenceImageDim, isFree)
             val text = if (isBefore) combineConfig.beforeLabel else combineConfig.afterLabel
             val anchor =
                 if (isFree) {
@@ -257,7 +266,12 @@ class PairImageComposer
 
             recycleOriginalsIfReplaced(before, wmBefore, after, wmAfter, recycleInputs)
 
-            val border = resolveBorderPx(combineConfig, profile)
+            val referenceDim =
+                minOf(
+                    minOf(wmBefore.width, wmBefore.height),
+                    minOf(wmAfter.width, wmAfter.height),
+                )
+            val border = resolveBorderPx(combineConfig, referenceDim)
             val placement = calculatePlacement(wmBefore, wmAfter, combineConfig.layout, border)
 
             val combined = createCanvasBitmap(placement)
@@ -268,7 +282,7 @@ class PairImageComposer
             canvas.drawBitmap(wmAfter, placement.afterLeft.toFloat(), placement.afterTop.toFloat(), null)
 
             if (combineConfig.labelEnabled) {
-                drawBothLabels(canvas, combineConfig, profile, wmBefore, wmAfter, placement)
+                drawBothLabels(canvas, combineConfig, referenceDim, wmBefore, wmAfter, placement)
             }
 
             recycleIntermediateBitmaps(before, wmBefore, after, wmAfter, recycleInputs)
@@ -311,11 +325,23 @@ class PairImageComposer
 
         private fun resolveBorderPx(
             combineConfig: CombineConfig,
-            profile: RenderProfile,
+            referenceImageDim: Int,
         ): Int {
             if (!combineConfig.borderEnabled) return 0
             val density = context.resources.displayMetrics.density
-            return (combineConfig.borderThicknessDp * density * profile.borderScale).toInt()
+            val scale = referenceImageDim.toFloat() / REFERENCE_IMAGE_DIM_PX
+            return (combineConfig.borderThicknessDp * density * scale).toInt()
+        }
+
+        private fun resolveCornerPx(
+            combineConfig: CombineConfig,
+            referenceImageDim: Int,
+            isFreeMode: Boolean,
+        ): Float {
+            if (!isFreeMode) return 0f
+            val density = context.resources.displayMetrics.density
+            val scale = referenceImageDim.toFloat() / REFERENCE_IMAGE_DIM_PX
+            return combineConfig.labelBgCornerDp * density * scale
         }
 
         private fun calculatePlacement(
@@ -369,14 +395,13 @@ class PairImageComposer
         private fun drawBothLabels(
             canvas: Canvas,
             combineConfig: CombineConfig,
-            profile: RenderProfile,
+            referenceImageDim: Int,
             wmBefore: Bitmap,
             wmAfter: Bitmap,
             placement: LayoutPlacement,
         ) {
             val isFree = combineConfig.labelPositionMode == LabelPositionMode.FREE
-            val density = context.resources.displayMetrics.density
-            val cornerPx = if (isFree) combineConfig.labelBgCornerDp * density * profile.borderScale else 0f
+            val cornerPx = resolveCornerPx(combineConfig, referenceImageDim, isFree)
 
             drawLabel(
                 canvas = canvas,

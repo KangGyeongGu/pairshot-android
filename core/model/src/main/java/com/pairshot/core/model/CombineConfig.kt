@@ -19,6 +19,14 @@ data class CombineConfig(
     val labelBgColorArgb: Int = 0xFF000000.toInt(),
     val labelBgAlpha: Float = 0.5f,
     val labelBgMatchesBorder: Boolean = true,
-)
+) {
+    companion object {
+        val NoDecoration: CombineConfig =
+            CombineConfig(
+                borderEnabled = false,
+                labelEnabled = false,
+            )
+    }
+}
 
 fun CombineConfig.effectiveLabelBgColor(): Int = if (labelBgMatchesBorder && borderEnabled) borderColorArgb else labelBgColorArgb

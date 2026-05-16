@@ -6,6 +6,7 @@ import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -20,13 +21,13 @@ class AppSettingsRepositoryImpl
     ) : AppSettingsRepository {
         private val baseSettingsFlow: Flow<AppSettings> =
             combine(
-                appPreferences.jpegQuality,
+                appPreferences.imageQuality,
                 appPreferences.fileNamePrefix,
                 appPreferences.overlayEnabled,
                 appPreferences.overlayAlpha,
-            ) { quality, prefix, enabled, alpha ->
+            ) { qualityName, prefix, enabled, alpha ->
                 AppSettings(
-                    jpegQuality = quality,
+                    imageQuality = qualityName.toImageQualityPreset(),
                     fileNamePrefix = prefix,
                     overlayEnabled = enabled,
                     defaultOverlayAlpha = alpha,
@@ -66,7 +67,7 @@ class AppSettingsRepositoryImpl
 
         override suspend fun getCurrent(): AppSettings = settingsFlow.first()
 
-        override suspend fun updateJpegQuality(quality: Int) = appPreferences.setJpegQuality(quality)
+        override suspend fun updateImageQuality(preset: ImageQualityPreset) = appPreferences.setImageQuality(preset.name)
 
         override suspend fun updateFileNamePrefix(prefix: String) = appPreferences.setFileNamePrefix(prefix)
 
@@ -130,5 +131,7 @@ class AppSettingsRepositoryImpl
 
 private fun String.toSortOrder(): SortOrder = runCatching { SortOrder.valueOf(this) }.getOrDefault(SortOrder.DESC)
 
-private fun String.toAspectRatio(): AspectRatio =
-    runCatching { AspectRatio.valueOf(this) }.getOrDefault(AspectRatio.RATIO_4_3)
+private fun String.toAspectRatio(): AspectRatio = runCatching { AspectRatio.valueOf(this) }.getOrDefault(AspectRatio.RATIO_4_3)
+
+private fun String.toImageQualityPreset(): ImageQualityPreset =
+    runCatching { ImageQualityPreset.valueOf(this) }.getOrDefault(ImageQualityPreset.DEFAULT)

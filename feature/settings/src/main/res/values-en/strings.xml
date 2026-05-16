@@ -26,7 +26,7 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
 
-    <string name="settings_item_image_quality">Image quality</string>
+    <string name="settings_item_image_quality">Export quality</string>
     <string name="settings_item_file_name_prefix">File name prefix</string>
     <string name="settings_item_overlay_opacity">Overlay opacity</string>
     <string name="settings_item_watermark_use">Use watermark</string>
@@ -47,7 +47,7 @@
     <string name="settings_quality_low_desc">Smaller file size</string>
     <string name="settings_quality_high">High (85%)</string>
     <string name="settings_quality_high_desc">Default, balanced</string>
-    <string name="settings_quality_best">Best (95%)</string>
+    <string name="settings_quality_best">Best (100%)</string>
     <string name="settings_quality_best_desc">Maximum quality</string>
 
     <!-- License Screen -->
@@ -119,7 +119,7 @@
     <string name="settings_dialog_cache_clear_title">Clear cache</string>
     <string name="settings_dialog_cache_clear_message">Clear cache?\nThumbnails will be deleted and regenerated.</string>
     <string name="settings_dialog_cache_clear_button">Clear</string>
-    <string name="settings_dialog_image_quality_title">Image quality</string>
+    <string name="settings_dialog_image_quality_title">Export quality</string>
     <string name="settings_dialog_apply">Apply</string>
     <string name="settings_dialog_file_name_prefix_title">File name prefix</string>
     <string name="settings_dialog_prefix_hint">Enter prefix (e.g., SiteA)_</string>

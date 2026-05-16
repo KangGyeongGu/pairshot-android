@@ -1,6 +1,7 @@
 package com.pairshot.core.data.repository
 
 import android.net.Uri
+import com.pairshot.core.data.export.ExportPipeline
 import com.pairshot.core.data.export.ShareImagePreparer
 import com.pairshot.core.data.export.WatermarkedBitmapWriter
 import com.pairshot.core.database.dao.PhotoPairDao
@@ -15,6 +16,8 @@ import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportHistoryEntry
 import com.pairshot.core.model.ExportHistoryKind
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.ImageQualityPreset
+import com.pairshot.core.model.RenderProfile
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.rendering.PairImageComposer
 import com.pairshot.core.storage.MediaStoreManager
@@ -44,6 +47,7 @@ class ExportRepositoryImpl
         private val pairImageComposer: PairImageComposer,
         private val appSettingsRepository: AppSettingsRepository,
         private val exportHistoryRepository: ExportHistoryRepository,
+        private val exportPipeline: ExportPipeline,
     ) : ExportRepository {
         override suspend fun composeCombinedForGallery(
             pairIds: List<Long>,
@@ -52,15 +56,22 @@ class ExportRepositoryImpl
             onProgress: (current: Int, total: Int) -> Unit,
         ): Int =
             withContext(Dispatchers.IO) {
-                val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
+                val imageQuality = appSettingsRepository.getCurrent().imageQuality
                 val pairs = photoPairDao.getByIds(pairIds)
                 val tempDir = shareImagePreparer.prepareTempDir("compose_combined")
-                var savedCount = 0
                 try {
-                    pairs.forEachIndexed { index, pair ->
-                        val before = pair.validBeforeUriOrNull()
-                        val after = pair.validAfterUriOrNull()
-                        if (before != null && after != null) {
+                    val results =
+                        exportPipeline.processInParallel(
+                            total = pairs.size,
+                            maxOutputPx = imageQuality.maxOutputPx,
+                            onProgress = onProgress,
+                        ) { index ->
+                            val pair = pairs[index]
+                            val before = pair.validBeforeUriOrNull()
+                            val after = pair.validAfterUriOrNull()
+                            if (before == null || after == null) {
+                                return@processInParallel false
+                            }
                             val displayName = "PAIR_%03d.jpg".format(index + 1)
                             val tempFile = File(tempDir, displayName)
                             composeCombinedFile(
@@ -69,7 +80,7 @@ class ExportRepositoryImpl
                                 destFile = tempFile,
                                 combineConfig = combineConfig,
                                 watermarkConfig = watermarkConfig,
-                                jpegQuality = jpegQuality,
+                                imageQuality = imageQuality,
                             )
                             val savedUri =
                                 mediaStoreManager.saveToGallery(
@@ -84,14 +95,12 @@ class ExportRepositoryImpl
                                     kind = ExportHistoryKind.COMBINED,
                                 ),
                             )
-                            savedCount++
+                            true
                         }
-                        onProgress(index + 1, pairs.size)
-                    }
+                    results.count { it == true }
                 } finally {
                     tempDir.deleteRecursively()
                 }
-                savedCount
             }
 
         override suspend fun saveDecoratedOriginals(
@@ -102,51 +111,57 @@ class ExportRepositoryImpl
             onProgress: (current: Int, total: Int) -> Unit,
         ): Int =
             withContext(Dispatchers.IO) {
-                val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
+                val imageQuality = appSettingsRepository.getCurrent().imageQuality
                 val pairs = photoPairDao.getByIds(pairIds)
                 val tempDir = shareImagePreparer.prepareTempDir("save_decorated_originals")
-                var savedCount = 0
                 try {
-                    pairs.forEachIndexed { index, pair ->
-                        val seq = index + 1
-                        if (preset.includeBefore) {
-                            pair.validBeforeUriOrNull()?.let { uri ->
-                                saveDecoratedToGallery(
-                                    pairId = pair.id,
-                                    sourceUri = uri,
-                                    tempDir = tempDir,
-                                    displayName = "BEFORE_%03d.jpg".format(seq),
-                                    kind = ExportHistoryKind.WATERMARKED_BEFORE,
-                                    isBefore = true,
-                                    combineConfig = combineConfig,
-                                    watermarkConfig = watermarkConfig,
-                                    jpegQuality = jpegQuality,
-                                )
-                                savedCount++
+                    val perPairCounts =
+                        exportPipeline.processInParallel(
+                            total = pairs.size,
+                            maxOutputPx = imageQuality.maxOutputPx,
+                            onProgress = onProgress,
+                        ) { index ->
+                            val pair = pairs[index]
+                            val seq = index + 1
+                            var localCount = 0
+                            if (preset.includeBefore) {
+                                pair.validBeforeUriOrNull()?.let { uri ->
+                                    saveDecoratedToGallery(
+                                        pairId = pair.id,
+                                        sourceUri = uri,
+                                        tempDir = tempDir,
+                                        displayName = "BEFORE_%03d.jpg".format(seq),
+                                        kind = ExportHistoryKind.WATERMARKED_BEFORE,
+                                        isBefore = true,
+                                        combineConfig = combineConfig,
+                                        watermarkConfig = watermarkConfig,
+                                        imageQuality = imageQuality,
+                                    )
+                                    localCount++
+                                }
                             }
-                        }
-                        if (preset.includeAfter) {
-                            pair.validAfterUriOrNull()?.let { uri ->
-                                saveDecoratedToGallery(
-                                    pairId = pair.id,
-                                    sourceUri = uri,
-                                    tempDir = tempDir,
-                                    displayName = "AFTER_%03d.jpg".format(seq),
-                                    kind = ExportHistoryKind.WATERMARKED_AFTER,
-                                    isBefore = false,
-                                    combineConfig = combineConfig,
-                                    watermarkConfig = watermarkConfig,
-                                    jpegQuality = jpegQuality,
-                                )
-                                savedCount++
+                            if (preset.includeAfter) {
+                                pair.validAfterUriOrNull()?.let { uri ->
+                                    saveDecoratedToGallery(
+                                        pairId = pair.id,
+                                        sourceUri = uri,
+                                        tempDir = tempDir,
+                                        displayName = "AFTER_%03d.jpg".format(seq),
+                                        kind = ExportHistoryKind.WATERMARKED_AFTER,
+                                        isBefore = false,
+                                        combineConfig = combineConfig,
+                                        watermarkConfig = watermarkConfig,
+                                        imageQuality = imageQuality,
+                                    )
+                                    localCount++
+                                }
                             }
+                            localCount
                         }
-                        onProgress(index + 1, pairs.size)
-                    }
+                    perPairCounts.filterNotNull().sum()
                 } finally {
                     tempDir.deleteRecursively()
                 }
-                savedCount
             }
 
         override suspend fun prepareZipForSave(
@@ -157,7 +172,7 @@ class ExportRepositoryImpl
             onProgress: (current: Int, total: Int) -> Unit,
         ): PreparedZip? =
             withContext(Dispatchers.IO) {
-                val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
+                val imageQuality = appSettingsRepository.getCurrent().imageQuality
                 val pairs = photoPairDao.getByIds(pairIds)
                 val outputDir = shareImagePreparer.prepareTempDir("save_zip")
                 val staging = shareImagePreparer.prepareTempDir("save_zip_staging")
@@ -165,29 +180,34 @@ class ExportRepositoryImpl
                 val zipFile = File(outputDir, suggestedName)
                 var success = false
                 try {
-                    val zipEntries = ArrayList<ZipImageEntry>()
-                    pairs.forEachIndexed { index, pair ->
-                        materializePairForShare(
-                            pair = pair,
-                            seq = index + 1,
-                            preset = preset,
-                            combineConfig = combineConfig,
-                            watermarkConfig = watermarkConfig,
-                            jpegQuality = jpegQuality,
-                            destDir = staging,
-                        ) { destFile, subdir ->
-                            zipEntries.add(
-                                ZipImageEntry(
-                                    uri = Uri.fromFile(destFile),
-                                    entryPath = "$subdir/${destFile.name}",
-                                ),
-                            )
+                    val entryLists =
+                        exportPipeline.processInParallel(
+                            total = pairs.size,
+                            maxOutputPx = imageQuality.maxOutputPx,
+                            onProgress = onProgress,
+                        ) { index ->
+                            val pair = pairs[index]
+                            val entries = mutableListOf<ZipImageEntry>()
+                            materializePairForShare(
+                                pair = pair,
+                                seq = index + 1,
+                                preset = preset,
+                                combineConfig = combineConfig,
+                                watermarkConfig = watermarkConfig,
+                                imageQuality = imageQuality,
+                                destDir = staging,
+                            ) { destFile, subdir ->
+                                entries.add(
+                                    ZipImageEntry(
+                                        uri = Uri.fromFile(destFile),
+                                        entryPath = "$subdir/${destFile.name}",
+                                    ),
+                                )
+                            }
+                            entries
                         }
-                        onProgress(index + 1, pairs.size)
-                    }
-
+                    val zipEntries = entryLists.filterNotNull().flatten()
                     if (zipEntries.isEmpty()) return@withContext null
-
                     zipManager.createZipToFile(
                         entries = zipEntries,
                         outputFile = zipFile,
@@ -249,25 +269,31 @@ class ExportRepositoryImpl
             onProgress: (current: Int, total: Int) -> Unit,
         ): List<String> =
             withContext(Dispatchers.IO) {
-                val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
+                val imageQuality = appSettingsRepository.getCurrent().imageQuality
                 val pairs = photoPairDao.getByIds(pairIds)
                 val shareDir = shareImagePreparer.prepareShareImageDir()
-                val results = ArrayList<String>()
-                pairs.forEachIndexed { index, pair ->
-                    materializePairForShare(
-                        pair = pair,
-                        seq = index + 1,
-                        preset = preset,
-                        combineConfig = combineConfig,
-                        watermarkConfig = watermarkConfig,
-                        jpegQuality = jpegQuality,
-                        destDir = shareDir,
-                    ) { destFile, _ ->
-                        results.add(shareImagePreparer.getFileProviderUri(destFile).toString())
+                val urlLists =
+                    exportPipeline.processInParallel(
+                        total = pairs.size,
+                        maxOutputPx = imageQuality.maxOutputPx,
+                        onProgress = onProgress,
+                    ) { index ->
+                        val pair = pairs[index]
+                        val urls = mutableListOf<String>()
+                        materializePairForShare(
+                            pair = pair,
+                            seq = index + 1,
+                            preset = preset,
+                            combineConfig = combineConfig,
+                            watermarkConfig = watermarkConfig,
+                            imageQuality = imageQuality,
+                            destDir = shareDir,
+                        ) { destFile, _ ->
+                            urls.add(shareImagePreparer.getFileProviderUri(destFile).toString())
+                        }
+                        urls
                     }
-                    onProgress(index + 1, pairs.size)
-                }
-                results
+                urlLists.filterNotNull().flatten()
             }
 
         private suspend fun buildShareZip(
@@ -278,32 +304,39 @@ class ExportRepositoryImpl
             onProgress: (current: Int, total: Int) -> Unit,
         ): String =
             withContext(Dispatchers.IO) {
-                val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
+                val imageQuality = appSettingsRepository.getCurrent().imageQuality
                 val pairs = photoPairDao.getByIds(pairIds)
                 val outputDir = shareImagePreparer.prepareTempDir("share_zip")
                 val outputFile = File(outputDir, "PairShot.zip")
                 val staging = shareImagePreparer.prepareTempDir("share_zip_staging")
                 try {
-                    val zipEntries = ArrayList<ZipImageEntry>()
-                    pairs.forEachIndexed { index, pair ->
-                        materializePairForShare(
-                            pair = pair,
-                            seq = index + 1,
-                            preset = preset,
-                            combineConfig = combineConfig,
-                            watermarkConfig = watermarkConfig,
-                            jpegQuality = jpegQuality,
-                            destDir = staging,
-                        ) { destFile, subdir ->
-                            zipEntries.add(
-                                ZipImageEntry(
-                                    uri = Uri.fromFile(destFile),
-                                    entryPath = "$subdir/${destFile.name}",
-                                ),
-                            )
+                    val entryLists =
+                        exportPipeline.processInParallel(
+                            total = pairs.size,
+                            maxOutputPx = imageQuality.maxOutputPx,
+                            onProgress = onProgress,
+                        ) { index ->
+                            val pair = pairs[index]
+                            val entries = mutableListOf<ZipImageEntry>()
+                            materializePairForShare(
+                                pair = pair,
+                                seq = index + 1,
+                                preset = preset,
+                                combineConfig = combineConfig,
+                                watermarkConfig = watermarkConfig,
+                                imageQuality = imageQuality,
+                                destDir = staging,
+                            ) { destFile, subdir ->
+                                entries.add(
+                                    ZipImageEntry(
+                                        uri = Uri.fromFile(destFile),
+                                        entryPath = "$subdir/${destFile.name}",
+                                    ),
+                                )
+                            }
+                            entries
                         }
-                        onProgress(index + 1, pairs.size)
-                    }
+                    val zipEntries = entryLists.filterNotNull().flatten()
                     zipManager.createZipToFile(
                         entries = zipEntries,
                         outputFile = outputFile,
@@ -321,7 +354,7 @@ class ExportRepositoryImpl
             preset: ExportPreset,
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig?,
-            jpegQuality: Int,
+            imageQuality: ImageQualityPreset,
             destDir: File,
             onFile: (destFile: File, subdir: String) -> Unit,
         ) {
@@ -329,7 +362,7 @@ class ExportRepositoryImpl
                 pair.validBeforeUriOrNull()?.let { uri ->
                     val name = "BEFORE_%03d.jpg".format(seq)
                     val destFile = File(destDir, name)
-                    materializeSingle(uri, destFile, isBefore = true, combineConfig, watermarkConfig, jpegQuality)
+                    materializeSingle(uri, destFile, isBefore = true, combineConfig, watermarkConfig, imageQuality)
                     onFile(destFile, "before")
                 }
             }
@@ -337,7 +370,7 @@ class ExportRepositoryImpl
                 pair.validAfterUriOrNull()?.let { uri ->
                     val name = "AFTER_%03d.jpg".format(seq)
                     val destFile = File(destDir, name)
-                    materializeSingle(uri, destFile, isBefore = false, combineConfig, watermarkConfig, jpegQuality)
+                    materializeSingle(uri, destFile, isBefore = false, combineConfig, watermarkConfig, imageQuality)
                     onFile(destFile, "after")
                 }
             }
@@ -347,7 +380,7 @@ class ExportRepositoryImpl
                 if (before != null && after != null) {
                     val name = "PAIR_%03d.jpg".format(seq)
                     val destFile = File(destDir, name)
-                    composeCombinedFile(before, after, destFile, combineConfig, watermarkConfig, jpegQuality)
+                    composeCombinedFile(before, after, destFile, combineConfig, watermarkConfig, imageQuality)
                     onFile(destFile, "combined")
                 }
             }
@@ -359,16 +392,19 @@ class ExportRepositoryImpl
             isBefore: Boolean,
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig?,
-            jpegQuality: Int,
+            imageQuality: ImageQualityPreset,
         ) {
-            if (com.pairshot.core.domain.export.needsIndividualDecoration(combineConfig, watermarkConfig)) {
+            if (com.pairshot.core.domain.export
+                    .needsIndividualDecoration(combineConfig, watermarkConfig)
+            ) {
                 pairImageComposer.composeSingleToFile(
                     sourceUri = Uri.parse(sourceUri),
                     destFile = destFile,
                     isBefore = isBefore,
                     combineConfig = combineConfig,
                     watermarkConfig = watermarkConfig ?: WatermarkConfig(),
-                    jpegQuality = jpegQuality,
+                    jpegQuality = imageQuality.jpegQuality,
+                    profile = RenderProfile.forExport(imageQuality),
                 )
             } else {
                 shareImagePreparer.copyFromContentUri(sourceUri, destFile)
@@ -384,7 +420,7 @@ class ExportRepositoryImpl
             isBefore: Boolean,
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig?,
-            jpegQuality: Int,
+            imageQuality: ImageQualityPreset,
         ) {
             val tempFile = File(tempDir, displayName)
             pairImageComposer.composeSingleToFile(
@@ -393,7 +429,8 @@ class ExportRepositoryImpl
                 isBefore = isBefore,
                 combineConfig = combineConfig,
                 watermarkConfig = watermarkConfig ?: WatermarkConfig(),
-                jpegQuality = jpegQuality,
+                jpegQuality = imageQuality.jpegQuality,
+                profile = RenderProfile.forExport(imageQuality),
             )
             val savedUri =
                 mediaStoreManager.saveToGallery(
@@ -416,16 +453,18 @@ class ExportRepositoryImpl
             destFile: File,
             combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig?,
-            jpegQuality: Int,
+            imageQuality: ImageQualityPreset,
         ) {
+            val profile = RenderProfile.forExport(imageQuality)
             if (watermarkConfig != null) {
                 watermarkedBitmapWriter.combineWithWatermark(
                     beforeUri = beforeUri,
                     afterUri = afterUri,
                     destFile = destFile,
                     config = watermarkConfig,
-                    jpegQuality = jpegQuality,
+                    jpegQuality = imageQuality.jpegQuality,
                     combineConfig = combineConfig,
+                    profile = profile,
                 )
             } else {
                 pairImageComposer.composeToFile(
@@ -434,7 +473,8 @@ class ExportRepositoryImpl
                     destFile = destFile,
                     combineConfig = combineConfig,
                     watermarkConfig = WatermarkConfig(),
-                    jpegQuality = jpegQuality,
+                    jpegQuality = imageQuality.jpegQuality,
+                    profile = profile,
                 )
             }
         }

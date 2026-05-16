@@ -10,9 +10,10 @@ import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.RewardedAdController
 import com.pairshot.core.ads.lifecycle.AppOpenAdLifecycleObserver
 import com.pairshot.core.billing.BillingRepository
-import com.pairshot.core.promotion.domain.PromotionRepository
+import com.pairshot.core.data.device.ExportMemoryThrottle
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.promotion.domain.PromotionRepository
 import com.pairshot.feature.settings.theme.AppTheme
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +51,9 @@ class PairShotApplication : Application() {
     @Inject
     lateinit var syncMissingSourcesUseCase: SyncMissingSourcesUseCase
 
+    @Inject
+    lateinit var exportMemoryThrottle: ExportMemoryThrottle
+
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
@@ -58,6 +62,7 @@ class PairShotApplication : Application() {
             Timber.plant(Timber.DebugTree())
             installStrictMode()
         }
+        registerComponentCallbacks(exportMemoryThrottle)
         applicationScope.launch {
             val name = appSettingsRepository.appThemeNameFlow.first()
             AppTheme.fromName(name).apply()

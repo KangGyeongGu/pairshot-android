@@ -26,7 +26,7 @@
     <string name="settings_theme_light">라이트</string>
     <string name="settings_theme_dark">다크</string>
 
-    <string name="settings_item_image_quality">이미지 품질</string>
+    <string name="settings_item_image_quality">내보내기 품질</string>
     <string name="settings_item_file_name_prefix">파일명 접두어</string>
     <string name="settings_item_overlay_opacity">오버레이 투명도</string>
     <string name="settings_item_watermark_use">워터마크 사용</string>
@@ -47,7 +47,7 @@
     <string name="settings_quality_low_desc">파일 크기 작음</string>
     <string name="settings_quality_high">높음 (85%)</string>
     <string name="settings_quality_high_desc">기본값, 균형</string>
-    <string name="settings_quality_best">최상 (95%)</string>
+    <string name="settings_quality_best">최상 (100%)</string>
     <string name="settings_quality_best_desc">최대 품질</string>
 
     <!-- License Screen -->
@@ -119,7 +119,7 @@
     <string name="settings_dialog_cache_clear_title">캐시 초기화</string>
     <string name="settings_dialog_cache_clear_message">캐시를 초기화하시겠습니까?\n썸네일이 삭제되며, 다시 생성됩니다.</string>
     <string name="settings_dialog_cache_clear_button">초기화</string>
-    <string name="settings_dialog_image_quality_title">이미지 품질</string>
+    <string name="settings_dialog_image_quality_title">내보내기 품질</string>
     <string name="settings_dialog_apply">적용</string>
     <string name="settings_dialog_file_name_prefix_title">파일명 접두어</string>
     <string name="settings_dialog_prefix_hint">접두어 입력 (예: 현장A)_</string>

@@ -8,6 +8,7 @@ import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.ClearCacheUseCase
 import com.pairshot.core.domain.settings.GetStorageInfoUseCase
 import com.pairshot.core.domain.settings.WatermarkRepository
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
@@ -38,7 +39,7 @@ sealed interface SettingsUiState {
         val usedStorageBytes: Long,
         val cacheBytes: Long,
         val appVersion: String,
-        val jpegQuality: Int = 85,
+        val imageQuality: ImageQualityPreset = ImageQualityPreset.DEFAULT,
         val fileNamePrefix: String = "PAIRSHOT",
         val overlayEnabled: Boolean = true,
         val overlayAlpha: Float = 0.35f,
@@ -80,7 +81,7 @@ class SettingsViewModel
                 when (storageState) {
                     is SettingsUiState.Success -> {
                         storageState.copy(
-                            jpegQuality = appSettings.jpegQuality,
+                            imageQuality = appSettings.imageQuality,
                             fileNamePrefix = appSettings.fileNamePrefix,
                             overlayEnabled = appSettings.overlayEnabled,
                             overlayAlpha = appSettings.defaultOverlayAlpha,
@@ -198,9 +199,9 @@ class SettingsViewModel
             }
         }
 
-        fun updateJpegQuality(quality: Int) {
+        fun updateImageQuality(preset: ImageQualityPreset) {
             viewModelScope.launch {
-                appSettingsRepository.updateJpegQuality(quality)
+                appSettingsRepository.updateImageQuality(preset)
             }
         }
 

@@ -21,7 +21,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,10 +39,11 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.core.ui.component.PairShotDialog
 import com.pairshot.core.ui.component.SettingsSliderItem
@@ -53,29 +53,30 @@ import com.pairshot.core.ui.R as CoreR
 
 private val InputFieldMinHeight = PairShotIconSize.xl
 private val InputErrorHeight = PairShotScreen.horizontalPadding
-private const val JPEG_QUALITY_LOW = 75
-private const val JPEG_QUALITY_HIGH = 85
-private const val JPEG_QUALITY_BEST = 95
 
 private data class QualityOption(
     val label: String,
     val description: String,
-    val value: Int,
+    val value: ImageQualityPreset,
 )
 
 @Composable
 private fun qualityOptions(): List<QualityOption> =
     listOf(
-        QualityOption(stringResource(R.string.settings_quality_low), stringResource(R.string.settings_quality_low_desc), JPEG_QUALITY_LOW),
+        QualityOption(
+            stringResource(R.string.settings_quality_low),
+            stringResource(R.string.settings_quality_low_desc),
+            ImageQualityPreset.LOW,
+        ),
         QualityOption(
             stringResource(R.string.settings_quality_high),
             stringResource(R.string.settings_quality_high_desc),
-            JPEG_QUALITY_HIGH,
+            ImageQualityPreset.HIGH,
         ),
         QualityOption(
             stringResource(R.string.settings_quality_best),
             stringResource(R.string.settings_quality_best_desc),
-            JPEG_QUALITY_BEST,
+            ImageQualityPreset.BEST,
         ),
     )
 
@@ -143,11 +144,11 @@ internal fun ClearCacheDialog(
 
 @Composable
 internal fun ImageQualityDialog(
-    currentQuality: Int,
-    onQualityChange: (Int) -> Unit,
+    currentQuality: ImageQualityPreset,
+    onQualityChange: (ImageQualityPreset) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var selectedQuality by rememberSaveable { mutableIntStateOf(currentQuality) }
+    var selectedQuality by rememberSaveable { mutableStateOf(currentQuality) }
 
     PairShotBottomSheet(onDismissRequest = onDismiss) {
         Text(

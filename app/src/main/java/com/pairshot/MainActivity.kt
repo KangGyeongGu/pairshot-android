@@ -14,9 +14,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,19 +33,19 @@ import com.pairshot.app.navigation.effect.ExportShareEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.ads.initializer.AdsInitializer
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
-import com.pairshot.core.designsystem.PairShotSnackbarTokens
-import com.pairshot.core.ui.component.PairShotSnackbar
+import com.pairshot.core.ui.component.PairShotSnackbarController
+import com.pairshot.core.ui.component.PairShotSnackbarHost
+import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.component.TopProgressPill
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val SELECTION_MESSAGE_AUTO_DISMISS_MS = 2500L
 private const val SNACKBAR_OFFSET_WHEN_PROGRESS_DP = 80
 
 @AndroidEntryPoint
@@ -113,7 +111,7 @@ private fun AppRootContent(
     val startupVm: StartupDecisionViewModel = hiltViewModel()
     val initialRoute by startupVm.initialRoute.collectAsStateWithLifecycle()
     val progress by selectionVm.progress.collectAsStateWithLifecycle()
-    var selectionMessage by remember { mutableStateOf<SelectionMessage?>(null) }
+    val snackbarController = remember { PairShotSnackbarController() }
 
     LaunchedEffect(initialRoute) {
         if (initialRoute != null) onStartupReady()
@@ -132,13 +130,8 @@ private fun AppRootContent(
         }
 
     LaunchedEffect(Unit) {
-        selectionVm.messages.collect { msg -> selectionMessage = msg }
-    }
-
-    LaunchedEffect(selectionMessage) {
-        if (selectionMessage != null) {
-            delay(SELECTION_MESSAGE_AUTO_DISMISS_MS)
-            selectionMessage = null
+        selectionVm.messages.collect { msg ->
+            snackbarController.show(msg.toSnackbarEvent())
         }
     }
 
@@ -190,29 +183,30 @@ private fun AppRootContent(
             )
         }
 
-        selectionMessage?.let { msg ->
-            val variant =
-                when (msg) {
-                    is SelectionMessage.Success -> SnackbarVariant.SUCCESS
-                    is SelectionMessage.Warning -> SnackbarVariant.WARNING
-                    is SelectionMessage.Error -> SnackbarVariant.ERROR
-                }
-            PairShotSnackbar(
-                message = msg.text.asString(),
-                variant = variant,
-                modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .padding(
-                            top =
-                                if (progress != null) {
-                                    SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
-                                } else {
-                                    PairShotSnackbarTokens.topOffset
-                                },
-                        ),
-            )
-        }
+        PairShotSnackbarHost(
+            controller = snackbarController,
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(
+                        top =
+                            if (progress != null) {
+                                SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
+                            } else {
+                                PairShotSnackbarTokens.topOffset
+                            },
+                    ),
+        )
     }
+}
+
+private fun SelectionMessage.toSnackbarEvent(): SnackbarEvent {
+    val variant =
+        when (this) {
+            is SelectionMessage.Success -> SnackbarVariant.SUCCESS
+            is SelectionMessage.Warning -> SnackbarVariant.WARNING
+            is SelectionMessage.Error -> SnackbarVariant.ERROR
+        }
+    return SnackbarEvent(message = text, variant = variant)
 }

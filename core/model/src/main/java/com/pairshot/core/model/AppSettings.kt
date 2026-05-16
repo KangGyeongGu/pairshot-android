@@ -1,7 +1,7 @@
 package com.pairshot.core.model
 
 data class AppSettings(
-    val jpegQuality: Int = 95,
+    val imageQuality: ImageQualityPreset = ImageQualityPreset.DEFAULT,
     val fileNamePrefix: String = "PAIRSHOT",
     val overlayEnabled: Boolean = true,
     val defaultOverlayAlpha: Float = 0.35f,

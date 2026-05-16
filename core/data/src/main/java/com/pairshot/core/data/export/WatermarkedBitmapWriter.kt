@@ -22,6 +22,7 @@ class WatermarkedBitmapWriter
             config: WatermarkConfig,
             jpegQuality: Int,
             combineConfig: CombineConfig = CombineConfig(),
+            profile: RenderProfile = RenderProfile.FULL,
         ) {
             pairImageComposer.composeToFile(
                 beforeUri = Uri.parse(beforeUri),
@@ -30,7 +31,7 @@ class WatermarkedBitmapWriter
                 combineConfig = combineConfig,
                 watermarkConfig = config.copy(enabled = true),
                 jpegQuality = jpegQuality,
-                profile = RenderProfile.FULL,
+                profile = profile,
             )
         }
     }

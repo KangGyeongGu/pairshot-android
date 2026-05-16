@@ -26,12 +26,14 @@ class AppPreferences
         @ApplicationContext private val context: Context,
     ) {
         private companion object {
-            const val DEFAULT_JPEG_QUALITY = 95
             const val DEFAULT_OVERLAY_ALPHA = 0.35f
+            const val LEGACY_JPEG_LOW_THRESHOLD = 80
+            const val LEGACY_JPEG_BEST_THRESHOLD = 93
         }
 
         private object Keys {
             val JPEG_QUALITY = intPreferencesKey("jpeg_quality")
+            val IMAGE_QUALITY = stringPreferencesKey("image_quality")
             val FILE_NAME_PREFIX = stringPreferencesKey("file_name_prefix")
             val OVERLAY_ENABLED = booleanPreferencesKey("overlay_enabled")
             val OVERLAY_ALPHA = floatPreferencesKey("overlay_alpha")
@@ -52,9 +54,17 @@ class AppPreferences
             val ONBOARDING_PAYWALL_SHOWN = booleanPreferencesKey("onboarding_paywall_shown")
         }
 
-        val jpegQuality: Flow<Int> =
+        val imageQuality: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.JPEG_QUALITY] ?: DEFAULT_JPEG_QUALITY
+                prefs[Keys.IMAGE_QUALITY]
+                    ?: prefs[Keys.JPEG_QUALITY]?.let { legacy ->
+                        when {
+                            legacy <= LEGACY_JPEG_LOW_THRESHOLD -> "LOW"
+                            legacy >= LEGACY_JPEG_BEST_THRESHOLD -> "BEST"
+                            else -> "HIGH"
+                        }
+                    }
+                    ?: "HIGH"
             }
 
         val fileNamePrefix: Flow<String> =
@@ -72,9 +82,10 @@ class AppPreferences
                 prefs[Keys.OVERLAY_ALPHA] ?: DEFAULT_OVERLAY_ALPHA
             }
 
-        suspend fun setJpegQuality(quality: Int) {
+        suspend fun setImageQuality(preset: String) {
             context.appDataStore.edit { prefs ->
-                prefs[Keys.JPEG_QUALITY] = quality
+                prefs[Keys.IMAGE_QUALITY] = preset
+                prefs.remove(Keys.JPEG_QUALITY)
             }
         }
 

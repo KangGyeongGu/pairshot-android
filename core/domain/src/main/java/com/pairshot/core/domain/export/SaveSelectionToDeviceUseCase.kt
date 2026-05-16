@@ -35,7 +35,7 @@ class SaveSelectionToDeviceUseCase
         ): SaveToDeviceResult {
             require(pairIds.isNotEmpty()) { "no pairs to export" }
 
-            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig()
+            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
             val effectiveFormat = enforceProFormat(preset.format)
 
             return when (effectiveFormat) {

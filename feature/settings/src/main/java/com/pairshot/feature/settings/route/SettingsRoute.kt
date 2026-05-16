@@ -18,10 +18,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.adsui.component.RewardedGateDialog
-import com.pairshot.core.promotion.ui.PromotionRegisterDialog
-import com.pairshot.core.promotion.ui.PromotionViewModel
+import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.domain.premium.PremiumFeature
 import com.pairshot.core.navigation.SettingsHighlight
+import com.pairshot.core.promotion.ui.PromotionRegisterDialog
+import com.pairshot.core.promotion.ui.PromotionViewModel
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
@@ -37,7 +38,6 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
-import com.pairshot.core.billing.domain.SubscriptionStatus
 
 @Composable
 fun SettingsRoute(
@@ -187,7 +187,7 @@ fun SettingsRoute(
                 showRewardedGateDialog = PremiumFeature.COMBINE_DETAIL
             }
         },
-        onJpegQualityChange = viewModel::updateJpegQuality,
+        onImageQualityChange = viewModel::updateImageQuality,
         onFileNamePrefixChange = viewModel::updateFileNamePrefix,
         onOverlayEnabledChange = viewModel::updateOverlayEnabled,
         onOverlayAlphaChange = viewModel::updateOverlayAlpha,

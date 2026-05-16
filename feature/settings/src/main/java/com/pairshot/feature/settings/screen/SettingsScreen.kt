@@ -53,11 +53,12 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotCard
-import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTouchTarget
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.navigation.SettingsHighlight
@@ -86,11 +87,7 @@ import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
 private const val SWITCH_SCALE = 0.67f
-private const val DEFAULT_JPEG_QUALITY = 85
 private const val DEFAULT_OVERLAY_ALPHA = 0.35f
-private const val JPEG_QUALITY_LOW = 75
-private const val JPEG_QUALITY_HIGH = 85
-private const val JPEG_QUALITY_BEST = 95
 
 private const val HIGHLIGHT_PULSE_ON_MS = 600L
 private const val HIGHLIGHT_PULSE_OFF_MS = 400L
@@ -112,7 +109,7 @@ fun SettingsScreen(
     onWatermarkConfigChange: (WatermarkConfig) -> Unit,
     onWatermarkSettingsClick: () -> Unit,
     onCombineSettingsClick: () -> Unit,
-    onJpegQualityChange: (Int) -> Unit,
+    onImageQualityChange: (ImageQualityPreset) -> Unit,
     onFileNamePrefixChange: (String) -> Unit,
     onOverlayEnabledChange: (Boolean) -> Unit,
     onOverlayAlphaChange: (Float) -> Unit,
@@ -172,7 +169,7 @@ fun SettingsScreen(
         )
     }
 
-    val currentQuality = (uiState as? SettingsUiState.Success)?.jpegQuality ?: DEFAULT_JPEG_QUALITY
+    val currentQuality = (uiState as? SettingsUiState.Success)?.imageQuality ?: ImageQualityPreset.DEFAULT
     val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: "PAIRSHOT"
     val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: DEFAULT_OVERLAY_ALPHA
 
@@ -186,7 +183,7 @@ fun SettingsScreen(
     if (showQualityDialog) {
         ImageQualityDialog(
             currentQuality = currentQuality,
-            onQualityChange = onJpegQualityChange,
+            onQualityChange = onImageQualityChange,
             onDismiss = { showQualityDialog = false },
         )
     }
@@ -255,29 +252,12 @@ fun SettingsScreen(
                 }
 
                 is SettingsUiState.Success -> {
-                    val qualityOptions =
-                        listOf(
-                            Triple(
-                                stringResource(R.string.settings_quality_low),
-                                stringResource(R.string.settings_quality_low_desc),
-                                JPEG_QUALITY_LOW,
-                            ),
-                            Triple(
-                                stringResource(R.string.settings_quality_high),
-                                stringResource(R.string.settings_quality_high_desc),
-                                JPEG_QUALITY_HIGH,
-                            ),
-                            Triple(
-                                stringResource(R.string.settings_quality_best),
-                                stringResource(R.string.settings_quality_best_desc),
-                                JPEG_QUALITY_BEST,
-                            ),
-                        )
                     val qualityLabel =
-                        qualityOptions
-                            .firstOrNull { it.third == uiState.jpegQuality }
-                            ?.first
-                            ?: "${uiState.jpegQuality}%"
+                        when (uiState.imageQuality) {
+                            ImageQualityPreset.LOW -> stringResource(R.string.settings_quality_low)
+                            ImageQualityPreset.HIGH -> stringResource(R.string.settings_quality_high)
+                            ImageQualityPreset.BEST -> stringResource(R.string.settings_quality_best)
+                        }
                     val prefixDisplay =
                         if (uiState.fileNamePrefix.isEmpty()) {
                             stringResource(R.string.settings_file_name_prefix_none)

@@ -2,22 +2,17 @@ package com.pairshot.feature.settings.component
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -30,6 +25,7 @@ import kotlinx.coroutines.withContext
 
 private const val PREVIEW_SCALE_FACTOR = 0.5f
 private const val PREVIEW_MIN_DIMENSION_PX = 200
+private const val PLACEHOLDER_ASPECT_RATIO = 1f
 
 @Composable
 internal fun WatermarkPreviewSection(
@@ -44,11 +40,9 @@ internal fun WatermarkPreviewSection(
         }
 
     var previewBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var aspectRatio by remember { mutableFloatStateOf(1f) }
 
     LaunchedEffect(previewConfig) {
         val sample = previewSampleProvider.get()
-        aspectRatio = sample.width.toFloat() / sample.height.toFloat().coerceAtLeast(1f)
         val result =
             withContext(Dispatchers.Default) {
                 val scaled =
@@ -68,32 +62,27 @@ internal fun WatermarkPreviewSection(
         previewBitmap = result
     }
 
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(MaterialTheme.shapes.medium)
-                .background(Color.Black),
-        contentAlignment = Alignment.Center,
-    ) {
-        val bmp = previewBitmap
-        if (bmp != null) {
-            Image(
-                bitmap = bmp.asImageBitmap(),
-                contentDescription = stringResource(R.string.watermark_preview_desc),
-                contentScale = ContentScale.Fit,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(aspectRatio),
-            )
-        } else {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(aspectRatio),
-            )
-        }
+    val bmp = previewBitmap
+    if (bmp != null) {
+        Image(
+            bitmap = bmp.asImageBitmap(),
+            contentDescription = stringResource(R.string.watermark_preview_desc),
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.High,
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .aspectRatio(
+                        bmp.width.toFloat().coerceAtLeast(1f) /
+                            bmp.height.toFloat().coerceAtLeast(1f),
+                    ),
+        )
+    } else {
+        Box(
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .aspectRatio(PLACEHOLDER_ASPECT_RATIO),
+        )
     }
 }
