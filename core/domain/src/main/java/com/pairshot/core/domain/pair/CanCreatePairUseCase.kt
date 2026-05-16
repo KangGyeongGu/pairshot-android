@@ -1,6 +1,6 @@
 package com.pairshot.core.domain.pair
 
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.ZoneId
@@ -10,11 +10,11 @@ class CanCreatePairUseCase
     @Inject
     constructor(
         private val photoPairRepository: PhotoPairRepository,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
     ) {
         suspend operator fun invoke(): Result {
-            val entitlement = entitlementProvider.current()
-            if (entitlement.isActive) return Result.Allowed
+            val membership = membershipProvider.current()
+            if (membership.isPro) return Result.Allowed
             val sinceEpochMs = todayStartEpochMs()
             val createdToday = photoPairRepository.countCreatedSince(sinceEpochMs).first()
             return if (createdToday < FREE_DAILY_LIMIT) {

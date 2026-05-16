@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="promotion_dialog_title">프로모션 코드</string>
+    <string name="promotion_dialog_scan_qr">QR 스캔</string>
+    <string name="promotion_dialog_or_separator">또는</string>
+    <string name="promotion_dialog_input_hint">PS-30D-… 또는 PAIRSHOT-…</string>
+    <string name="promotion_dialog_register">등록</string>
+    <string name="promotion_dialog_cancel">취소</string>
+    <string name="promotion_dialog_registering">코드 활성화 중…</string>
+    <string name="promotion_dialog_need_code">코드가 필요하다면?</string>
+
+    <string name="promotion_qr_scanner_title">프로모션 QR 스캔</string>
+    <string name="promotion_qr_camera_permission_required">카메라 권한이 필요합니다</string>
+
+    <string name="promotion_error_invalid_format">코드 형식이 올바르지 않습니다. 다시 확인해주세요</string>
+    <string name="promotion_error_invalid_signature">유효하지 않은 코드입니다</string>
+    <string name="promotion_error_not_found">존재하지 않는 코드입니다</string>
+    <string name="promotion_error_already_used">이미 다른 기기에서 사용 중인 코드입니다</string>
+    <string name="promotion_error_revoked">이미 만료되거나 폐기된 코드입니다</string>
+    <string name="promotion_error_network">인터넷 연결을 확인한 후 다시 시도해주세요</string>
+    <string name="promotion_error_unknown">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요</string>
+
+    <string name="promotion_success_pro_days">%1$d일 Pro 멤버십이 활성화되었습니다</string>
+    <string name="promotion_success_pro_unlimited">무기한 Pro 멤버십이 활성화되었습니다</string>
+    <string name="promotion_success_adfree_days">%1$d일 광고 제거가 활성화되었습니다</string>
+    <string name="promotion_success_adfree_unlimited">무기한 광고 제거가 활성화되었습니다</string>
+
+    <string name="promotion_list_section_title">내 프로모션</string>
+    <string name="promotion_list_empty">등록된 프로모션이 없습니다</string>
+    <string name="promotion_list_status_activated">활성</string>
+    <string name="promotion_list_status_expired">만료</string>
+    <string name="promotion_list_status_revoked">폐기</string>
+    <string name="promotion_list_status_unused">미사용</string>
+    <string name="promotion_list_unlimited">무제한</string>
+
+    <string name="promotion_entitlement_pro">Pro</string>
+    <string name="promotion_entitlement_ad_free">광고 제거</string>
+
+    <plurals name="promotion_list_days_format">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+
+</resources>

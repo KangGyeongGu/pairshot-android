@@ -8,8 +8,7 @@ import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.billing.PurchaseLaunchResult
 import com.pairshot.core.billing.domain.BillingOffer
 import com.pairshot.core.billing.domain.PurchaseError
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
-import com.pairshot.core.domain.entitlement.isPaidSubscriber
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,7 +48,7 @@ class PaywallViewModel
     @Inject
     constructor(
         private val billingRepository: BillingRepository,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
         private val appSettingsRepository: AppSettingsRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(PaywallUiState())
@@ -109,9 +108,9 @@ class PaywallViewModel
         fun restore() {
             viewModelScope.launch {
                 billingRepository.refresh()
-                val subscribed = entitlementProvider.current().isPaidSubscriber
+                val isPro = membershipProvider.current().isPro
                 _events.tryEmit(
-                    if (subscribed) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
+                    if (isPro) PaywallEvent.RestoreSuccess else PaywallEvent.RestoreEmpty,
                 )
             }
         }
@@ -125,8 +124,8 @@ class PaywallViewModel
 
         private fun observeEntitlement() {
             viewModelScope.launch {
-                entitlementProvider.observe().collect { entitlement ->
-                    if (entitlement.isPaidSubscriber) {
+                membershipProvider.observe().collect { membership ->
+                    if (membership.isPro) {
                         appSettingsRepository.markOnboardingPaywallShown()
                         _events.tryEmit(PaywallEvent.EntitlementGranted)
                     }

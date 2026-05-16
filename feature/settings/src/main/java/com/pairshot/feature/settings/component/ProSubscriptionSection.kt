@@ -19,10 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.coupon.domain.CouponStatus
+import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.domain.entitlement.EntitlementSource
-import com.pairshot.core.domain.entitlement.ProEntitlement
+import com.pairshot.core.domain.membership.Membership
 import com.pairshot.core.ui.component.SettingsCard
 import com.pairshot.core.ui.component.SettingsDivider
 import com.pairshot.core.ui.component.SettingsItem
@@ -34,8 +33,8 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProSubscriptionSection(
-    entitlement: ProEntitlement,
-    couponStatus: CouponStatus,
+    membership: Membership,
+    subscriptionStatus: SubscriptionStatus,
     onLearnMore: () -> Unit,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
@@ -44,62 +43,57 @@ fun ProSubscriptionSection(
     SettingsSectionLabel(label = stringResource(R.string.settings_section_pro_subscription))
     Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
 
-    val isPro = entitlement.source == EntitlementSource.SUBSCRIPTION
     val membershipLabel =
-        if (isPro) {
+        if (membership.isPro) {
             stringResource(R.string.settings_pro_membership_pro)
         } else {
             stringResource(R.string.settings_pro_membership_free)
         }
-    val couponTrailing = couponTrailingText(couponStatus)
+    val promoTrailing = promoTrailingText(membership)
+    val hasActiveSubscription = subscriptionStatus is SubscriptionStatus.Active
 
-    when (entitlement.source) {
-        EntitlementSource.NONE ->
-            FreeBlock(
-                membershipLabel = membershipLabel,
-                couponTrailing = couponTrailing,
-                onLearnMore = onLearnMore,
-                onPromoCode = onPromoCode,
-            )
-        EntitlementSource.SUBSCRIPTION ->
-            SubscriptionBlock(
-                membershipLabel = membershipLabel,
-                couponTrailing = couponTrailing,
-                onManageSubscription = onManageSubscription,
-                onRestore = onRestore,
-                onPromoCode = onPromoCode,
-            )
-        EntitlementSource.COUPON ->
-            CouponBlock(
-                membershipLabel = membershipLabel,
-                couponTrailing = couponTrailing,
-                onRestore = onRestore,
-                onPromoCode = onPromoCode,
-            )
+    if (!membership.isPro) {
+        FreeBlock(
+            membershipLabel = membershipLabel,
+            promoTrailing = promoTrailing,
+            onLearnMore = onLearnMore,
+            onPromoCode = onPromoCode,
+        )
+    } else {
+        ProBlock(
+            membershipLabel = membershipLabel,
+            promoTrailing = promoTrailing,
+            hasActiveSubscription = hasActiveSubscription,
+            onManageSubscription = onManageSubscription,
+            onRestore = onRestore,
+            onPromoCode = onPromoCode,
+        )
     }
     Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
 }
 
 @Composable
-private fun couponTrailingText(status: CouponStatus): String? =
-    when (status) {
-        CouponStatus.None -> null
-        is CouponStatus.Active -> {
-            val expiry = status.expiresAtEpochMillis
-            if (expiry != null) {
-                stringResource(R.string.settings_pro_coupon_expires, formatDate(expiry))
-            } else {
-                stringResource(R.string.settings_pro_coupon_unlimited)
-            }
-        }
-        is CouponStatus.Expired ->
-            stringResource(R.string.settings_pro_coupon_expires, formatDate(status.expiresAtEpochMillis))
+private fun promoTrailingText(membership: Membership): String? =
+    when {
+        membership.isPro && membership.proExpiresAtEpochMillis != null ->
+            stringResource(R.string.settings_pro_coupon_expires, formatDate(membership.proExpiresAtEpochMillis!!))
+
+        membership.isPro && membership.proExpiresAtEpochMillis == null ->
+            stringResource(R.string.settings_pro_coupon_unlimited)
+
+        !membership.isPro && membership.isAdFree && membership.adFreeExpiresAtEpochMillis != null ->
+            stringResource(R.string.settings_pro_coupon_expires, formatDate(membership.adFreeExpiresAtEpochMillis!!))
+
+        !membership.isPro && membership.isAdFree ->
+            stringResource(R.string.settings_pro_coupon_unlimited)
+
+        else -> null
     }
 
 @Composable
 private fun FreeBlock(
     membershipLabel: String,
-    couponTrailing: String?,
+    promoTrailing: String?,
     onLearnMore: () -> Unit,
     onPromoCode: () -> Unit,
 ) {
@@ -132,7 +126,7 @@ private fun FreeBlock(
         SettingsDivider()
         SettingsItem(
             label = stringResource(R.string.settings_item_promo_code),
-            trailing = couponTrailing,
+            trailing = promoTrailing,
             onClick = onPromoCode,
         )
     }
@@ -156,43 +150,23 @@ private fun ProValueRow(text: String) {
 }
 
 @Composable
-private fun SubscriptionBlock(
+private fun ProBlock(
     membershipLabel: String,
-    couponTrailing: String?,
+    promoTrailing: String?,
+    hasActiveSubscription: Boolean,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onPromoCode: () -> Unit,
 ) {
     SettingsCard {
         MembershipItem(value = membershipLabel)
-        SettingsDivider()
-        SettingsItem(
-            label = stringResource(R.string.settings_pro_manage_subscription),
-            onClick = onManageSubscription,
-        )
-        SettingsDivider()
-        SettingsItem(
-            label = stringResource(R.string.settings_pro_restore),
-            onClick = onRestore,
-        )
-        SettingsDivider()
-        SettingsItem(
-            label = stringResource(R.string.settings_item_promo_code),
-            trailing = couponTrailing,
-            onClick = onPromoCode,
-        )
-    }
-}
-
-@Composable
-private fun CouponBlock(
-    membershipLabel: String,
-    couponTrailing: String?,
-    onRestore: () -> Unit,
-    onPromoCode: () -> Unit,
-) {
-    SettingsCard {
-        MembershipItem(value = membershipLabel)
+        if (hasActiveSubscription) {
+            SettingsDivider()
+            SettingsItem(
+                label = stringResource(R.string.settings_pro_manage_subscription),
+                onClick = onManageSubscription,
+            )
+        }
         SettingsDivider()
         SettingsItem(
             label = stringResource(R.string.settings_pro_restore),
@@ -201,7 +175,7 @@ private fun CouponBlock(
         SettingsDivider()
         SettingsItem(
             label = stringResource(R.string.settings_item_promo_code),
-            trailing = couponTrailing,
+            trailing = promoTrailing,
             onClick = onPromoCode,
         )
     }

@@ -55,9 +55,9 @@ fun PairShotBannerAd(
             )
         }
     val adsConfig = remember(entryPoint) { entryPoint.adsConfig() }
-    val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
-    val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
-    val isAdFree: Boolean? by isActiveFlow.collectAsStateWithLifecycle(initialValue = null)
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
+    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
+    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current

@@ -10,7 +10,7 @@ import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.RewardedAdController
 import com.pairshot.core.ads.lifecycle.AppOpenAdLifecycleObserver
 import com.pairshot.core.billing.BillingRepository
-import com.pairshot.core.coupon.domain.CouponRepository
+import com.pairshot.core.promotion.domain.PromotionRepository
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.feature.settings.theme.AppTheme
@@ -42,7 +42,7 @@ class PairShotApplication : Application() {
     lateinit var appOpenAdLifecycleObserver: AppOpenAdLifecycleObserver
 
     @Inject
-    lateinit var couponRepository: CouponRepository
+    lateinit var promotionRepository: PromotionRepository
 
     @Inject
     lateinit var billingRepository: BillingRepository
@@ -68,7 +68,7 @@ class PairShotApplication : Application() {
         appOpenAdLifecycleObserver.register(this)
         billingRepository.start()
         applicationScope.launch {
-            runCatching { withContext(Dispatchers.IO) { couponRepository.retryPendingIfAny() } }
+            runCatching { withContext(Dispatchers.IO) { promotionRepository.retryPendingIfAny() } }
         }
 
         registerForegroundObservers()
@@ -102,7 +102,7 @@ class PairShotApplication : Application() {
             object : DefaultLifecycleObserver {
                 override fun onStart(owner: LifecycleOwner) {
                     applicationScope.launch {
-                        runCatching { withContext(Dispatchers.IO) { couponRepository.syncStatus() } }
+                        runCatching { withContext(Dispatchers.IO) { promotionRepository.refresh() } }
                     }
                     applicationScope.launch {
                         runCatching { withContext(Dispatchers.IO) { syncMissingSourcesUseCase() } }

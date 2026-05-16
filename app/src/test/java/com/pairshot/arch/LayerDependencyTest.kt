@@ -64,8 +64,8 @@ class LayerDependencyTest {
             .definedBy("com.pairshot.core.ads..")
             .layer("AdsUi")
             .definedBy("com.pairshot.core.adsui..")
-            .layer("Coupon")
-            .definedBy("com.pairshot.core.coupon..")
+            .layer("Promotion")
+            .definedBy("com.pairshot.core.promotion..")
             .layer("AppShell")
             .definedBy("com.pairshot.app..", "com.pairshot.di..")
             .whereLayer("Feature")
@@ -73,14 +73,14 @@ class LayerDependencyTest {
             .whereLayer("Data")
             .mayOnlyBeAccessedByLayers("AppShell")
             .whereLayer("Domain")
-            .mayOnlyBeAccessedByLayers("Feature", "Data", "Infra", "Ads", "AdsUi", "Coupon", "AppShell")
+            .mayOnlyBeAccessedByLayers("Feature", "Data", "Infra", "Ads", "AdsUi", "Promotion", "AppShell")
             .whereLayer("Infra")
             .mayOnlyBeAccessedByLayers("Feature", "Data", "AppShell")
             .whereLayer("Ads")
             .mayOnlyBeAccessedByLayers("Feature", "AdsUi", "AppShell")
             .whereLayer("AdsUi")
             .mayOnlyBeAccessedByLayers("Feature", "AppShell")
-            .whereLayer("Coupon")
+            .whereLayer("Promotion")
             .mayOnlyBeAccessedByLayers("Feature", "AppShell")
 
     @ArchTest
@@ -107,11 +107,11 @@ class LayerDependencyTest {
     val `L-07 Coupon should not access Data`: ArchRule =
         noClasses()
             .that()
-            .resideInAPackage("com.pairshot.core.coupon..")
+            .resideInAPackage("com.pairshot.core.promotion..")
             .should()
             .dependOnClassesThat()
             .resideInAPackage("com.pairshot.core.data..")
-            .because("Coupon module must not depend on Data layer — domain interface only")
+            .because("Promotion module must not depend on Data layer — domain interface only")
 
     @ArchTest
     val `L-08 Domain should not access Coupon`: ArchRule =
@@ -120,18 +120,18 @@ class LayerDependencyTest {
             .resideInAPackage("com.pairshot.core.domain..")
             .should()
             .dependOnClassesThat()
-            .resideInAPackage("com.pairshot.core.coupon..")
-            .because("Domain layer must not depend on Coupon module — pure Kotlin only")
+            .resideInAPackage("com.pairshot.core.promotion..")
+            .because("Domain layer must not depend on Promotion module — pure Kotlin only")
 
     @ArchTest
     val `L-09 Coupon should not access Ads`: ArchRule =
         noClasses()
             .that()
-            .resideInAPackage("com.pairshot.core.coupon..")
+            .resideInAPackage("com.pairshot.core.promotion..")
             .should()
             .dependOnClassesThat()
             .resideInAPackage("com.pairshot.core.ads..")
-            .because("Coupon module must not directly depend on Ads module")
+            .because("Promotion module must not directly depend on Ads module")
 
     @ArchTest
     val `L-10 Ads should only depend on Domain among core modules`: ArchRule =
@@ -150,7 +150,7 @@ class LayerDependencyTest {
                 "com.pairshot.core.ui..",
                 "com.pairshot.core.designsystem..",
                 "com.pairshot.core.navigation..",
-                "com.pairshot.core.coupon..",
+                "com.pairshot.core.promotion..",
                 "com.pairshot.core.adsui..",
             ).because("Ads module may depend on core/domain only, not other core modules")
 
@@ -169,7 +169,7 @@ class LayerDependencyTest {
                 "com.pairshot.core.database..",
                 "com.pairshot.core.model..",
                 "com.pairshot.core.navigation..",
-                "com.pairshot.core.coupon..",
+                "com.pairshot.core.promotion..",
                 "com.pairshot.core.data..",
             ).because("AdsUi module may depend on core/ads + core/ui + core/designsystem + core/domain only")
 }

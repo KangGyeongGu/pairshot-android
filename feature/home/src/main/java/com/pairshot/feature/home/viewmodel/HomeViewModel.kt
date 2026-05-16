@@ -7,8 +7,7 @@ import com.pairshot.core.domain.album.CreateAlbumUseCase
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
-import com.pairshot.core.domain.entitlement.isPaidSubscriber
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.PhotoPairRepository
@@ -91,12 +90,12 @@ class HomeViewModel
         private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
         private val locationProvider: LocationProvider,
         private val appSettingsRepository: AppSettingsRepository,
-        entitlementProvider: ProEntitlementProvider,
+        membershipProvider: MembershipProvider,
     ) : ViewModel() {
         val isProSubscriber: StateFlow<Boolean> =
-            entitlementProvider
+            membershipProvider
                 .observe()
-                .map { it.isPaidSubscriber }
+                .map { it.isPro }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),

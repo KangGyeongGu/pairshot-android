@@ -7,7 +7,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.initializer.AdsInitializer
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +27,7 @@ class AppOpenAdController
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
         private val adsInitializer: AdsInitializer,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
         private val appSettingsRepository: AppSettingsRepository,
         private val fullscreenAdState: FullscreenAdState,
     ) {
@@ -53,7 +53,7 @@ class AppOpenAdController
 
         fun onForeground(activity: Activity) {
             scope.launch {
-                if (entitlementProvider.current().isActive) return@launch
+                if (membershipProvider.current().isAdFree) return@launch
                 if (fullscreenAdState.isShowing()) return@launch
                 if (isWithinCooldown()) return@launch
 

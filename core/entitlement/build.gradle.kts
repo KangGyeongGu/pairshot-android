@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:model"))
     implementation(project(":core:billing"))
-    implementation(project(":core:coupon"))
+    implementation(project(":core:promotion"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

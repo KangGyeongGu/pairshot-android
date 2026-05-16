@@ -2,7 +2,7 @@ package com.pairshot.app.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.navigation.Camera
@@ -20,7 +20,7 @@ class StartupDecisionViewModel
     @Inject
     constructor(
         private val appSettingsRepository: AppSettingsRepository,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
         private val photoPairRepository: PhotoPairRepository,
     ) : ViewModel() {
         private val _initialRoute = MutableStateFlow<Any?>(null)
@@ -35,7 +35,7 @@ class StartupDecisionViewModel
         private suspend fun decide(): Any {
             if (appSettingsRepository.isOnboardingPaywallShown()) return Camera()
             val canSkipPaywall =
-                entitlementProvider.current().isActive ||
+                membershipProvider.current().isPro ||
                     photoPairRepository.countAll().first() > 0
             return if (canSkipPaywall) {
                 appSettingsRepository.markOnboardingPaywallShown()

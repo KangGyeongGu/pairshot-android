@@ -18,9 +18,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.adsui.component.RewardedGateDialog
-import com.pairshot.core.coupon.ui.CouponActivationUiState
-import com.pairshot.core.coupon.ui.CouponRegisterDialog
-import com.pairshot.core.coupon.ui.CouponViewModel
+import com.pairshot.core.promotion.ui.PromotionRegisterDialog
+import com.pairshot.core.promotion.ui.PromotionViewModel
 import com.pairshot.core.domain.premium.PremiumFeature
 import com.pairshot.core.navigation.SettingsHighlight
 import com.pairshot.core.ui.component.PairShotSnackbarController
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
 import com.pairshot.core.billing.domain.SubscriptionStatus
-import com.pairshot.core.coupon.R as CouponR
 
 @Composable
 fun SettingsRoute(
@@ -50,16 +48,15 @@ fun SettingsRoute(
     onNavigateToPaywall: () -> Unit,
     highlight: SettingsHighlight? = null,
     viewModel: SettingsViewModel = hiltViewModel(),
-    couponViewModel: CouponViewModel = hiltViewModel(),
+    promotionViewModel: PromotionViewModel = hiltViewModel(),
     subscriptionViewModel: SubscriptionSettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
     val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
-    val activationState by couponViewModel.activationState.collectAsStateWithLifecycle()
-    val couponStatus by couponViewModel.status.collectAsStateWithLifecycle()
-    val myCoupons by couponViewModel.myCoupons.collectAsStateWithLifecycle()
-    val myCouponsLoading by couponViewModel.myCouponsLoading.collectAsStateWithLifecycle()
+    val activationState by promotionViewModel.activationState.collectAsStateWithLifecycle()
+    val myPromotions by promotionViewModel.myPromotions.collectAsStateWithLifecycle()
+    val myPromotionsLoading by promotionViewModel.myPromotionsLoading.collectAsStateWithLifecycle()
     val subscriptionState by subscriptionViewModel.state.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,41 +73,18 @@ fun SettingsRoute(
         }
     val rewardedAdController = remember(entryPoint) { entryPoint.rewardedAdController() }
     val settingsPremiumGate = remember(entryPoint) { entryPoint.settingsPremiumGate() }
-    val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
     val adsInitializer = remember(entryPoint) { entryPoint.adsInitializer() }
-    val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
-    val isAdFree by isActiveFlow.collectAsStateWithLifecycle(initialValue = false)
+    val isProFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isPro } }
+    val isPro by isProFlow.collectAsStateWithLifecycle(initialValue = false)
     val showAdsConsent by adsInitializer.privacyOptionsRequired.collectAsStateWithLifecycle()
 
-    var showCouponDialog by remember { mutableStateOf(false) }
+    var showPromotionDialog by remember { mutableStateOf(false) }
     var showRewardedGateDialog by remember { mutableStateOf<PremiumFeature?>(null) }
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.refresh()
-        }
-    }
-
-    LaunchedEffect(activationState) {
-        val state = activationState
-        if (state is CouponActivationUiState.Success) {
-            val days = state.durationDays
-            val event =
-                if (days == null) {
-                    SnackbarEvent(
-                        UiText.Resource(CouponR.string.coupon_success_registered_unlimited),
-                        SnackbarVariant.SUCCESS,
-                    )
-                } else {
-                    SnackbarEvent(
-                        UiText.Resource(
-                            CouponR.string.coupon_success_registered_days,
-                            listOf(days.toInt()),
-                        ),
-                        SnackbarVariant.SUCCESS,
-                    )
-                }
-            snackbarController.show(event)
         }
     }
 
@@ -136,16 +110,16 @@ fun SettingsRoute(
         }
     }
 
-    if (showCouponDialog) {
-        CouponRegisterDialog(
+    if (showPromotionDialog) {
+        PromotionRegisterDialog(
             activationState = activationState,
-            myCoupons = myCoupons,
-            myCouponsLoading = myCouponsLoading,
-            onActivate = { code -> couponViewModel.activate(code) },
-            onLoadMyCoupons = { couponViewModel.loadMyCoupons() },
+            myPromotions = myPromotions,
+            myPromotionsLoading = myPromotionsLoading,
+            onActivate = { code -> promotionViewModel.activate(code) },
+            onLoadMyPromotions = { promotionViewModel.loadMyPromotions() },
             onDismiss = {
-                showCouponDialog = false
-                couponViewModel.resetActivationState()
+                showPromotionDialog = false
+                promotionViewModel.resetActivationState()
             },
         )
     }
@@ -200,14 +174,14 @@ fun SettingsRoute(
         onNavigateBack = onNavigateBack,
         onWatermarkConfigChange = viewModel::updateWatermarkConfig,
         onWatermarkSettingsClick = {
-            if (isAdFree || settingsPremiumGate.isUnlocked(PremiumFeature.WATERMARK_DETAIL)) {
+            if (isPro || settingsPremiumGate.isUnlocked(PremiumFeature.WATERMARK_DETAIL)) {
                 onNavigateToWatermarkSettings()
             } else {
                 showRewardedGateDialog = PremiumFeature.WATERMARK_DETAIL
             }
         },
         onCombineSettingsClick = {
-            if (isAdFree || settingsPremiumGate.isUnlocked(PremiumFeature.COMBINE_DETAIL)) {
+            if (isPro || settingsPremiumGate.isUnlocked(PremiumFeature.COMBINE_DETAIL)) {
                 onNavigateToCombineSettings()
             } else {
                 showRewardedGateDialog = PremiumFeature.COMBINE_DETAIL
@@ -237,8 +211,8 @@ fun SettingsRoute(
         },
         proSubscriptionSection = {
             ProSubscriptionSection(
-                entitlement = subscriptionState.entitlement,
-                couponStatus = couponStatus,
+                membership = subscriptionState.membership,
+                subscriptionStatus = subscriptionState.subscriptionStatus,
                 onLearnMore = onNavigateToPaywall,
                 onManageSubscription = {
                     val productId = (subscriptionState.subscriptionStatus as? SubscriptionStatus.Active)?.productId
@@ -257,8 +231,8 @@ fun SettingsRoute(
                 },
                 onRestore = { subscriptionViewModel.restore() },
                 onPromoCode = {
-                    couponViewModel.loadMyCoupons()
-                    showCouponDialog = true
+                    promotionViewModel.loadMyPromotions()
+                    showPromotionDialog = true
                 },
             )
         },

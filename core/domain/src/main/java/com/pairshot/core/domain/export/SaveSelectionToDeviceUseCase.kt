@@ -1,7 +1,6 @@
 package com.pairshot.core.domain.export
 
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
-import com.pairshot.core.domain.entitlement.isPaidSubscriber
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
@@ -25,7 +24,7 @@ class SaveSelectionToDeviceUseCase
     @Inject
     constructor(
         private val exportRepository: ExportRepository,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
     ) {
         suspend operator fun invoke(
             pairIds: List<Long>,
@@ -46,7 +45,7 @@ class SaveSelectionToDeviceUseCase
         }
 
         private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
-            if (format == ExportFormat.ZIP && !entitlementProvider.current().isPaidSubscriber) {
+            if (format == ExportFormat.ZIP && !membershipProvider.current().isPro) {
                 ExportFormat.INDIVIDUAL
             } else {
                 format

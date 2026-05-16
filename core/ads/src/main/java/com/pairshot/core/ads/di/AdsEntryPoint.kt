@@ -7,7 +7,7 @@ import com.pairshot.core.ads.controller.NativeAdPool
 import com.pairshot.core.ads.controller.RewardedAdController
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -20,7 +20,7 @@ interface AdsEntryPoint {
 
     fun adsInitializer(): AdsInitializer
 
-    fun proEntitlementProvider(): ProEntitlementProvider
+    fun membershipProvider(): MembershipProvider
 
     fun fullscreenAdState(): FullscreenAdState
 

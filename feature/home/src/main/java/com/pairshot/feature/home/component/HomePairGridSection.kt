@@ -89,15 +89,15 @@ fun HomePairGridSection(
                 )
             }
         }
-    val entitlementProvider = remember(entryPoint) { entryPoint?.proEntitlementProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint?.membershipProvider() }
     val poolProvider = remember(entryPoint) { entryPoint?.nativeAdPoolProvider() }
-    val isActiveFlow = remember(entitlementProvider) { entitlementProvider?.observe()?.map { it.isActive } }
+    val adFreeFlow = remember(membershipProvider) { membershipProvider?.observe()?.map { it.isAdFree } }
 
     val isAdFree: Boolean? =
         if (isInspection) {
             true
         } else {
-            isActiveFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
+            adFreeFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
         }
 
     val nativeAdPool = remember(poolProvider) { poolProvider?.get() }

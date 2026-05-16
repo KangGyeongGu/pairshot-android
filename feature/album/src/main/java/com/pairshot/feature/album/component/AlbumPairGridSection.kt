@@ -52,10 +52,10 @@ fun AlbumPairGridSection(
                 AdsEntryPoint::class.java,
             )
         }
-    val entitlementProvider = remember(entryPoint) { entryPoint.proEntitlementProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
     val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
-    val isActiveFlow = remember(entitlementProvider) { entitlementProvider.observe().map { it.isActive } }
-    val isAdFree: Boolean? by isActiveFlow.collectAsStateWithLifecycle(initialValue = null)
+    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
+    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val nativeAdPool = remember(poolProvider) { poolProvider.get() }
     DisposableEffect(nativeAdPool) {

@@ -9,7 +9,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.premium.PremiumFeature
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +28,7 @@ class RewardedAdController
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
         private val adsInitializer: AdsInitializer,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
         private val gate: SettingsPremiumGate,
         private val fullscreenAdState: FullscreenAdState,
     ) {
@@ -55,7 +55,7 @@ class RewardedAdController
                     return@launch
                 }
 
-                if (entitlementProvider.current().isActive) {
+                if (membershipProvider.current().isAdFree) {
                     gate.unlock(feature)
                     onReward()
                     return@launch

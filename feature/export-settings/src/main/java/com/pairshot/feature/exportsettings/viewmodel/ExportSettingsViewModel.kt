@@ -4,8 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
-import com.pairshot.core.domain.entitlement.isPaidSubscriber
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.ExportFormat
@@ -29,7 +28,7 @@ class ExportSettingsViewModel
         savedStateHandle: SavedStateHandle,
         private val appSettingsRepository: AppSettingsRepository,
         private val watermarkRepository: WatermarkRepository,
-        entitlementProvider: ProEntitlementProvider,
+        membershipProvider: MembershipProvider,
     ) : ViewModel() {
         val pairIds: String = savedStateHandle.toRoute<ExportSettings>().pairIds
 
@@ -37,9 +36,9 @@ class ExportSettingsViewModel
         val preset: StateFlow<ExportPreset> = _preset.asStateFlow()
 
         val isProSubscriber: StateFlow<Boolean> =
-            entitlementProvider
+            membershipProvider
                 .observe()
-                .map { it.isPaidSubscriber }
+                .map { it.isPro }
                 .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
         val watermarkConfig: StateFlow<WatermarkConfig> =

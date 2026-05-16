@@ -8,7 +8,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.pairshot.core.ads.config.AdsConfig
-import com.pairshot.core.domain.entitlement.ProEntitlementProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class NativeAdPool
     constructor(
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
-        private val entitlementProvider: ProEntitlementProvider,
+        private val membershipProvider: MembershipProvider,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         private val adsFlow = MutableStateFlow<List<NativeAd>>(emptyList())
@@ -40,7 +40,7 @@ class NativeAdPool
         fun ensurePreloaded(targetCount: Int) {
             if (targetCount <= 0) return
             scope.launch {
-                if (entitlementProvider.current().isActive) return@launch
+                if (membershipProvider.current().isAdFree) return@launch
 
                 val desired = targetCount.coerceAtMost(MAX_POOL_SIZE)
                 val currentSize = adsFlow.value.size

@@ -135,7 +135,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ads"))
-    implementation(project(":core:coupon"))
+    implementation(project(":core:promotion"))
     implementation(project(":core:billing"))
     implementation(project(":core:entitlement"))
 
