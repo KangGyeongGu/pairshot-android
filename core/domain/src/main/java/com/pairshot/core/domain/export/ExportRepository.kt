@@ -17,10 +17,11 @@ interface ExportRepository {
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int
 
-    suspend fun saveWatermarkedOriginals(
+    suspend fun saveDecoratedOriginals(
         pairIds: List<Long>,
         preset: ExportPreset,
-        watermarkConfig: WatermarkConfig,
+        combineConfig: CombineConfig,
+        watermarkConfig: WatermarkConfig?,
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int
 

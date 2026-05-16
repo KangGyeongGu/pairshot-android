@@ -91,11 +91,14 @@ class SaveSelectionToDeviceUseCase
                     0
                 }
 
-            val watermarkedCount =
-                if (watermarkConfig != null && (preset.includeBefore || preset.includeAfter)) {
-                    exportRepository.saveWatermarkedOriginals(
+            val individualCount =
+                if ((preset.includeBefore || preset.includeAfter) &&
+                    needsIndividualDecoration(combineConfig, watermarkConfig)
+                ) {
+                    exportRepository.saveDecoratedOriginals(
                         pairIds = pairIds,
                         preset = preset,
+                        combineConfig = combineConfig,
                         watermarkConfig = watermarkConfig,
                         onProgress = onProgress,
                     )
@@ -103,7 +106,17 @@ class SaveSelectionToDeviceUseCase
                     0
                 }
 
-            val total = combinedCount + watermarkedCount
+            val total = combinedCount + individualCount
             return if (total > 0) SaveToDeviceResult.SavedImagesToGallery(total) else SaveToDeviceResult.Nothing
         }
     }
+
+fun needsIndividualDecoration(
+    combineConfig: CombineConfig,
+    watermarkConfig: WatermarkConfig?,
+): Boolean {
+    val watermarkOn = watermarkConfig != null && watermarkConfig.enabled
+    val borderOn = combineConfig.borderEnabled
+    val labelOn = combineConfig.labelEnabled
+    return watermarkOn || borderOn || labelOn
+}

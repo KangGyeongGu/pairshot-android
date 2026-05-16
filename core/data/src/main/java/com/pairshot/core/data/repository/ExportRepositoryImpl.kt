@@ -94,28 +94,31 @@ class ExportRepositoryImpl
                 savedCount
             }
 
-        override suspend fun saveWatermarkedOriginals(
+        override suspend fun saveDecoratedOriginals(
             pairIds: List<Long>,
             preset: ExportPreset,
-            watermarkConfig: WatermarkConfig,
+            combineConfig: CombineConfig,
+            watermarkConfig: WatermarkConfig?,
             onProgress: (current: Int, total: Int) -> Unit,
         ): Int =
             withContext(Dispatchers.IO) {
                 val jpegQuality = appSettingsRepository.getCurrent().jpegQuality
                 val pairs = photoPairDao.getByIds(pairIds)
-                val tempDir = shareImagePreparer.prepareTempDir("save_wm_originals")
+                val tempDir = shareImagePreparer.prepareTempDir("save_decorated_originals")
                 var savedCount = 0
                 try {
                     pairs.forEachIndexed { index, pair ->
                         val seq = index + 1
                         if (preset.includeBefore) {
                             pair.validBeforeUriOrNull()?.let { uri ->
-                                saveWatermarkedToGallery(
+                                saveDecoratedToGallery(
                                     pairId = pair.id,
                                     sourceUri = uri,
                                     tempDir = tempDir,
-                                    displayName = "BEFORE_%03d_WM.jpg".format(seq),
+                                    displayName = "BEFORE_%03d.jpg".format(seq),
                                     kind = ExportHistoryKind.WATERMARKED_BEFORE,
+                                    isBefore = true,
+                                    combineConfig = combineConfig,
                                     watermarkConfig = watermarkConfig,
                                     jpegQuality = jpegQuality,
                                 )
@@ -124,12 +127,14 @@ class ExportRepositoryImpl
                         }
                         if (preset.includeAfter) {
                             pair.validAfterUriOrNull()?.let { uri ->
-                                saveWatermarkedToGallery(
+                                saveDecoratedToGallery(
                                     pairId = pair.id,
                                     sourceUri = uri,
                                     tempDir = tempDir,
-                                    displayName = "AFTER_%03d_WM.jpg".format(seq),
+                                    displayName = "AFTER_%03d.jpg".format(seq),
                                     kind = ExportHistoryKind.WATERMARKED_AFTER,
+                                    isBefore = false,
+                                    combineConfig = combineConfig,
                                     watermarkConfig = watermarkConfig,
                                     jpegQuality = jpegQuality,
                                 )
@@ -324,7 +329,7 @@ class ExportRepositoryImpl
                 pair.validBeforeUriOrNull()?.let { uri ->
                     val name = "BEFORE_%03d.jpg".format(seq)
                     val destFile = File(destDir, name)
-                    materializeSingle(uri, destFile, watermarkConfig, jpegQuality)
+                    materializeSingle(uri, destFile, isBefore = true, combineConfig, watermarkConfig, jpegQuality)
                     onFile(destFile, "before")
                 }
             }
@@ -332,7 +337,7 @@ class ExportRepositoryImpl
                 pair.validAfterUriOrNull()?.let { uri ->
                     val name = "AFTER_%03d.jpg".format(seq)
                     val destFile = File(destDir, name)
-                    materializeSingle(uri, destFile, watermarkConfig, jpegQuality)
+                    materializeSingle(uri, destFile, isBefore = false, combineConfig, watermarkConfig, jpegQuality)
                     onFile(destFile, "after")
                 }
             }
@@ -351,27 +356,45 @@ class ExportRepositoryImpl
         private suspend fun materializeSingle(
             sourceUri: String,
             destFile: File,
+            isBefore: Boolean,
+            combineConfig: CombineConfig,
             watermarkConfig: WatermarkConfig?,
             jpegQuality: Int,
         ) {
-            if (watermarkConfig != null) {
-                watermarkedBitmapWriter.applyWatermarkToFile(sourceUri, destFile, watermarkConfig, jpegQuality)
+            if (com.pairshot.core.domain.export.needsIndividualDecoration(combineConfig, watermarkConfig)) {
+                pairImageComposer.composeSingleToFile(
+                    sourceUri = Uri.parse(sourceUri),
+                    destFile = destFile,
+                    isBefore = isBefore,
+                    combineConfig = combineConfig,
+                    watermarkConfig = watermarkConfig ?: WatermarkConfig(),
+                    jpegQuality = jpegQuality,
+                )
             } else {
                 shareImagePreparer.copyFromContentUri(sourceUri, destFile)
             }
         }
 
-        private suspend fun saveWatermarkedToGallery(
+        private suspend fun saveDecoratedToGallery(
             pairId: Long,
             sourceUri: String,
             tempDir: File,
             displayName: String,
             kind: ExportHistoryKind,
-            watermarkConfig: WatermarkConfig,
+            isBefore: Boolean,
+            combineConfig: CombineConfig,
+            watermarkConfig: WatermarkConfig?,
             jpegQuality: Int,
         ) {
             val tempFile = File(tempDir, displayName)
-            watermarkedBitmapWriter.applyWatermarkToFile(sourceUri, tempFile, watermarkConfig, jpegQuality)
+            pairImageComposer.composeSingleToFile(
+                sourceUri = Uri.parse(sourceUri),
+                destFile = tempFile,
+                isBefore = isBefore,
+                combineConfig = combineConfig,
+                watermarkConfig = watermarkConfig ?: WatermarkConfig(),
+                jpegQuality = jpegQuality,
+            )
             val savedUri =
                 mediaStoreManager.saveToGallery(
                     tempFileUri = Uri.fromFile(tempFile),

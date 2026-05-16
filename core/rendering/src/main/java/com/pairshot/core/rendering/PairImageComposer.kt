@@ -140,6 +140,92 @@ class PairImageComposer
             }
         }
 
+        suspend fun composeSingleToFile(
+            sourceUri: Uri,
+            destFile: File,
+            isBefore: Boolean,
+            combineConfig: CombineConfig,
+            watermarkConfig: WatermarkConfig,
+            jpegQuality: Int,
+        ) = withContext(Dispatchers.Default) {
+            val source =
+                withContext(Dispatchers.IO) {
+                    exifBitmapLoader.loadBitmapWithExifCorrection(sourceUri)
+                }
+            val composed = composeSingleInternal(source, isBefore, combineConfig, watermarkConfig)
+            try {
+                withContext(Dispatchers.IO) {
+                    FileOutputStream(destFile).use { out ->
+                        composed.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out)
+                    }
+                }
+            } finally {
+                if (!composed.isRecycled) composed.recycle()
+            }
+        }
+
+        private suspend fun composeSingleInternal(
+            source: Bitmap,
+            isBefore: Boolean,
+            combineConfig: CombineConfig,
+            watermarkConfig: WatermarkConfig,
+        ): Bitmap {
+            val wmSource = applyWatermarkIfEnabled(source, watermarkConfig)
+            if (wmSource !== source && !source.isRecycled) source.recycle()
+
+            val border = resolveBorderPx(combineConfig, RenderProfile.FULL)
+            val canvasWidth = wmSource.width + border * 2
+            val canvasHeight = wmSource.height + border * 2
+            val canvasBitmap =
+                Bitmap.createBitmap(
+                    canvasWidth.coerceAtLeast(1),
+                    canvasHeight.coerceAtLeast(1),
+                    Bitmap.Config.ARGB_8888,
+                )
+            val canvas = Canvas(canvasBitmap)
+            paintBackground(canvas, combineConfig)
+            canvas.drawBitmap(wmSource, border.toFloat(), border.toFloat(), null)
+
+            if (combineConfig.labelEnabled) {
+                drawSingleLabel(canvas, isBefore, combineConfig, wmSource, border)
+            }
+
+            if (!wmSource.isRecycled) wmSource.recycle()
+
+            return canvasBitmap
+        }
+
+        private fun drawSingleLabel(
+            canvas: Canvas,
+            isBefore: Boolean,
+            combineConfig: CombineConfig,
+            image: Bitmap,
+            border: Int,
+        ) {
+            val isFree = combineConfig.labelPositionMode == LabelPositionMode.FREE
+            val density = context.resources.displayMetrics.density
+            val cornerPx =
+                if (isFree) combineConfig.labelBgCornerDp * density * RenderProfile.FULL.borderScale else 0f
+            val text = if (isBefore) combineConfig.beforeLabel else combineConfig.afterLabel
+            val anchor =
+                if (isFree) {
+                    if (isBefore) combineConfig.beforeLabelAnchor else combineConfig.afterLabelAnchor
+                } else {
+                    null
+                }
+            drawLabel(
+                canvas = canvas,
+                text = text,
+                imageLeft = border,
+                imageTop = border,
+                imageWidth = image.width,
+                imageHeight = image.height,
+                config = combineConfig,
+                anchor = anchor,
+                cornerPx = cornerPx,
+            )
+        }
+
         suspend fun combineSideBySide(
             beforeUri: Uri,
             afterUri: Uri,
