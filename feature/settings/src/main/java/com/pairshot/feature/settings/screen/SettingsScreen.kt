@@ -54,6 +54,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.navigation.SettingsHighlight
@@ -293,8 +297,8 @@ fun SettingsScreen(
                             state = listState,
                             contentPadding =
                                 PaddingValues(
-                                    horizontal = PairShotSpacing.screenPadding,
-                                    vertical = PairShotSpacing.cardPadding,
+                                    horizontal = PairShotScreen.horizontalPadding,
+                                    vertical = PairShotCard.innerPadding,
                                 ),
                         ) {
                             item(key = "section_pro_subscription") {
@@ -303,7 +307,7 @@ fun SettingsScreen(
 
                             item(key = "label_capture") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_shooting_files))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_capture") {
@@ -319,8 +323,8 @@ fun SettingsScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .height(PairShotSpacing.inputRow)
-                                                    .padding(horizontal = PairShotSpacing.cardPadding),
+                                                    .height(PairShotTouchTarget.large)
+                                                    .padding(horizontal = PairShotCard.innerPadding),
                                             verticalAlignment = Alignment.CenterVertically,
                                         ) {
                                             Text(
@@ -386,12 +390,12 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_capture") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_watermark") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_watermark))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_watermark") {
@@ -402,8 +406,8 @@ fun SettingsScreen(
                                         modifier =
                                             Modifier
                                                 .fillMaxWidth()
-                                                .height(PairShotSpacing.inputRow)
-                                                .padding(horizontal = PairShotSpacing.cardPadding),
+                                                .height(PairShotTouchTarget.large)
+                                                .padding(horizontal = PairShotCard.innerPadding),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
@@ -448,12 +452,12 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_watermark") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_combine") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_combine))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_combine") {
@@ -468,12 +472,12 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_combine") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_general") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_general))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_general") {
@@ -512,12 +516,12 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_general") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_storage_info") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_storage_and_info))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_storage_info") {
@@ -561,7 +565,7 @@ fun SettingsScreen(
                 Modifier
                     .align(Alignment.TopCenter)
                     .statusBarsPadding()
-                    .padding(top = PairShotSpacing.snackbarTopOffset),
+                    .padding(top = PairShotSnackbarTokens.topOffset),
         )
     }
 }

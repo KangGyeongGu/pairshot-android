@@ -1,5 +1,7 @@
 package com.pairshot.core.ui.component
 
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,7 +32,7 @@ fun PairShotProgressBar(
         label = "progressAnimation",
     )
 
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(PairShotSpacing.xs)) {
         if (label != null) {
             Text(
                 text = label,
@@ -42,7 +44,7 @@ fun PairShotProgressBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(6.dp)
+                    .height(PairShotRadius.sm)
                     .clip(RoundedCornerShape(percent = 50))
                     .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {

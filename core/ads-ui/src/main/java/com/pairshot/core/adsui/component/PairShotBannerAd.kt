@@ -1,5 +1,6 @@
 package com.pairshot.core.adsui.component
 
+import com.pairshot.core.designsystem.PairShotBanner
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
@@ -35,7 +36,7 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
-val DefaultAdaptiveBannerFallbackHeight: Dp = 62.dp
+val DefaultAdaptiveBannerFallbackHeight: Dp = PairShotBanner.adaptiveFallbackHeight
 
 @Composable
 fun PairShotBannerAd(

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.ModalShape
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotMenu
 
 private const val MENU_WIDTH_FRACTION = 0.48f
 
@@ -34,8 +35,8 @@ fun PairShotTopMenu(
     val screenWidthDp = with(density) { windowInfo.containerSize.width.toDp() }
     val menuWidth =
         (screenWidthDp * MENU_WIDTH_FRACTION)
-            .coerceAtLeast(PairShotSpacing.menuMinWidth)
-            .coerceAtMost(PairShotSpacing.menuMaxWidth)
+            .coerceAtLeast(PairShotMenu.minWidth)
+            .coerceAtMost(PairShotMenu.maxWidth)
 
     DropdownMenu(
         expanded = expanded,
@@ -43,11 +44,10 @@ fun PairShotTopMenu(
         modifier = modifier.width(menuWidth),
         shape = ModalShape,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        tonalElevation = 0.dp,
-        shadowElevation = PairShotSpacing.menuShadow,
+        shadowElevation = PairShotMenu.elevation,
         border =
             BorderStroke(
-                PairShotSpacing.menuBorderWidth,
+                PairShotMenu.borderWidth,
                 MaterialTheme.colorScheme.outlineVariant,
             ),
         content = content,
@@ -65,7 +65,7 @@ fun PairShotTopMenuItem(
     DropdownMenuItem(
         text = text,
         onClick = onClick,
-        modifier = modifier.heightIn(min = 48.dp),
+        modifier = modifier.heightIn(min = PairShotSpacing.xxxl),
         leadingIcon = leadingIcon,
         enabled = enabled,
     )
@@ -98,7 +98,7 @@ fun PairShotTopMenuItemText(
 @Composable
 fun PairShotTopMenuDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
-        modifier = modifier.padding(horizontal = PairShotSpacing.itemGap),
+        modifier = modifier.padding(horizontal = PairShotSpacing.md),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 }

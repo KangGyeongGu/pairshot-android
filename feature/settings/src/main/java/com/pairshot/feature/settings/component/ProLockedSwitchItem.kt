@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotTouchTarget
 
 private const val SWITCH_SCALE = 0.67f
 
@@ -30,8 +32,8 @@ internal fun ProLockedSwitchItem(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .height(PairShotSpacing.inputRow)
-                .padding(horizontal = PairShotSpacing.cardPadding),
+                .height(PairShotTouchTarget.large)
+                .padding(horizontal = PairShotCard.innerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -41,7 +43,7 @@ internal fun ProLockedSwitchItem(
             modifier = Modifier.weight(1f),
         )
         PairShotProBadge()
-        Spacer(modifier = Modifier.width(PairShotSpacing.iconTextGap))
+        Spacer(modifier = Modifier.width(PairShotSpacing.sm))
         Switch(
             checked = false,
             onCheckedChange = null,

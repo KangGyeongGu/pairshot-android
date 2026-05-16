@@ -79,8 +79,8 @@ fun AlbumPairGridSection(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
-        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
     ) {
         items.forEach { entry ->
             when (entry) {

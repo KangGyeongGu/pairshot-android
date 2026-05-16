@@ -39,6 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.rendering.OverlayTransformCalculator
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
@@ -63,7 +65,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.pairshot.core.ui.R as CoreR
 
-private val CameraShutterHeight = 116.dp
+private val CameraShutterHeight = CameraSpec.shutterSectionHeight
 private const val ALL_COMPLETED_NAVIGATE_BACK_DELAY_MS = 2000L
 
 @Composable
@@ -267,7 +269,7 @@ internal fun AfterCameraScreen(
     Box(modifier = Modifier.fillMaxSize().background(PairShotCameraTokens.Letterbox)) {
         val stripSectionHeight = BeforeStripHeight
         val shutterSectionHeight = CameraShutterHeight
-        val bottomSpacerHeight = 32.dp
+        val bottomSpacerHeight = PairShotSpacing.xxl
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -423,7 +425,7 @@ internal fun AfterCameraScreen(
                     Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = PairShotSpacing.snackbarTopOffset),
+                        .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
     }

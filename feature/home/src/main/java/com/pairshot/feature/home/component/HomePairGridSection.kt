@@ -127,8 +127,8 @@ fun HomePairGridSection(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
-        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
     ) {
         var lastDate: LocalDate? = null
         items.forEach { entry ->
@@ -150,7 +150,7 @@ fun HomePairGridSection(
                                     Modifier
                                         .fillMaxWidth()
                                         .padding(
-                                            top = PairShotSpacing.iconTextGap,
+                                            top = PairShotSpacing.sm,
                                             bottom = PairShotSpacing.xs,
                                         ),
                             )

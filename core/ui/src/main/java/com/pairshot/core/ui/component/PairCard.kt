@@ -25,14 +25,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.model.PhotoPair
+import com.pairshot.core.designsystem.PairShotBadge
+import com.pairshot.core.designsystem.spec.PairCardSpec
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.ui.R
 
-private val SelectionBorderWidth = 2.dp
-private val CombinedBadgeSize = 28.dp
-private val CombinedBadgeIconSize = 20.dp
-private val CombinedBadgeIconPadding = 4.dp
-private val BadgeEdgePadding = 8.dp
-private const val PAIR_CARD_ASPECT_RATIO = 1.5f
+private val SelectionBorderWidth = PairCardSpec.selectionBorderWidth
+private val CombinedBadgeSize = PairShotBadge.size
+private val CombinedBadgeIconSize = PairShotBadge.iconSize
+private val CombinedBadgeIconPadding = PairShotBadge.iconPadding
+private val BadgeEdgePadding = PairShotBadge.edgeInset
+private const val PAIR_CARD_ASPECT_RATIO = PairCardSpec.ASPECT_RATIO
 
 @Composable
 fun PairCard(
@@ -131,11 +134,9 @@ private fun PairCardSlot(
 private fun CombinedStatusBadge(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.size(CombinedBadgeSize),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(PairShotSpacing.sm),
         color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
     ) {
         Icon(
             imageVector = Icons.Filled.JoinRight,

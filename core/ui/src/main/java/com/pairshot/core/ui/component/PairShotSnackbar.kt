@@ -24,6 +24,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import kotlinx.coroutines.delay
 
 private const val SNACKBAR_BG_ARGB = 0xF01C1C1EL
@@ -61,25 +62,25 @@ fun PairShotSnackbar(
     Surface(
         shape = RoundedCornerShape(SNACKBAR_CORNER_RADIUS_DP.dp),
         color = SnackbarBackground,
-        shadowElevation = PairShotSpacing.snackbarElevation,
+        shadowElevation = PairShotSnackbarTokens.elevation,
         modifier =
             modifier
-                .widthIn(max = PairShotSpacing.snackbarMaxWidth)
-                .heightIn(min = PairShotSpacing.snackbarMinHeight),
+                .widthIn(max = PairShotSnackbarTokens.maxWidth)
+                .heightIn(min = PairShotSnackbarTokens.minHeight),
     ) {
         Row(
             modifier =
                 Modifier.padding(
-                    horizontal = PairShotSpacing.snackbarHorizontalPadding,
-                    vertical = PairShotSpacing.snackbarVerticalPadding,
+                    horizontal = PairShotSnackbarTokens.horizontalPadding,
+                    vertical = PairShotSnackbarTokens.verticalPadding,
                 ),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.snackbarInnerGap),
+            horizontalArrangement = Arrangement.spacedBy(PairShotSnackbarTokens.innerGap),
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(PairShotSpacing.snackbarDotSize)
+                        .size(PairShotSnackbarTokens.dotSize)
                         .background(dotColor(variant), CircleShape),
             )
             Text(

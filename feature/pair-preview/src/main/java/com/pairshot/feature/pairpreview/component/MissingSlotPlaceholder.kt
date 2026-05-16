@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.feature.pairpreview.R
 
 @Composable
@@ -32,12 +34,12 @@ fun MissingSlotPlaceholder(
             MissingSlotSide.AFTER -> R.string.pair_preview_slot_capture_after
         }
     Box(
-        modifier = modifier.fillMaxSize().padding(PairShotSpacing.screenPadding),
+        modifier = modifier.fillMaxSize().padding(PairShotScreen.horizontalPadding),
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(PairShotSpacing.cardPadding),
+            verticalArrangement = Arrangement.spacedBy(PairShotCard.innerPadding),
         ) {
             Text(
                 text = stringResource(messageRes),

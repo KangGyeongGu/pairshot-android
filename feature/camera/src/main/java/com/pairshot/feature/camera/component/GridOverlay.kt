@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotStroke
 
 private const val GRID_DIVISIONS = 3f
 private const val SECOND_LINE_MULTIPLIER = 2f
@@ -15,7 +16,7 @@ private const val SECOND_LINE_MULTIPLIER = 2f
 @Composable
 fun GridOverlay(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.fillMaxSize()) {
-        val strokeWidth = 1.dp.toPx()
+        val strokeWidth = PairShotStroke.hairline.toPx()
         val color = PairShotCameraTokens.Foreground.copy(alpha = 0.3f)
         val thirdW = size.width / GRID_DIVISIONS
         val thirdH = size.height / GRID_DIVISIONS

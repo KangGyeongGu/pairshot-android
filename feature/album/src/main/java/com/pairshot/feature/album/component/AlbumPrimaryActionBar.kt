@@ -1,5 +1,7 @@
 package com.pairshot.feature.album.component
 
+import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,21 +25,20 @@ fun AlbumPrimaryActionBar(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
     ) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = PairShotSpacing.lg, vertical = PairShotSpacing.md),
         ) {
             Button(
                 onClick = onClick,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
+                        .height(PairShotButton.primaryActionHeight),
                 shape = MaterialTheme.shapes.medium,
                 colors =
                     ButtonDefaults.buttonColors(

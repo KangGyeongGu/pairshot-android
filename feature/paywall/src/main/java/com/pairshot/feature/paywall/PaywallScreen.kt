@@ -50,16 +50,21 @@ import androidx.compose.ui.unit.sp
 import com.pairshot.core.billing.domain.BillingOffer
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotTouchTarget
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
 import java.text.NumberFormat
 import java.util.Currency
 
-private val LOGO_SIZE = 56.dp
-private val LOGO_CORNER = 12.dp
-private val LOGO_SHADOW_ELEVATION = 10.dp
-private val PLAN_CARD_CORNER = 16.dp
-private val PLAN_CARD_PADDING = 20.dp
+private val LOGO_SIZE = PairShotTouchTarget.large
+private val LOGO_CORNER = PairShotSpacing.md
+private val LOGO_SHADOW_ELEVATION = PairShotSpacing.md
+private val PLAN_CARD_CORNER = PairShotSpacing.lg
+private val PLAN_CARD_PADDING = PairShotScreen.horizontalPadding
 private const val LOGO_SHADOW_AMBIENT_ALPHA = 0.18f
 private const val LOGO_SHADOW_SPOT_ALPHA = 0.28f
 private const val MONTHS_PER_YEAR = 12L
@@ -100,19 +105,19 @@ fun PaywallScreen(
                     Modifier
                         .weight(1f)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp),
+                        .padding(horizontal = PairShotSpacing.xl),
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 Hero()
 
-                Spacer(modifier = Modifier.height(44.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.xxxl))
                 ValueProp(stringResource(R.string.paywall_value_unlimited))
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.lg))
                 ValueProp(stringResource(R.string.paywall_value_no_ads))
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.lg))
                 ValueProp(stringResource(R.string.paywall_value_pro_features))
 
-                Spacer(modifier = Modifier.height(44.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.xxxl))
                 PlanSection(
                     state = state,
                     onStartTrial = onStartTrial,
@@ -121,7 +126,7 @@ fun PaywallScreen(
                     onRetryLoad = onRetryLoad,
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
                 if (!dismissible) {
                     CenteredTextLink(
                         text = stringResource(R.string.paywall_continue_free),
@@ -134,17 +139,17 @@ fun PaywallScreen(
                     onClick = onRestore,
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
                 DisclosureBlock()
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.lg))
             }
 
             LegalRow(
-                modifier = Modifier.padding(horizontal = 24.dp),
+                modifier = Modifier.padding(horizontal = PairShotSpacing.xl),
                 onOpenTerms = { uriHandler.openUri(termsUrl) },
                 onOpenPrivacy = { uriHandler.openUri(privacyUrl) },
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.md))
         }
 
         PairShotSnackbarHost(
@@ -153,7 +158,7 @@ fun PaywallScreen(
                 Modifier
                     .align(Alignment.TopCenter)
                     .statusBarsPadding()
-                    .padding(top = PairShotSpacing.snackbarTopOffset),
+                    .padding(top = PairShotSnackbarTokens.topOffset),
         )
     }
 }
@@ -162,7 +167,7 @@ fun PaywallScreen(
 private fun DisclosureBlock() {
     val color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DISCLOSURE_ALPHA)
     val style = MaterialTheme.typography.labelSmall
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(PairShotRadius.sm)) {
         Text(
             text = stringResource(R.string.paywall_disclosure_auto_renew),
             style = style,
@@ -191,7 +196,7 @@ private fun TopBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 4.dp, top = 4.dp),
+                    .padding(start = PairShotSpacing.xs, top = PairShotSpacing.xs),
         ) {
             IconButton(
                 onClick = onDismiss,
@@ -204,7 +209,7 @@ private fun TopBar(
             }
         }
     } else {
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.xl))
     }
 }
 
@@ -227,14 +232,14 @@ private fun Hero() {
                         spotColor = Color.Black.copy(alpha = LOGO_SHADOW_SPOT_ALPHA),
                     ),
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.md))
         Text(
             text = stringResource(R.string.paywall_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
         Text(
             text = stringResource(R.string.paywall_subtitle),
             style = MaterialTheme.typography.bodyLarge,
@@ -250,7 +255,7 @@ private fun ValueProp(text: String) {
             imageVector = Icons.Outlined.Check,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(end = 12.dp),
+            modifier = Modifier.padding(end = PairShotSpacing.md),
         )
         Text(text = text, style = MaterialTheme.typography.bodyLarge)
     }
@@ -281,7 +286,7 @@ private fun PlanSection(
                     featured = true,
                     onClick = { onPurchaseYearly(yearly) },
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.md))
             }
 
             if (monthlyBase != null) {
@@ -317,7 +322,7 @@ private fun PlanCard(
         if (featured) {
             null
         } else {
-            BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+            BorderStroke(PairShotStroke.hairline, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
         }
 
     Surface(
@@ -336,12 +341,12 @@ private fun PlanCard(
                     fontWeight = FontWeight.SemiBold,
                 )
                 if (badge != null) {
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(PairShotSpacing.md))
                     Badge(text = badge, featured = featured)
                 }
             }
             if (price.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(PairShotRadius.sm))
                 Text(
                     text = price,
                     style = MaterialTheme.typography.headlineSmall,
@@ -349,7 +354,7 @@ private fun PlanCard(
                 )
             }
             if (subtitle.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(if (price.isEmpty()) 6.dp else 2.dp))
+                Spacer(modifier = Modifier.height(if (price.isEmpty()) PairShotRadius.sm else PairShotStroke.thin))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
@@ -380,9 +385,9 @@ private fun Badge(
     Box(
         modifier =
             Modifier
-                .clip(RoundedCornerShape(6.dp))
+                .clip(RoundedCornerShape(PairShotRadius.sm))
                 .background(badgeBg)
-                .padding(horizontal = 8.dp, vertical = 3.dp),
+                .padding(horizontal = PairShotSpacing.sm, vertical = PairShotStroke.thick),
     ) {
         Text(
             text = text,
@@ -396,12 +401,12 @@ private fun Badge(
 @Composable
 private fun LoadingBlock() {
     Box(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = PairShotSpacing.xxxl * 3),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
             Text(
                 text = stringResource(R.string.paywall_loading),
                 style = MaterialTheme.typography.bodySmall,
@@ -413,7 +418,7 @@ private fun LoadingBlock() {
 @Composable
 private fun ErrorBlock(onRetryLoad: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = PairShotSpacing.xxl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -421,7 +426,7 @@ private fun ErrorBlock(onRetryLoad: () -> Unit) {
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.md))
         OutlinedButton(onClick = onRetryLoad) {
             Text(text = stringResource(R.string.paywall_load_failed_retry))
         }
@@ -443,7 +448,7 @@ private fun CenteredTextLink(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(vertical = 10.dp),
+                .padding(vertical = PairShotSpacing.md),
     )
 }
 
@@ -462,7 +467,7 @@ private fun LegalRow(
             text = stringResource(R.string.paywall_terms),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = LEGAL_ALPHA),
-            modifier = Modifier.clickable(onClick = onOpenTerms).padding(8.dp),
+            modifier = Modifier.clickable(onClick = onOpenTerms).padding(PairShotSpacing.sm),
         )
         Text(
             text = "·",
@@ -473,7 +478,7 @@ private fun LegalRow(
             text = stringResource(R.string.paywall_privacy),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = LEGAL_ALPHA),
-            modifier = Modifier.clickable(onClick = onOpenPrivacy).padding(8.dp),
+            modifier = Modifier.clickable(onClick = onOpenPrivacy).padding(PairShotSpacing.sm),
         )
     }
 }

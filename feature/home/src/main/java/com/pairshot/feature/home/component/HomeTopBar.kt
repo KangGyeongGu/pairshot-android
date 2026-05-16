@@ -22,6 +22,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotProBadge
+import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.feature.home.R
 import com.pairshot.core.ui.R as CoreR
 
@@ -113,7 +114,7 @@ private fun BrandTitle(isProSubscriber: Boolean) {
             color = MaterialTheme.colorScheme.onSurface,
         )
         if (isProSubscriber) {
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(PairShotRadius.sm))
             PairShotProBadge()
         }
     }

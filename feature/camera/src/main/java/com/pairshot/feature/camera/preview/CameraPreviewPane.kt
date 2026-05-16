@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.feature.camera.component.CameraOverlayLayer
 import com.pairshot.feature.camera.component.FocusExposureOverlay
@@ -190,7 +191,7 @@ internal fun CameraPreviewPane(
                     modifier =
                         Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(bottom = 12.dp),
+                            .padding(bottom = PairShotSpacing.md),
                 )
             }
         }

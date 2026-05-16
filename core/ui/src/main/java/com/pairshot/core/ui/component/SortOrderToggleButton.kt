@@ -1,5 +1,7 @@
 package com.pairshot.core.ui.component
 
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,6 @@ fun SortOrderToggleButton(
         modifier =
             modifier
                 .clickable(onClick = onToggle)
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .padding(horizontal = PairShotSpacing.md, vertical = PairShotRadius.sm),
     )
 }

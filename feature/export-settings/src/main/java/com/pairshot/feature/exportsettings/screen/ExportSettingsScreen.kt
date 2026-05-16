@@ -35,6 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotButton
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
@@ -103,15 +106,15 @@ fun ExportSettingsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding =
                         PaddingValues(
-                            start = PairShotSpacing.screenPadding,
-                            end = PairShotSpacing.screenPadding,
-                            top = PairShotSpacing.cardPadding,
+                            start = PairShotScreen.horizontalPadding,
+                            end = PairShotScreen.horizontalPadding,
+                            top = PairShotCard.innerPadding,
                             bottom = ACTION_BAR_RESERVED_HEIGHT,
                         ),
                 ) {
                     item(key = "label_include") {
                         SettingsSectionLabel(label = stringResource(R.string.export_section_include))
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_include") {
                         ExportIncludeSection(
@@ -125,9 +128,9 @@ fun ExportSettingsScreen(
                     }
 
                     item(key = "label_format") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(label = stringResource(R.string.export_section_format))
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_format") {
                         ExportFormatSection(
@@ -142,7 +145,7 @@ fun ExportSettingsScreen(
                         applyWatermark && watermarkConfig.isContentMissing()
 
                     item(key = "label_watermark") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(
                             label = stringResource(R.string.export_section_watermark),
                             trailingWarning =
@@ -152,7 +155,7 @@ fun ExportSettingsScreen(
                                     null
                                 },
                         )
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_watermark") {
                         ExportWatermarkSection(
@@ -163,9 +166,9 @@ fun ExportSettingsScreen(
                     }
 
                     item(key = "label_combine") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(label = stringResource(R.string.export_section_combine))
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_combine") {
                         ExportCombineSection(
@@ -176,7 +179,7 @@ fun ExportSettingsScreen(
                     }
 
                     item(key = "bottom_spacer") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                     }
                 }
             }
@@ -241,8 +244,8 @@ private fun ActionBar(
     }
 }
 
-private val FAB_SIZE = 56.dp
-private val FAB_ELEVATION = 4.dp
-private val ACTION_BAR_HORIZONTAL_PADDING = 24.dp
-private val ACTION_BAR_VERTICAL_PADDING = 16.dp
-private val ACTION_BAR_RESERVED_HEIGHT = 96.dp
+private val FAB_SIZE = PairShotButton.fabSize
+private val FAB_ELEVATION = PairShotSpacing.xs
+private val ACTION_BAR_HORIZONTAL_PADDING = PairShotSpacing.xl
+private val ACTION_BAR_VERTICAL_PADDING = PairShotSpacing.lg
+private val ACTION_BAR_RESERVED_HEIGHT = PairShotSpacing.xxxl + PairShotSpacing.xxxl

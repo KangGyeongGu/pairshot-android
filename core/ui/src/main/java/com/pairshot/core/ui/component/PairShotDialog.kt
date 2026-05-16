@@ -11,10 +11,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.pairshot.core.designsystem.ModalShape
+import com.pairshot.core.designsystem.PairShotDialogTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 
-private val DialogHorizontalMargin = 32.dp
-private val DialogConfirmMaxWidth = 360.dp
-private val DialogOptionMaxWidth = 480.dp
+private val DialogHorizontalMargin = PairShotSpacing.xxl
+private val DialogConfirmMaxWidth = PairShotDialogTokens.confirmMaxWidth
+private val DialogOptionMaxWidth = PairShotDialogTokens.optionMaxWidth
 
 @Composable
 fun confirmDialogWidth(): Dp {
@@ -61,7 +63,7 @@ fun PairShotDialog(
         modifier = modifier,
         shape = ModalShape,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        tonalElevation = if (isSystemInDarkTheme()) 14.dp else 8.dp,
+        tonalElevation = if (isSystemInDarkTheme()) PairShotSpacing.lg else PairShotSpacing.sm,
         properties = properties,
     )
 }

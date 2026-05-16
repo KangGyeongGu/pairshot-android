@@ -41,6 +41,9 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.core.ui.component.PairShotDialog
 import com.pairshot.core.ui.component.SettingsSliderItem
@@ -48,8 +51,8 @@ import com.pairshot.feature.settings.R
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
-private val InputFieldMinHeight = 40.dp
-private val InputErrorHeight = 20.dp
+private val InputFieldMinHeight = PairShotIconSize.xl
+private val InputErrorHeight = PairShotScreen.horizontalPadding
 private const val JPEG_QUALITY_LOW = 75
 private const val JPEG_QUALITY_HIGH = 85
 private const val JPEG_QUALITY_BEST = 95
@@ -90,7 +93,7 @@ internal fun OverlayAlphaDialog(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.lg))
         SettingsSliderItem(
             label = "",
             value = currentAlpha,
@@ -99,7 +102,7 @@ internal fun OverlayAlphaDialog(
             valueLabel = { "${(it * 100).roundToInt()}%" },
             onValueChange = onAlphaChange,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
@@ -152,14 +155,14 @@ internal fun ImageQualityDialog(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.md))
         qualityOptions().forEach { option ->
             Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .clickable { selectedQuality = option.value }
-                        .padding(vertical = PairShotSpacing.iconTextGap),
+                        .padding(vertical = PairShotSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
@@ -170,7 +173,7 @@ internal fun ImageQualityDialog(
                             selectedColor = MaterialTheme.colorScheme.primary,
                         ),
                 )
-                Column(modifier = Modifier.padding(start = PairShotSpacing.iconTextGap)) {
+                Column(modifier = Modifier.padding(start = PairShotSpacing.sm)) {
                     Text(
                         text = option.label,
                         style = MaterialTheme.typography.bodyLarge,
@@ -184,14 +187,14 @@ internal fun ImageQualityDialog(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TextButton(onClick = onDismiss) { Text(stringResource(CoreR.string.common_button_cancel)) }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(PairShotSpacing.sm))
             TextButton(
                 onClick = {
                     onQualityChange(selectedQuality)
@@ -242,7 +245,7 @@ internal fun FileNamePrefixDialog(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.lg))
         Box(modifier = Modifier.fillMaxWidth()) {
             BasicTextField(
                 value = prefixInput,
@@ -268,7 +271,7 @@ internal fun FileNamePrefixDialog(
                                 color = lineColor,
                                 start = Offset(0f, size.height),
                                 end = Offset(size.width, size.height),
-                                strokeWidth = 1.dp.toPx(),
+                                strokeWidth = PairShotStroke.hairline.toPx(),
                             )
                         },
                 decorationBox = { innerTextField ->
@@ -305,13 +308,13 @@ internal fun FileNamePrefixDialog(
                 Text(stringResource(R.string.settings_dialog_reset_default))
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
         ) {
             TextButton(onClick = onDismiss) { Text(stringResource(CoreR.string.common_button_cancel)) }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(PairShotSpacing.sm))
             TextButton(
                 onClick = {
                     onPrefixChange(prefixInput)

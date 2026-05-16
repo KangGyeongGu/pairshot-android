@@ -1,5 +1,6 @@
 package com.pairshot.feature.album.screen
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -117,10 +118,9 @@ fun AlbumDetailScreen(
                         onPairLongPress = onPairLongPress,
                         contentPadding =
                             PaddingValues(
-                                top = 0.dp,
-                                bottom = 12.dp,
-                                start = 12.dp,
-                                end = 12.dp,
+                                bottom = PairShotSpacing.md,
+                                start = PairShotSpacing.md,
+                                end = PairShotSpacing.md,
                             ),
                         modifier = Modifier.fillMaxSize(),
                     )

@@ -33,9 +33,13 @@ import com.pairshot.core.model.PairStatus
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
+import com.pairshot.core.designsystem.spec.PairCardSpec
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 
-private const val PAIR_CARD_ASPECT_RATIO = 1.5f
+private const val PAIR_CARD_ASPECT_RATIO = PairCardSpec.ASPECT_RATIO
 
 @Composable
 fun PairPickerGridSection(
@@ -64,8 +68,8 @@ fun PairPickerGridSection(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
     ) {
         items(items = pairs, key = { it.id }) { pair ->
             PairPickerCard(
@@ -89,8 +93,8 @@ private fun PairPickerCard(
     val shape = MaterialTheme.shapes.medium
     val border =
         when {
-            isAlreadyInAlbum -> Modifier.border(2.dp, MaterialTheme.colorScheme.outline, shape)
-            isSelected -> Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape)
+            isAlreadyInAlbum -> Modifier.border(PairShotStroke.thin, MaterialTheme.colorScheme.outline, shape)
+            isSelected -> Modifier.border(PairShotStroke.thin, MaterialTheme.colorScheme.primary, shape)
             else -> Modifier
         }
 
@@ -171,8 +175,8 @@ private fun PairPickerCard(
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
-                            .padding(6.dp)
-                            .size(22.dp),
+                            .padding(PairShotRadius.sm)
+                            .size(PairShotSpacing.xl),
                 )
             }
         }

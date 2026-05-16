@@ -42,8 +42,6 @@ fun PairShotNativeAdCard(
                 .aspectRatio(NATIVE_AD_ASPECT_RATIO),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
     ) {
         val headlineColor = MaterialTheme.colorScheme.onSurface.toArgb()
         val bodyColor = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()

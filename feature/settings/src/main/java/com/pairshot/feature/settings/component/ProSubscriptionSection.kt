@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.domain.membership.Membership
 import com.pairshot.core.ui.component.SettingsCard
 import com.pairshot.core.ui.component.SettingsDivider
@@ -41,7 +42,7 @@ fun ProSubscriptionSection(
     onPromoCode: () -> Unit,
 ) {
     SettingsSectionLabel(label = stringResource(R.string.settings_section_pro_subscription))
-    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
 
     val membershipLabel =
         if (membership.isPro) {
@@ -69,7 +70,7 @@ fun ProSubscriptionSection(
             onPromoCode = onPromoCode,
         )
     }
-    Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+    Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
 }
 
 @Composable
@@ -98,29 +99,29 @@ private fun FreeBlock(
     onPromoCode: () -> Unit,
 ) {
     SettingsCard {
-        Column(modifier = Modifier.padding(PairShotSpacing.cardPadding)) {
+        Column(modifier = Modifier.padding(PairShotCard.innerPadding)) {
             Text(
                 text = stringResource(R.string.settings_pro_free_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.md))
             ProValueRow(stringResource(R.string.settings_pro_value_unlimited))
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
             ProValueRow(stringResource(R.string.settings_pro_value_no_ads))
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
             ProValueRow(stringResource(R.string.settings_pro_value_pro_features))
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.lg))
             Button(
                 onClick = onLearnMore,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(PairShotSpacing.md),
             ) {
                 Text(text = stringResource(R.string.settings_pro_learn_more))
             }
         }
     }
-    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
     SettingsCard {
         MembershipItem(value = membershipLabel)
         SettingsDivider()
@@ -139,7 +140,7 @@ private fun ProValueRow(text: String) {
             imageVector = Icons.Outlined.Check,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(end = 10.dp),
+            modifier = Modifier.padding(end = PairShotSpacing.md),
         )
         Text(
             text = text,

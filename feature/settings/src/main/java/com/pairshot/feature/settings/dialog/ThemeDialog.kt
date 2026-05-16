@@ -41,7 +41,7 @@ internal fun ThemeDialog(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.md))
 
         AppTheme.entries.forEach { option ->
             val labelRes =
@@ -55,7 +55,7 @@ internal fun ThemeDialog(
                     Modifier
                         .fillMaxWidth()
                         .clickable { selected = option }
-                        .padding(vertical = PairShotSpacing.iconTextGap),
+                        .padding(vertical = PairShotSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
@@ -70,12 +70,12 @@ internal fun ThemeDialog(
                     text = stringResource(labelRes),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(start = PairShotSpacing.iconTextGap),
+                    modifier = Modifier.padding(start = PairShotSpacing.sm),
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,

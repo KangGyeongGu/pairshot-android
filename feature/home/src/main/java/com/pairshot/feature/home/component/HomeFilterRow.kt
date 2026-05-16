@@ -16,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.model.SortOrder
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.viewmodel.HomeMode
@@ -33,12 +35,12 @@ fun HomeFilterRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = PairShotSpacing.screenPadding),
+                .padding(horizontal = PairShotScreen.horizontalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.itemGap),
+            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.md),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             HomeMode.entries.forEach { mode ->
@@ -92,7 +94,7 @@ private fun SortOrderDualLabel(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
     ) {
         SortOrderLabel(
             label = stringResource(com.pairshot.core.ui.R.string.common_label_sort_descending),
@@ -131,6 +133,6 @@ private fun SortOrderLabel(
         modifier =
             Modifier
                 .clickable(onClick = onClick)
-                .padding(horizontal = 4.dp, vertical = 6.dp),
+                .padding(horizontal = PairShotSpacing.xs, vertical = PairShotRadius.sm),
     )
 }

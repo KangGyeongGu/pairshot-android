@@ -41,6 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType
 import com.pairshot.core.ui.component.SettingsCard
@@ -107,8 +109,8 @@ internal fun WatermarkTypeItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -118,7 +120,7 @@ internal fun WatermarkTypeItem(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             WatermarkType.entries.forEach { type ->
                 val isSelected = type == selectedType
                 val isLocked = type == WatermarkType.LOGO && !isProSubscriber
@@ -135,8 +137,8 @@ internal fun WatermarkTypeItem(
                             ).clickable {
                                 if (isLocked) onProLocked() else onTypeChange(type)
                             }.padding(
-                                horizontal = PairShotSpacing.itemGap,
-                                vertical = PairShotSpacing.iconTextGap,
+                                horizontal = PairShotSpacing.md,
+                                vertical = PairShotSpacing.sm,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -159,7 +161,7 @@ internal fun WatermarkTypeItem(
                                 },
                         )
                         if (isLocked) {
-                            Spacer(modifier = Modifier.width(PairShotSpacing.iconTextGap))
+                            Spacer(modifier = Modifier.width(PairShotSpacing.sm))
                             PairShotProBadge()
                         }
                     }
@@ -202,8 +204,8 @@ private fun WatermarkTextItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -247,8 +249,8 @@ private fun WatermarkTextItem(
                         innerTextField()
                     }
                     if (isFocused) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
+                        HorizontalDivider(color = dividerColor, thickness = PairShotStroke.hairline)
                     }
                 }
             },

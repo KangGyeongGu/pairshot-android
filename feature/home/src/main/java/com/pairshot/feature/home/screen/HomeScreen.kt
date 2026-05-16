@@ -1,5 +1,6 @@
 package com.pairshot.feature.home.screen
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -153,7 +154,7 @@ fun HomeScreen(
                     .padding(paddingValues),
         ) {
             PairShotBannerAd()
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
             HomeFilterRow(
                 selectedMode = mode,
                 inSelectionMode = inSelectionMode,
@@ -161,7 +162,7 @@ fun HomeScreen(
                 onModeSelected = onModeSelected,
                 onToggleSortOrder = onToggleSortOrder,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
 
             if (listIsEmpty && !inSelectionMode) {
                 HomeEmptyAction(
@@ -172,10 +173,9 @@ fun HomeScreen(
             } else {
                 val contentPadding =
                     PaddingValues(
-                        start = 12.dp,
-                        end = 12.dp,
-                        top = 0.dp,
-                        bottom = 8.dp,
+                        start = PairShotSpacing.md,
+                        end = PairShotSpacing.md,
+                        bottom = PairShotSpacing.sm,
                     )
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,

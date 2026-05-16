@@ -1,5 +1,6 @@
 package com.pairshot.feature.home.dialog
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -76,7 +77,7 @@ fun CreateAlbumDialog(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.md))
                 OutlinedTextField(
                     value = albumName,
                     onValueChange = { albumName = it },

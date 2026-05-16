@@ -1,5 +1,6 @@
 package com.pairshot.feature.album.component
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,7 @@ fun AlbumEmptyActions(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
         ) {
             Button(
                 onClick = onCaptureBeforeClick,

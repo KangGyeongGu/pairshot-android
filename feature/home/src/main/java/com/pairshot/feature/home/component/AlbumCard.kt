@@ -25,6 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.model.Album
 import com.pairshot.feature.home.R
 
@@ -70,13 +73,13 @@ fun AlbumCard(
             isSelectionMode && isSelected -> {
                 Modifier
                     .clip(itemShape)
-                    .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), itemShape)
+                    .border(BorderStroke(PairShotStroke.thin, MaterialTheme.colorScheme.primary), itemShape)
             }
 
             isSelectionMode -> {
                 Modifier
                     .clip(itemShape)
-                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), itemShape)
+                    .border(BorderStroke(PairShotStroke.hairline, MaterialTheme.colorScheme.outlineVariant), itemShape)
             }
 
             else -> {
@@ -93,13 +96,13 @@ fun AlbumCard(
                     onLongClick = onLongPress,
                 ).then(borderModifier)
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(PairShotRadius.sm),
         ) {
             Text(
                 text = album.name,
@@ -111,12 +114,12 @@ fun AlbumCard(
             album.address?.let { address ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.LocationOn,
                         contentDescription = stringResource(R.string.home_desc_location),
-                        modifier = Modifier.size(12.dp),
+                        modifier = Modifier.size(PairShotSpacing.md),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
@@ -130,17 +133,17 @@ fun AlbumCard(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.md, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.CameraAlt,
                         contentDescription = stringResource(R.string.home_desc_pair_count),
-                        modifier = Modifier.size(12.dp),
+                        modifier = Modifier.size(PairShotSpacing.md),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(

@@ -1,5 +1,6 @@
 package com.pairshot.core.ui.component
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +26,7 @@ fun MarqueeTitleText(
                 iterations = Int.MAX_VALUE,
                 animationMode = MarqueeAnimationMode.Immediately,
                 repeatDelayMillis = 1_200,
-                velocity = 30.dp,
+                velocity = PairShotSpacing.xxl,
             ),
     )
 }

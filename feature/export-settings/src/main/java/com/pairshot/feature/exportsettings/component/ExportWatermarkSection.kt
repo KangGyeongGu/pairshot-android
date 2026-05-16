@@ -21,6 +21,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.ui.component.SettingsCard
 import com.pairshot.feature.exportsettings.R
 import com.pairshot.core.ui.R as CoreR
@@ -55,8 +57,8 @@ internal fun ExportSwitchWithGearItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(PairShotSpacing.inputRow)
-                .padding(start = PairShotSpacing.cardPadding),
+                .height(PairShotTouchTarget.large)
+                .padding(start = PairShotCard.innerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

@@ -1,5 +1,6 @@
 package com.pairshot.feature.album.dialog
 
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,7 +38,7 @@ fun AlbumDeletePairsDialog(
             text = stringResource(CoreR.string.dialog_delete_pair_method_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = PairShotSpacing.sm),
         )
         Text(
             text =
@@ -57,7 +58,7 @@ fun AlbumDeletePairsDialog(
                 },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = PairShotSpacing.lg),
         )
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
         ActionRow(
@@ -83,7 +84,7 @@ fun AlbumDeletePairsDialog(
             label = stringResource(CoreR.string.common_button_cancel),
             onClick = onDismiss,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
     }
 }
 
@@ -102,6 +103,6 @@ private fun ActionRow(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(vertical = 16.dp),
+                .padding(vertical = PairShotSpacing.lg),
     )
 }

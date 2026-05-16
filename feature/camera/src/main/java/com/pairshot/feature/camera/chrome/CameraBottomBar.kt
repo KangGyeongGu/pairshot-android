@@ -27,12 +27,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
+import com.pairshot.core.designsystem.spec.CameraSpec
+import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.feature.camera.R
 import com.pairshot.feature.camera.component.ShutterButton
 import com.pairshot.core.ui.R as CoreR
 
-private val ThumbnailSize = 56.dp
-private val ThumbnailCornerRadius = 8.dp
+private val ThumbnailSize = CameraSpec.thumbnailSize
+private val ThumbnailCornerRadius = CameraSpec.thumbnailCornerRadius
 
 @Composable
 internal fun CameraBottomBar(
@@ -50,7 +53,7 @@ internal fun CameraBottomBar(
                 .fillMaxWidth()
                 .height(height)
                 .background(PairShotCameraTokens.Letterbox)
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = CameraSpec.bottomBarHorizontalPadding),
     ) {
         ThumbnailOrHomeButton(
             thumbnailUri = lastPairThumbnailUri,
@@ -66,7 +69,7 @@ internal fun CameraBottomBar(
                 imageVector = Icons.Default.Settings,
                 contentDescription = stringResource(CoreR.string.common_desc_settings),
                 tint = PairShotCameraTokens.Foreground,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(PairShotIconSize.lg),
             )
         }
 
@@ -91,7 +94,7 @@ private fun ThumbnailOrHomeButton(
                 .size(ThumbnailSize)
                 .clip(shape)
                 .border(
-                    width = 1.dp,
+                    width = PairShotStroke.hairline,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     shape = shape,
                 ).clickable(onClick = onClick),
@@ -110,7 +113,7 @@ private fun ThumbnailOrHomeButton(
                 imageVector = Icons.Default.Home,
                 contentDescription = stringResource(R.string.camera_desc_home),
                 tint = PairShotCameraTokens.Foreground,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(PairShotIconSize.lg),
             )
         }
     }

@@ -37,6 +37,7 @@ import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.ui.component.PairShotSnackbar
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.component.TopProgressPill
@@ -185,7 +186,7 @@ private fun AppRootContent(
                     Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = PairShotSpacing.snackbarTopOffset),
+                        .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
 
@@ -208,7 +209,7 @@ private fun AppRootContent(
                                 if (progress != null) {
                                     SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
                                 } else {
-                                    PairShotSpacing.snackbarTopOffset
+                                    PairShotSnackbarTokens.topOffset
                                 },
                         ),
             )

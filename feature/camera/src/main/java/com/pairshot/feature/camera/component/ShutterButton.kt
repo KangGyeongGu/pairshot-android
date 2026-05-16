@@ -24,6 +24,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.feature.camera.R
 
 private const val SHUTTER_DISABLED_ALPHA = 0.5f
@@ -47,10 +50,10 @@ fun ShutterButton(
     Box(
         modifier =
             modifier
-                .size(56.dp)
+                .size(CameraSpec.shutterOuterSize)
                 .scale(scale)
                 .alpha(if (enabled) 1f else SHUTTER_DISABLED_ALPHA)
-                .border(width = 3.dp, color = PairShotCameraTokens.Foreground, shape = CircleShape)
+                .border(width = CameraSpec.shutterBorderWidth, color = PairShotCameraTokens.Foreground, shape = CircleShape)
                 .semantics { contentDescription = shutterDesc }
                 .clickable(
                     interactionSource = interactionSource,
@@ -61,16 +64,16 @@ fun ShutterButton(
         contentAlignment = Alignment.Center,
     ) {
         Surface(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(CameraSpec.shutterInnerSize),
             shape = CircleShape,
             color = innerColor,
             content = {},
         )
         if (!enabled) {
             CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(PairShotIconSize.md),
                 color = PairShotCameraTokens.Foreground,
-                strokeWidth = 2.dp,
+                strokeWidth = PairShotStroke.thin,
             )
         }
     }

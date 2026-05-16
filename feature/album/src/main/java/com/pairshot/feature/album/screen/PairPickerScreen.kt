@@ -1,5 +1,7 @@
 package com.pairshot.feature.album.screen
 
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -73,7 +75,6 @@ fun PairPickerScreen(
         bottomBar = {
             Surface(
                 color = MaterialTheme.colorScheme.background,
-                tonalElevation = 0.dp,
             ) {
                 Button(
                     onClick = onConfirm,
@@ -82,7 +83,7 @@ fun PairPickerScreen(
                         Modifier
                             .fillMaxWidth()
                             .navigationBarsPadding()
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                            .padding(horizontal = PairShotScreen.horizontalPadding, vertical = PairShotSpacing.md),
                 ) {
                     Text(
                         text =
@@ -101,10 +102,10 @@ fun PairPickerScreen(
             onToggle = onToggle,
             contentPadding =
                 androidx.compose.foundation.layout.PaddingValues(
-                    top = innerPadding.calculateTopPadding() + 12.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 12.dp,
-                    start = 12.dp,
-                    end = 12.dp,
+                    top = innerPadding.calculateTopPadding() + PairShotSpacing.md,
+                    bottom = innerPadding.calculateBottomPadding() + PairShotSpacing.md,
+                    start = PairShotSpacing.md,
+                    end = PairShotSpacing.md,
                 ),
             modifier = Modifier.fillMaxSize(),
         )

@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.feature.camera.chrome.CameraBottomBar
 import com.pairshot.feature.camera.component.BeforePreviewStrip
 import com.pairshot.feature.camera.component.BeforeStripHeight
@@ -33,8 +35,8 @@ import com.pairshot.feature.camera.component.CameraSettingsSheet
 import com.pairshot.feature.camera.component.ZoomUiState
 import com.pairshot.feature.camera.state.CameraSettingsState
 
-val CameraShutterSectionHeight = 116.dp
-val CameraBottomSpacer = 32.dp
+val CameraShutterSectionHeight = CameraSpec.shutterSectionHeight
+val CameraBottomSpacer = CameraSpec.bottomSpacer
 
 data class CameraScreenCallbacks(
     val onZoomRatioChanged: (Float) -> Unit,
@@ -150,7 +152,7 @@ fun CameraScreenContent(
                     Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = PairShotSpacing.snackbarTopOffset),
+                        .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
     }
