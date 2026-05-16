@@ -140,7 +140,7 @@ private fun resolveAdaptiveBannerHeight(
     density: Density,
 ): Dp {
     if (activity == null) return DefaultAdaptiveBannerFallbackHeight
-    val adSize = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp)
+    val adSize = AdSize.getInlineAdaptiveBannerAdSize(widthDp, BANNER_MAX_HEIGHT_DP)
     val heightPx = adSize.getHeightInPixels(activity)
     if (heightPx <= 0) return DefaultAdaptiveBannerFallbackHeight
     return with(density) { heightPx.toDp() }
@@ -151,13 +151,7 @@ private fun buildAdView(
     adsConfig: AdsConfig,
     widthDp: Int,
 ): AdView {
-    val activity = context.asActivityOrNull()
-    val adSize =
-        if (activity != null) {
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp)
-        } else {
-            AdSize.BANNER
-        }
+    val adSize = AdSize.getInlineAdaptiveBannerAdSize(widthDp, BANNER_MAX_HEIGHT_DP)
     return AdView(context).apply {
         layoutParams =
             ViewGroup.LayoutParams(
@@ -178,3 +172,6 @@ private tailrec fun Context.asActivityOrNull(): Activity? =
     }
 
 private const val TAG = "PairShotBannerAd"
+
+/** Max height (dp) for inline adaptive banner. Server returns size up to this; we reserve the max. */
+private const val BANNER_MAX_HEIGHT_DP = 60
