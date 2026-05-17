@@ -39,9 +39,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType

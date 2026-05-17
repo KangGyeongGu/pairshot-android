@@ -50,5 +50,6 @@ include(":feature:album")
 include(":feature:pair-preview")
 include(":feature:export-settings")
 include(":feature:paywall")
+include(":feature:tutorial")
 
 include(":microbenchmark:rendering")

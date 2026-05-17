@@ -2,7 +2,6 @@ package com.pairshot.core.promotion.domain
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class PromotionState(
     val proActive: Boolean,

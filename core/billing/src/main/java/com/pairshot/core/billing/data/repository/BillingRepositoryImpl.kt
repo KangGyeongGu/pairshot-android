@@ -50,8 +50,8 @@ class BillingRepositoryImpl
     ) : BillingRepository {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-        private val _status = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
-        override val subscriptionStatus: StateFlow<SubscriptionStatus> = _status.asStateFlow()
+        private val _subscriptionStatus = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
+        override val subscriptionStatus: StateFlow<SubscriptionStatus> = _subscriptionStatus.asStateFlow()
 
         private val productDetailsCache: ConcurrentHashMap<String, ProductDetails> = ConcurrentHashMap()
 
@@ -139,12 +139,18 @@ class BillingRepositoryImpl
                         ).build()
                 val result = holder.client.launchBillingFlow(activity, flowParams)
                 when (result.responseCode) {
-                    BillingClient.BillingResponseCode.OK -> PurchaseLaunchResult.Launched
+                    BillingClient.BillingResponseCode.OK -> {
+                        PurchaseLaunchResult.Launched
+                    }
+
                     BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                         syncStatusFromQuery()
                         PurchaseLaunchResult.AlreadyOwned
                     }
-                    else -> PurchaseLaunchResult.Failed(mapBillingError(result.responseCode, result.debugMessage))
+
+                    else -> {
+                        PurchaseLaunchResult.Failed(mapBillingError(result.responseCode, result.debugMessage))
+                    }
                 }
             }.getOrElse { error ->
                 Timber.w(error, "launchPurchaseFlow threw")
@@ -164,7 +170,7 @@ class BillingRepositoryImpl
 
         private suspend fun syncStatusFromQuery() {
             if (!awaitReadyOrFalse()) {
-                _status.value = SubscriptionStatus.Inactive
+                _subscriptionStatus.value = SubscriptionStatus.Inactive
                 return
             }
             val params =
@@ -179,7 +185,7 @@ class BillingRepositoryImpl
             }
             val active = result.purchasesList.firstOrNull()
             val newStatus = PurchaseStateMachine.toStatus(active)
-            _status.value = newStatus
+            _subscriptionStatus.value = newStatus
             if (active != null && !active.isAcknowledged && active.purchaseState == Purchase.PurchaseState.PURCHASED) {
                 acknowledgeWithRetry(active)
             }

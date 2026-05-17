@@ -7,6 +7,7 @@
     <string name="settings_section_watermark">Watermark</string>
     <string name="settings_section_combine">Combining</string>
     <string name="settings_section_general">General</string>
+    <string name="settings_section_help">Help</string>
     <string name="settings_section_storage_and_info">Storage and app info</string>
 
     <!-- Language -->
@@ -62,6 +63,8 @@
 
     <string name="watermark_logo_label">Logo</string>
     <string name="watermark_logo_choose">Choose</string>
+    <string name="watermark_logo_change">Change</string>
+    <string name="watermark_logo_remove">Remove logo</string>
     <string name="watermark_field_position">Position</string>
     <string name="watermark_field_size">Size</string>
     <string name="watermark_field_opacity">Opacity</string>

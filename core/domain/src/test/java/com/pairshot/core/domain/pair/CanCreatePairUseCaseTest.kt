@@ -2,11 +2,13 @@ package com.pairshot.core.domain.pair
 
 import com.pairshot.core.domain.membership.Membership
 import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,7 +20,9 @@ import java.time.ZoneId
 class CanCreatePairUseCaseTest {
     private val repository: PhotoPairRepository = mockk()
     private val membership: MembershipProvider = mockk()
-    private val useCase = CanCreatePairUseCase(repository, membership)
+    private val tutorialMode: TutorialModeProvider =
+        mockk { every { isActive } returns MutableStateFlow(false) }
+    private val useCase = CanCreatePairUseCase(repository, membership, tutorialMode)
 
     @Test
     fun `pro user can always create pair and repository is not queried`() =
@@ -47,7 +51,11 @@ class CanCreatePairUseCaseTest {
             val result = useCase()
             assertTrue(result is CanCreatePairUseCase.Result.Allowed)
             val expectedTodayStart =
-                LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                LocalDate
+                    .now()
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
             assertEquals(expectedTodayStart, capturedSince.captured)
         }
 
@@ -79,6 +87,18 @@ class CanCreatePairUseCaseTest {
             every { repository.countCreatedSince(any()) } returns flowOf(CanCreatePairUseCase.FREE_DAILY_LIMIT - 1)
             val result = useCase()
             assertTrue(result is CanCreatePairUseCase.Result.Allowed)
+        }
+
+    @Test
+    fun `tutorial-active free user past limit is still Allowed without querying repo or membership`() =
+        runTest {
+            val tutorialActiveMode: TutorialModeProvider =
+                mockk { every { isActive } returns MutableStateFlow(true) }
+            val useCaseInTutorial = CanCreatePairUseCase(repository, membership, tutorialActiveMode)
+            val result = useCaseInTutorial()
+            assertTrue(result is CanCreatePairUseCase.Result.Allowed)
+            coVerify(exactly = 0) { membership.current() }
+            coVerify(exactly = 0) { repository.countCreatedSince(any()) }
         }
 
     private fun proMembership(): Membership =

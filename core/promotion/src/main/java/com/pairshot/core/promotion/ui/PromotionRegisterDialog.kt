@@ -494,5 +494,7 @@ private fun PromotionActivationUiState.errorMessageResId(): Int? =
             }
         }
 
-        else -> null
+        else -> {
+            null
+        }
     }

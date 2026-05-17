@@ -18,8 +18,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.ModalShape
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotMenu
+import com.pairshot.core.designsystem.PairShotSpacing
 
 private const val MENU_WIDTH_FRACTION = 0.48f
 

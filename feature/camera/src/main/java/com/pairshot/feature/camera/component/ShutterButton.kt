@@ -27,7 +27,9 @@ import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.spec.CameraSpec
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.feature.camera.R
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 
 private const val SHUTTER_DISABLED_ALPHA = 0.5f
 
@@ -37,6 +39,7 @@ fun ShutterButton(
     modifier: Modifier = Modifier,
     innerColor: Color = PairShotCameraTokens.Foreground,
     enabled: Boolean = true,
+    tutorialAnchorKey: AnchorKey? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -55,6 +58,7 @@ fun ShutterButton(
                 .alpha(if (enabled) 1f else SHUTTER_DISABLED_ALPHA)
                 .border(width = CameraSpec.shutterBorderWidth, color = PairShotCameraTokens.Foreground, shape = CircleShape)
                 .semantics { contentDescription = shutterDesc }
+                .let { base -> if (tutorialAnchorKey != null) base.tutorialAnchor(tutorialAnchorKey) else base }
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,

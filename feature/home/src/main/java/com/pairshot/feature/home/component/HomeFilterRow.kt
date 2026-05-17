@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.SortOrder
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.viewmodel.HomeMode

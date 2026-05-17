@@ -29,14 +29,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.spec.PairCardSpec
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
-import com.pairshot.core.designsystem.spec.PairCardSpec
-import com.pairshot.core.designsystem.PairShotRadius
-import com.pairshot.core.designsystem.PairShotStroke
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 
 private const val PAIR_CARD_ASPECT_RATIO = PairCardSpec.ASPECT_RATIO

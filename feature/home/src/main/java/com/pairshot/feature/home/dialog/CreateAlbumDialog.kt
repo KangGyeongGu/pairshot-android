@@ -1,6 +1,5 @@
 package com.pairshot.feature.home.dialog
 
-import com.pairshot.core.designsystem.PairShotSpacing
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.ui.component.PairShotDialog
 import com.pairshot.feature.home.R

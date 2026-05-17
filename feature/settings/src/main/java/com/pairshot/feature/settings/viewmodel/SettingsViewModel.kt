@@ -71,11 +71,11 @@ class SettingsViewModel
                     initialValue = false,
                 )
 
-        private val _storageState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
+        private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
 
         val uiState: StateFlow<SettingsUiState> =
             combine(
-                _storageState,
+                _uiState,
                 appSettingsRepository.settingsFlow,
             ) { storageState, appSettings ->
                 when (storageState) {
@@ -140,7 +140,7 @@ class SettingsViewModel
             viewModelScope.launch {
                 try {
                     val info = getStorageInfoUseCase()
-                    _storageState.update {
+                    _uiState.update {
                         SettingsUiState.Success(
                             usedStorageBytes = info.usedBytes,
                             cacheBytes = info.cacheBytes,
@@ -148,7 +148,7 @@ class SettingsViewModel
                         )
                     }
                 } catch (_: Exception) {
-                    _storageState.value =
+                    _uiState.value =
                         SettingsUiState.Error(UiText.Resource(R.string.settings_error_load_failed))
                 }
             }
@@ -188,6 +188,7 @@ class SettingsViewModel
                     val path = watermarkRepository.saveLogoFile(uri)
                     val current = watermarkConfig.value
                     watermarkRepository.saveConfig(current.copy(logoPath = path))
+                    watermarkRepository.pruneOldLogoFiles(keepPath = path)
                 } catch (_: Exception) {
                     _snackbarMessage.emit(
                         SnackbarEvent(
@@ -196,6 +197,14 @@ class SettingsViewModel
                         ),
                     )
                 }
+            }
+        }
+
+        fun removeLogo() {
+            viewModelScope.launch {
+                watermarkRepository.removeLogoFile()
+                val current = watermarkConfig.value
+                watermarkRepository.saveConfig(current.copy(logoPath = ""))
             }
         }
 

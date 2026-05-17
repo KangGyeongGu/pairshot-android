@@ -21,9 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotSpacing
 
 private const val GRID_CELL_COUNT = 9
 private const val GRID_ROW_COUNT = 3

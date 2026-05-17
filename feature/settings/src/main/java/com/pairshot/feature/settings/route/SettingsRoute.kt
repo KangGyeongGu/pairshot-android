@@ -20,6 +20,7 @@ import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.adsui.component.RewardedGateDialog
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.domain.premium.PremiumFeature
+import com.pairshot.core.domain.tutorial.TutorialReplayController
 import com.pairshot.core.navigation.SettingsHighlight
 import com.pairshot.core.promotion.ui.PromotionRegisterDialog
 import com.pairshot.core.promotion.ui.PromotionViewModel
@@ -75,6 +76,15 @@ fun SettingsRoute(
     val settingsPremiumGate = remember(entryPoint) { entryPoint.settingsPremiumGate() }
     val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
     val adsInitializer = remember(entryPoint) { entryPoint.adsInitializer() }
+    val tutorialEntryPoint =
+        remember(context) {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                SettingsTutorialEntryPoint::class.java,
+            )
+        }
+    val tutorialReplay: TutorialReplayController =
+        remember(tutorialEntryPoint) { tutorialEntryPoint.tutorialReplayController() }
     val isProFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isPro } }
     val isPro by isProFlow.collectAsStateWithLifecycle(initialValue = false)
     val showAdsConsent by adsInitializer.privacyOptionsRequired.collectAsStateWithLifecycle()
@@ -208,6 +218,10 @@ fun SettingsRoute(
                     }
                 }
             }
+        },
+        onReplayTutorial = {
+            onNavigateBack()
+            tutorialReplay.restart()
         },
         proSubscriptionSection = {
             ProSubscriptionSection(

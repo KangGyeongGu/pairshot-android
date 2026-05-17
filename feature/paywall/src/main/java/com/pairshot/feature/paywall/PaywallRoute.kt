@@ -66,7 +66,10 @@ fun PaywallRoute(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                PaywallEvent.EntitlementGranted -> onEntitled()
+                PaywallEvent.EntitlementGranted -> {
+                    onEntitled()
+                }
+
                 PaywallEvent.AlreadyOwned -> {
                     snackbarController.show(
                         SnackbarEvent(
@@ -76,22 +79,32 @@ fun PaywallRoute(
                     )
                     onEntitled()
                 }
-                is PaywallEvent.PurchaseFailed ->
+
+                is PaywallEvent.PurchaseFailed -> {
                     snackbarController.show(
                         SnackbarEvent(
                             UiText.Resource(purchaseFailedStringRes(event.reason)),
                             SnackbarVariant.ERROR,
                         ),
                     )
-                PaywallEvent.RestoreSuccess -> onEntitled()
-                PaywallEvent.RestoreEmpty ->
+                }
+
+                PaywallEvent.RestoreSuccess -> {
+                    onEntitled()
+                }
+
+                PaywallEvent.RestoreEmpty -> {
                     snackbarController.show(
                         SnackbarEvent(
                             UiText.Resource(R.string.paywall_restore_no_subscription),
                             SnackbarVariant.WARNING,
                         ),
                     )
-                PaywallEvent.ContinuedFree -> onEntitled()
+                }
+
+                PaywallEvent.ContinuedFree -> {
+                    onEntitled()
+                }
             }
         }
     }
@@ -115,11 +128,15 @@ fun PaywallRoute(
 private fun purchaseFailedStringRes(error: PurchaseError): Int =
     when (error) {
         PurchaseError.BillingUnavailable -> R.string.paywall_purchase_failed_billing_unavailable
+
         PurchaseError.ServiceDisconnected,
         PurchaseError.ServiceUnavailable,
         -> R.string.paywall_purchase_failed_service_disconnected
+
         PurchaseError.NetworkError -> R.string.paywall_purchase_failed_network
+
         PurchaseError.ItemUnavailable -> R.string.paywall_purchase_failed_item_unavailable
+
         PurchaseError.AlreadyOwned,
         PurchaseError.UserCanceled,
         PurchaseError.DeveloperError,

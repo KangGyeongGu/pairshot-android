@@ -25,6 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.metrics.performance.JankStats
 import androidx.metrics.performance.PerformanceMetricsState
+import androidx.navigation.compose.rememberNavController
+import com.pairshot.app.flow.AppFlowCoordinator
+import com.pairshot.app.flow.PostTutorialDecision
 import com.pairshot.app.navigation.PairShotNavHost
 import com.pairshot.app.navigation.SelectionActionViewModel
 import com.pairshot.app.navigation.SelectionMessage
@@ -36,15 +39,29 @@ import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
+import com.pairshot.core.navigation.Paywall
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.component.TopProgressPill
+import com.pairshot.feature.tutorial.domain.TutorialCoordinator
+import com.pairshot.feature.tutorial.ui.TutorialOverlay
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import timber.log.Timber
 import javax.inject.Inject
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface RootFlowEntryPoint {
+    fun tutorialCoordinator(): TutorialCoordinator
+
+    fun appFlowCoordinator(): AppFlowCoordinator
+}
 
 private const val SNACKBAR_OFFSET_WHEN_PROGRESS_DP = 80
 
@@ -109,14 +126,15 @@ private fun AppRootContent(
 ) {
     val selectionVm: SelectionActionViewModel = hiltViewModel()
     val startupVm: StartupDecisionViewModel = hiltViewModel()
-    val initialRoute by startupVm.initialRoute.collectAsStateWithLifecycle()
+    val plan by startupVm.plan.collectAsStateWithLifecycle()
     val progress by selectionVm.progress.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
 
-    LaunchedEffect(initialRoute) {
-        if (initialRoute != null) onStartupReady()
+    LaunchedEffect(plan) {
+        if (plan != null) onStartupReady()
     }
-    val resolvedRoute = initialRoute ?: return
+    val resolvedPlan = plan ?: return
+    val resolvedRoute = resolvedPlan.initialRoute
 
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -132,6 +150,36 @@ private fun AppRootContent(
     LaunchedEffect(Unit) {
         selectionVm.messages.collect { msg ->
             snackbarController.show(msg.toSnackbarEvent())
+        }
+    }
+
+    val navController = rememberNavController()
+    val rootEntryPoint =
+        remember(context) {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                RootFlowEntryPoint::class.java,
+            )
+        }
+    val tutorialCoordinator = remember(rootEntryPoint) { rootEntryPoint.tutorialCoordinator() }
+    val appFlowCoordinator = remember(rootEntryPoint) { rootEntryPoint.appFlowCoordinator() }
+
+    LaunchedEffect(tutorialCoordinator, resolvedPlan) {
+        if (resolvedPlan.startMainTutorial) {
+            tutorialCoordinator.start()
+        }
+    }
+    LaunchedEffect(tutorialCoordinator, appFlowCoordinator) {
+        tutorialCoordinator.finishedEvents.collect { event ->
+            when (appFlowCoordinator.decidePostTutorial(event.section, event.reason)) {
+                PostTutorialDecision.NavigateToOnboardingPaywall -> {
+                    navController.navigate(Paywall(dismissible = false))
+                }
+
+                PostTutorialDecision.Stay -> {
+                    Unit
+                }
+            }
         }
     }
 
@@ -158,6 +206,7 @@ private fun AppRootContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         PairShotNavHost(
+            navController = navController,
             onDestinationChanged = onRouteChanged,
             onShareSelected = selectionVm::shareSelection,
             onSaveSelectedToDevice = saveSelectedToDevice,
@@ -198,6 +247,8 @@ private fun AppRootContent(
                             },
                     ),
         )
+
+        TutorialOverlay()
     }
 }
 

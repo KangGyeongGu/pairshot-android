@@ -9,7 +9,7 @@ import com.pairshot.core.billing.PurchaseLaunchResult
 import com.pairshot.core.billing.domain.BillingOffer
 import com.pairshot.core.billing.domain.PurchaseError
 import com.pairshot.core.domain.membership.MembershipProvider
-import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.settings.OnboardingStateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,9 @@ data class PaywallUiState(
 sealed interface PaywallEvent {
     data object EntitlementGranted : PaywallEvent
 
-    data class PurchaseFailed(val reason: PurchaseError) : PaywallEvent
+    data class PurchaseFailed(
+        val reason: PurchaseError,
+    ) : PaywallEvent
 
     data object AlreadyOwned : PaywallEvent
 
@@ -49,7 +51,7 @@ class PaywallViewModel
     constructor(
         private val billingRepository: BillingRepository,
         private val membershipProvider: MembershipProvider,
-        private val appSettingsRepository: AppSettingsRepository,
+        private val onboardingStateRepository: OnboardingStateRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(PaywallUiState())
         val uiState: StateFlow<PaywallUiState> = _uiState.asStateFlow()
@@ -94,8 +96,14 @@ class PaywallViewModel
         ) {
             viewModelScope.launch {
                 when (val result = billingRepository.launchPurchaseFlow(activity, offer)) {
-                    PurchaseLaunchResult.Launched -> Unit
-                    PurchaseLaunchResult.AlreadyOwned -> _events.tryEmit(PaywallEvent.AlreadyOwned)
+                    PurchaseLaunchResult.Launched -> {
+                        Unit
+                    }
+
+                    PurchaseLaunchResult.AlreadyOwned -> {
+                        _events.tryEmit(PaywallEvent.AlreadyOwned)
+                    }
+
                     is PurchaseLaunchResult.Failed -> {
                         if (result.error !is PurchaseError.UserCanceled) {
                             _events.tryEmit(PaywallEvent.PurchaseFailed(result.error))
@@ -117,7 +125,7 @@ class PaywallViewModel
 
         fun continueFree() {
             viewModelScope.launch {
-                appSettingsRepository.markOnboardingPaywallShown()
+                onboardingStateRepository.markOnboardingPaywallShown()
                 _events.tryEmit(PaywallEvent.ContinuedFree)
             }
         }
@@ -126,7 +134,7 @@ class PaywallViewModel
             viewModelScope.launch {
                 membershipProvider.observe().collect { membership ->
                     if (membership.isPro) {
-                        appSettingsRepository.markOnboardingPaywallShown()
+                        onboardingStateRepository.markOnboardingPaywallShown()
                         _events.tryEmit(PaywallEvent.EntitlementGranted)
                     }
                 }

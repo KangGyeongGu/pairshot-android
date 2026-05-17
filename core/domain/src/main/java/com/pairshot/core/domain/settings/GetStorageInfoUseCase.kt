@@ -1,7 +1,6 @@
 package com.pairshot.core.domain.settings
 
 import com.pairshot.core.model.StorageInfo
-
 import javax.inject.Inject
 
 class GetStorageInfoUseCase

@@ -4,6 +4,7 @@ import androidx.camera.core.SurfaceRequest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,12 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCameraTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
-import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.feature.camera.chrome.CameraBottomBar
 import com.pairshot.feature.camera.component.BeforePreviewStrip
 import com.pairshot.feature.camera.component.BeforeStripHeight
@@ -58,6 +59,7 @@ data class CameraScreenCallbacks(
     val onDismissSettings: () -> Unit,
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CameraScreenContent(
     surfaceRequest: SurfaceRequest?,
@@ -68,7 +70,6 @@ fun CameraScreenContent(
     roll: Float,
     blackoutAlpha: Float,
     beforePreviewUris: List<String>,
-    lastPairThumbnailUri: String?,
     callbacks: CameraScreenCallbacks,
     snackbarController: PairShotSnackbarController = remember { PairShotSnackbarController() },
     thumbnailListState: LazyListState = rememberLazyListState(),
@@ -118,7 +119,6 @@ fun CameraScreenContent(
                     height = CameraShutterSectionHeight,
                     onToggleSettings = callbacks.onToggleSettings,
                     onShutterClick = callbacks.onShutter,
-                    lastPairThumbnailUri = lastPairThumbnailUri,
                     onThumbnailClick = callbacks.onThumbnailClick,
                 )
 
@@ -151,7 +151,7 @@ fun CameraScreenContent(
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
-                        .statusBarsPadding()
+                        .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
                         .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }

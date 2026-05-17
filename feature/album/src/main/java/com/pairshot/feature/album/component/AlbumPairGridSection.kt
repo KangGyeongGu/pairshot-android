@@ -14,8 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.pair.PairListItem
 import com.pairshot.core.domain.pair.buildPairListWithAds

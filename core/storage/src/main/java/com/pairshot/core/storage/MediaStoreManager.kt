@@ -117,6 +117,10 @@ class MediaStoreManager
                 DeleteResult.Failed(e)
             } catch (e: IOException) {
                 DeleteResult.Failed(e)
+            } catch (e: IllegalArgumentException) {
+                DeleteResult.Failed(e)
+            } catch (e: UnsupportedOperationException) {
+                DeleteResult.Failed(e)
             }
 
         private fun deleteFromGalleryLegacy(contentUri: Uri): DeleteResult =
@@ -126,6 +130,10 @@ class MediaStoreManager
             } catch (e: SecurityException) {
                 DeleteResult.Failed(e)
             } catch (e: IOException) {
+                DeleteResult.Failed(e)
+            } catch (e: IllegalArgumentException) {
+                DeleteResult.Failed(e)
+            } catch (e: UnsupportedOperationException) {
                 DeleteResult.Failed(e)
             }
 

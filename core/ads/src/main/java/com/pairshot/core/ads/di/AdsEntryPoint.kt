@@ -8,6 +8,7 @@ import com.pairshot.core.ads.controller.RewardedAdController
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
 import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -31,4 +32,6 @@ interface AdsEntryPoint {
     fun settingsPremiumGate(): SettingsPremiumGate
 
     fun nativeAdPoolProvider(): Provider<NativeAdPool>
+
+    fun tutorialModeProvider(): TutorialModeProvider
 }

@@ -1,6 +1,5 @@
 package com.pairshot.feature.album.component
 
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 import com.pairshot.core.ui.R as CoreR
 

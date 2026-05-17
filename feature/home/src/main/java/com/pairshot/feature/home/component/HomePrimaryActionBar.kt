@@ -1,7 +1,5 @@
 package com.pairshot.feature.home.component
 
-import com.pairshot.core.designsystem.PairShotButton
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.domain.tutorial.AnchorKey
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 
 @Composable
 fun HomePrimaryActionBar(
@@ -38,7 +40,8 @@ fun HomePrimaryActionBar(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(PairShotButton.primaryActionHeight),
+                        .height(PairShotButton.primaryActionHeight)
+                        .tutorialAnchor(AnchorKey.HOME_SHOOT_BUTTON),
                 shape = MaterialTheme.shapes.medium,
                 colors =
                     ButtonDefaults.buttonColors(

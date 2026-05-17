@@ -9,6 +9,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ class InterstitialAdController
         private val adsConfig: AdsConfig,
         private val adsInitializer: AdsInitializer,
         private val membershipProvider: MembershipProvider,
+        private val tutorialMode: TutorialModeProvider,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -47,6 +49,10 @@ class InterstitialAdController
             onFinished: () -> Unit,
         ) {
             scope.launch {
+                if (tutorialMode.isActive.value) {
+                    onFinished()
+                    return@launch
+                }
                 if (membershipProvider.current().isAdFree) {
                     onFinished()
                     return@launch

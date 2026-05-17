@@ -48,11 +48,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
-import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotRadius
-import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.feature.camera.R
 import kotlin.math.abs

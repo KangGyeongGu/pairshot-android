@@ -34,10 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
-import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotButton
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
-import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
@@ -47,6 +47,7 @@ import com.pairshot.feature.exportsettings.component.ExportCombineSection
 import com.pairshot.feature.exportsettings.component.ExportFormatSection
 import com.pairshot.feature.exportsettings.component.ExportIncludeSection
 import com.pairshot.feature.exportsettings.component.ExportWatermarkSection
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import com.pairshot.core.ui.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,14 +118,16 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_include") {
-                        ExportIncludeSection(
-                            includeBefore = includeBefore,
-                            includeAfter = includeAfter,
-                            includeCombined = includeCombined,
-                            onIncludeBeforeChange = onIncludeBeforeChange,
-                            onIncludeAfterChange = onIncludeAfterChange,
-                            onIncludeCombinedChange = onIncludeCombinedChange,
-                        )
+                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_INCLUDE)) {
+                            ExportIncludeSection(
+                                includeBefore = includeBefore,
+                                includeAfter = includeAfter,
+                                includeCombined = includeCombined,
+                                onIncludeBeforeChange = onIncludeBeforeChange,
+                                onIncludeAfterChange = onIncludeAfterChange,
+                                onIncludeCombinedChange = onIncludeCombinedChange,
+                            )
+                        }
                     }
 
                     item(key = "label_format") {
@@ -133,12 +136,14 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_format") {
-                        ExportFormatSection(
-                            format = format,
-                            isProSubscriber = isProSubscriber,
-                            onFormatChange = onFormatChange,
-                            onProLocked = onProLocked,
-                        )
+                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_FORMAT)) {
+                            ExportFormatSection(
+                                format = format,
+                                isProSubscriber = isProSubscriber,
+                                onFormatChange = onFormatChange,
+                                onProLocked = onProLocked,
+                            )
+                        }
                     }
 
                     val watermarkWarning =
@@ -158,11 +163,13 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_watermark") {
-                        ExportWatermarkSection(
-                            applyWatermark = applyWatermark,
-                            onApplyWatermarkChange = onApplyWatermarkChange,
-                            onNavigateToWatermarkSettings = onNavigateToWatermarkSettings,
-                        )
+                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_WATERMARK)) {
+                            ExportWatermarkSection(
+                                applyWatermark = applyWatermark,
+                                onApplyWatermarkChange = onApplyWatermarkChange,
+                                onNavigateToWatermarkSettings = onNavigateToWatermarkSettings,
+                            )
+                        }
                     }
 
                     item(key = "label_combine") {
@@ -171,11 +178,13 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_combine") {
-                        ExportCombineSection(
-                            applyCombineConfig = applyCombineConfig,
-                            onApplyCombineConfigChange = onApplyCombineConfigChange,
-                            onNavigateToCombineSettings = onNavigateToCombineSettings,
-                        )
+                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_COMBINE)) {
+                            ExportCombineSection(
+                                applyCombineConfig = applyCombineConfig,
+                                onApplyCombineConfigChange = onApplyCombineConfigChange,
+                                onNavigateToCombineSettings = onNavigateToCombineSettings,
+                            )
+                        }
                     }
 
                     item(key = "bottom_spacer") {

@@ -23,8 +23,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 import kotlinx.coroutines.delay
 
 private const val SNACKBAR_BG_ARGB = 0xF01C1C1EL

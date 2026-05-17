@@ -48,13 +48,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pairshot.core.billing.domain.BillingOffer
-import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotTheme
-import com.pairshot.core.designsystem.PairShotSnackbarTokens
-import com.pairshot.core.designsystem.PairShotScreen
-import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotTheme
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
 import java.text.NumberFormat
@@ -270,8 +270,14 @@ private fun PlanSection(
     onRetryLoad: () -> Unit,
 ) {
     when {
-        state.loading -> LoadingBlock()
-        state.loadError -> ErrorBlock(onRetryLoad = onRetryLoad)
+        state.loading -> {
+            LoadingBlock()
+        }
+
+        state.loadError -> {
+            ErrorBlock(onRetryLoad = onRetryLoad)
+        }
+
         else -> {
             val yearly = state.yearlyOffer
             val trial = state.trialOffer

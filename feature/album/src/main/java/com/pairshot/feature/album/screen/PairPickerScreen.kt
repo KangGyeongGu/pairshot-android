@@ -1,7 +1,5 @@
 package com.pairshot.feature.album.screen
 
-import com.pairshot.core.designsystem.PairShotScreen
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -23,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 import com.pairshot.feature.album.component.PairPickerGridSection
 import com.pairshot.feature.album.viewmodel.PairPickerUiState

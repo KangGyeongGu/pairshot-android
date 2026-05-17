@@ -7,6 +7,7 @@
     <string name="settings_section_watermark">워터마크</string>
     <string name="settings_section_combine">합성</string>
     <string name="settings_section_general">일반</string>
+    <string name="settings_section_help">도움말</string>
     <string name="settings_section_storage_and_info">저장공간 및 앱 정보</string>
 
     <!-- Language -->
@@ -62,6 +63,8 @@
 
     <string name="watermark_logo_label">로고</string>
     <string name="watermark_logo_choose">선택</string>
+    <string name="watermark_logo_change">변경</string>
+    <string name="watermark_logo_remove">로고 제거</string>
     <string name="watermark_field_position">위치</string>
     <string name="watermark_field_size">크기</string>
     <string name="watermark_field_opacity">투명도</string>

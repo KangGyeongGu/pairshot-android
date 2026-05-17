@@ -21,9 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairShotBannerAd
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType
 import com.pairshot.core.model.isContentMissing
@@ -47,6 +47,7 @@ fun WatermarkSettingsScreen(
     isProSubscriber: Boolean,
     onWatermarkConfigChange: (WatermarkConfig) -> Unit,
     onSelectLogo: () -> Unit,
+    onRemoveLogo: () -> Unit,
     onNavigateBack: () -> Unit,
     onProLocked: () -> Unit,
     watermarkRenderer: WatermarkRenderer,
@@ -151,6 +152,7 @@ fun WatermarkSettingsScreen(
                             watermarkConfig = watermarkConfig,
                             onWatermarkConfigChange = onWatermarkConfigChange,
                             onSelectLogo = onSelectLogo,
+                            onRemoveLogo = onRemoveLogo,
                         )
                     }
                 }

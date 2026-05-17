@@ -24,10 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.designsystem.PairShotBadge
-import com.pairshot.core.designsystem.spec.PairCardSpec
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.spec.PairCardSpec
+import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.ui.R
 
 private val SelectionBorderWidth = PairCardSpec.selectionBorderWidth

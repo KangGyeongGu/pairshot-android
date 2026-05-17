@@ -18,8 +18,8 @@ import javax.inject.Singleton
 class FakeBillingRepository
     @Inject
     constructor() : BillingRepository {
-        private val _status = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
-        override val subscriptionStatus: StateFlow<SubscriptionStatus> = _status.asStateFlow()
+        private val _subscriptionStatus = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
+        override val subscriptionStatus: StateFlow<SubscriptionStatus> = _subscriptionStatus.asStateFlow()
 
         override fun start() = Unit
 
@@ -60,7 +60,7 @@ class FakeBillingRepository
             offer: BillingOffer,
         ): PurchaseLaunchResult {
             delay(PURCHASE_DELAY_MS)
-            _status.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
+            _subscriptionStatus.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
             return PurchaseLaunchResult.Launched
         }
 

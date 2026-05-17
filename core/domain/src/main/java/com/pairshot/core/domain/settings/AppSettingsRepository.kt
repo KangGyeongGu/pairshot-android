@@ -47,8 +47,4 @@ interface AppSettingsRepository {
     val appThemeNameFlow: Flow<String>
 
     suspend fun updateAppThemeName(name: String)
-
-    suspend fun isOnboardingPaywallShown(): Boolean
-
-    suspend fun markOnboardingPaywallShown()
 }

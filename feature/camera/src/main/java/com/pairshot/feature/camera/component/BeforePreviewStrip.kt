@@ -50,11 +50,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
-import com.pairshot.core.ui.component.ImageProfile
-import com.pairshot.core.ui.component.ProfiledAsyncImage
+import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.spec.CameraSpec
-import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.ui.component.ImageProfile
+import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.camera.R
 import kotlin.math.abs
 

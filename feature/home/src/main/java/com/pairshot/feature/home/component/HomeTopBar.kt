@@ -23,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.feature.home.R
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import com.pairshot.core.ui.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +60,10 @@ fun HomeTopBar(
         },
         navigationIcon = {
             if (selectionMode) {
-                IconButton(onClick = onExitSelectionMode) {
+                IconButton(
+                    onClick = onExitSelectionMode,
+                    modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_EXIT_BUTTON),
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = stringResource(R.string.home_desc_deselect),
@@ -80,14 +85,20 @@ fun HomeTopBar(
                     )
                 }
             } else {
-                IconButton(onClick = onEnterSelectionMode) {
+                IconButton(
+                    onClick = onEnterSelectionMode,
+                    modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BUTTON),
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.CheckCircle,
                         contentDescription = stringResource(R.string.home_desc_selection_mode),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
-                IconButton(onClick = onNavigateToSettings) {
+                IconButton(
+                    onClick = onNavigateToSettings,
+                    modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SETTINGS_BUTTON),
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
                         contentDescription = stringResource(CoreR.string.common_desc_settings),

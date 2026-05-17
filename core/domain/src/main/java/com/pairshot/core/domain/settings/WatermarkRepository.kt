@@ -1,7 +1,6 @@
 package com.pairshot.core.domain.settings
 
 import com.pairshot.core.model.WatermarkConfig
-
 import kotlinx.coroutines.flow.Flow
 
 interface WatermarkRepository {
@@ -12,4 +11,8 @@ interface WatermarkRepository {
     suspend fun getConfig(): WatermarkConfig
 
     suspend fun saveLogoFile(sourceUri: String): String
+
+    suspend fun pruneOldLogoFiles(keepPath: String)
+
+    suspend fun removeLogoFile()
 }

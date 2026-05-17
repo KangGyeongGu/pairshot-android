@@ -14,9 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.ui.component.SettingsCard

@@ -12,7 +12,9 @@ sealed interface PurchaseLaunchResult {
 
     data object AlreadyOwned : PurchaseLaunchResult
 
-    data class Failed(val error: PurchaseError) : PurchaseLaunchResult
+    data class Failed(
+        val error: PurchaseError,
+    ) : PurchaseLaunchResult
 }
 
 interface BillingRepository {

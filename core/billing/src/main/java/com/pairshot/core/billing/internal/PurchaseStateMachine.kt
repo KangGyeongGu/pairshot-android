@@ -8,10 +8,17 @@ object PurchaseStateMachine {
         if (purchase == null) return SubscriptionStatus.Inactive
         val productId = purchase.products.firstOrNull() ?: return SubscriptionStatus.Inactive
         return when (purchase.purchaseState) {
-            Purchase.PurchaseState.PURCHASED ->
+            Purchase.PurchaseState.PURCHASED -> {
                 SubscriptionStatus.Active(productId = productId, autoRenew = purchase.isAutoRenewing)
-            Purchase.PurchaseState.PENDING -> SubscriptionStatus.Pending(productId)
-            else -> SubscriptionStatus.Inactive
+            }
+
+            Purchase.PurchaseState.PENDING -> {
+                SubscriptionStatus.Pending(productId)
+            }
+
+            else -> {
+                SubscriptionStatus.Inactive
+            }
         }
     }
 }

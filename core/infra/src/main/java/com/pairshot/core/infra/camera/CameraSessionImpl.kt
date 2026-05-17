@@ -431,10 +431,13 @@ class CameraSessionImpl
         private fun buildResolutionSelector(ratio: AspectRatio): ResolutionSelector {
             val strategy =
                 when (ratio) {
-                    AspectRatio.RATIO_4_3, AspectRatio.RATIO_1_1 ->
+                    AspectRatio.RATIO_4_3, AspectRatio.RATIO_1_1 -> {
                         AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
-                    AspectRatio.RATIO_16_9 ->
+                    }
+
+                    AspectRatio.RATIO_16_9 -> {
                         AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
+                    }
                 }
             return ResolutionSelector
                 .Builder()

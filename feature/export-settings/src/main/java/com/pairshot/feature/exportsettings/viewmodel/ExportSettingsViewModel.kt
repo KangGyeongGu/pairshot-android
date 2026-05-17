@@ -49,7 +49,8 @@ class ExportSettingsViewModel
             )
 
         val applyWatermark: StateFlow<Boolean> =
-            watermarkConfig.map { it.enabled }
+            watermarkConfig
+                .map { it.enabled }
                 .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
         init {

@@ -90,7 +90,9 @@ class KtorPromotionApi
                         }
                 }
 
-                HttpStatusCode.TooManyRequests -> MembershipApiResult.ServerError
+                HttpStatusCode.TooManyRequests -> {
+                    MembershipApiResult.ServerError
+                }
 
                 else -> {
                     val bodyText = runCatching { response.bodyAsText() }.getOrDefault("<read failed>")
@@ -145,11 +147,17 @@ class KtorPromotionApi
                         }
                 }
 
-                HttpStatusCode.NotFound -> ActivationApiResult.NotFound
+                HttpStatusCode.NotFound -> {
+                    ActivationApiResult.NotFound
+                }
 
-                HttpStatusCode.Conflict -> ActivationApiResult.AlreadyUsedOnAnotherDevice
+                HttpStatusCode.Conflict -> {
+                    ActivationApiResult.AlreadyUsedOnAnotherDevice
+                }
 
-                HttpStatusCode.Gone -> ActivationApiResult.Revoked
+                HttpStatusCode.Gone -> {
+                    ActivationApiResult.Revoked
+                }
 
                 HttpStatusCode.Unauthorized -> {
                     Timber.tag(API_TAG).w("activate 401 — check PROMOTION_API_AUTH_KEY")
@@ -159,9 +167,18 @@ class KtorPromotionApi
                 HttpStatusCode.BadRequest -> {
                     val body = runCatching { response.body<ErrorResponseDto>() }.getOrNull()
                     when (body?.error) {
-                        "INVALID_CODE_FORMAT" -> ActivationApiResult.InvalidCodeFormat
-                        "INVALID_SIGNATURE" -> ActivationApiResult.InvalidSignature
-                        "INVALID_DEVICE" -> ActivationApiResult.InvalidCodeFormat
+                        "INVALID_CODE_FORMAT" -> {
+                            ActivationApiResult.InvalidCodeFormat
+                        }
+
+                        "INVALID_SIGNATURE" -> {
+                            ActivationApiResult.InvalidSignature
+                        }
+
+                        "INVALID_DEVICE" -> {
+                            ActivationApiResult.InvalidCodeFormat
+                        }
+
                         else -> {
                             Timber.tag(API_TAG).w("400 unrecognized error=%s", body?.error)
                             ActivationApiResult.InvalidCodeFormat
@@ -169,7 +186,9 @@ class KtorPromotionApi
                     }
                 }
 
-                HttpStatusCode.TooManyRequests -> ActivationApiResult.ServerError
+                HttpStatusCode.TooManyRequests -> {
+                    ActivationApiResult.ServerError
+                }
 
                 else -> {
                     val bodyText = runCatching { response.bodyAsText() }.getOrDefault("<read failed>")

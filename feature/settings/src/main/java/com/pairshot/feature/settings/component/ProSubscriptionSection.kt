@@ -20,8 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.billing.domain.SubscriptionStatus
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.membership.Membership
 import com.pairshot.core.ui.component.SettingsCard
 import com.pairshot.core.ui.component.SettingsDivider
@@ -76,19 +76,25 @@ fun ProSubscriptionSection(
 @Composable
 private fun promoTrailingText(membership: Membership): String? =
     when {
-        membership.isPro && membership.proExpiresAtEpochMillis != null ->
+        membership.isPro && membership.proExpiresAtEpochMillis != null -> {
             stringResource(R.string.settings_pro_coupon_expires, formatDate(membership.proExpiresAtEpochMillis!!))
+        }
 
-        membership.isPro && membership.proExpiresAtEpochMillis == null ->
+        membership.isPro && membership.proExpiresAtEpochMillis == null -> {
             stringResource(R.string.settings_pro_coupon_unlimited)
+        }
 
-        !membership.isPro && membership.isAdFree && membership.adFreeExpiresAtEpochMillis != null ->
+        !membership.isPro && membership.isAdFree && membership.adFreeExpiresAtEpochMillis != null -> {
             stringResource(R.string.settings_pro_coupon_expires, formatDate(membership.adFreeExpiresAtEpochMillis!!))
+        }
 
-        !membership.isPro && membership.isAdFree ->
+        !membership.isPro && membership.isAdFree -> {
             stringResource(R.string.settings_pro_coupon_unlimited)
+        }
 
-        else -> null
+        else -> {
+            null
+        }
     }
 
 @Composable

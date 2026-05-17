@@ -11,6 +11,7 @@ import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
 import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.premium.PremiumFeature
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ class RewardedAdController
         private val adsInitializer: AdsInitializer,
         private val membershipProvider: MembershipProvider,
         private val gate: SettingsPremiumGate,
+        private val tutorialMode: TutorialModeProvider,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -50,6 +52,10 @@ class RewardedAdController
             onSkip: () -> Unit,
         ) {
             scope.launch {
+                if (tutorialMode.isActive.value) {
+                    onReward()
+                    return@launch
+                }
                 if (gate.isUnlocked(feature)) {
                     onReward()
                     return@launch

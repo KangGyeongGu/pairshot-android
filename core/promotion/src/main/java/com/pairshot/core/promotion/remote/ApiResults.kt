@@ -4,7 +4,9 @@ import com.pairshot.core.promotion.remote.dto.ActivateResponseDto
 import com.pairshot.core.promotion.remote.dto.MembershipDto
 
 sealed interface MembershipApiResult {
-    data class Success(val membership: MembershipDto) : MembershipApiResult
+    data class Success(
+        val membership: MembershipDto,
+    ) : MembershipApiResult
 
     data object NetworkError : MembershipApiResult
 
@@ -12,7 +14,9 @@ sealed interface MembershipApiResult {
 }
 
 sealed interface ActivationApiResult {
-    data class Success(val response: ActivateResponseDto) : ActivationApiResult
+    data class Success(
+        val response: ActivateResponseDto,
+    ) : ActivationApiResult
 
     data object InvalidCodeFormat : ActivationApiResult
 

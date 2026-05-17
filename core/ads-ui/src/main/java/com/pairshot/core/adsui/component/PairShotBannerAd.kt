@@ -1,6 +1,5 @@
 package com.pairshot.core.adsui.component
 
-import com.pairshot.core.designsystem.PairShotBanner
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
@@ -32,6 +31,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.designsystem.PairShotBanner
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -60,6 +60,9 @@ fun PairShotBannerAd(
     val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
     val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
+    val tutorialMode = remember(entryPoint) { entryPoint.tutorialModeProvider() }
+    val isTutorial by tutorialMode.isActive.collectAsStateWithLifecycle()
+
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
     val adWidth =
@@ -81,7 +84,7 @@ fun PairShotBannerAd(
         return
     }
 
-    if (isAdFree == true) return
+    if (isAdFree == true || isTutorial) return
 
     val adView =
         remember(context, adsConfig, adWidth) {
@@ -172,6 +175,5 @@ private tailrec fun Context.asActivityOrNull(): Activity? =
     }
 
 private const val TAG = "PairShotBannerAd"
-
 
 private const val BANNER_MAX_HEIGHT_DP = 60

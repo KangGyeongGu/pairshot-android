@@ -8,15 +8,15 @@
     <string name="export_section_watermark">Watermark</string>
     <string name="export_section_combine">Combining</string>
 
-    <string name="export_include_combined_only">Combined only</string>
-    <string name="export_include_before_only">Before only</string>
-    <string name="export_include_after_only">After only</string>
+    <string name="export_include_combined_only">Combined</string>
+    <string name="export_include_before_only">Before</string>
+    <string name="export_include_after_only">After</string>
 
-    <string name="export_format_image">Send/save as images</string>
-    <string name="export_format_zip">Send/save as ZIP</string>
+    <string name="export_format_image">Image file</string>
+    <string name="export_format_zip">ZIP file</string>
 
-    <string name="export_watermark_apply">Apply watermark option</string>
-    <string name="export_combine_apply">Apply combine option</string>
+    <string name="export_watermark_apply">Apply watermark</string>
+    <string name="export_combine_apply">Apply combine settings</string>
 
     <string name="export_warning_required">Setup required</string>
 

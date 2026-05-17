@@ -16,4 +16,5 @@ dependencies {
     implementation(project(":core:infra"))
     implementation(project(":core:ads"))
     implementation(project(":core:ads-ui"))
+    implementation(project(":feature:tutorial"))
 }

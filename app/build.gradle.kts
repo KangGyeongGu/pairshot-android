@@ -36,8 +36,9 @@ android {
     signingConfigs {
         create("release") {
 
-            val keystorePath = System.getenv("KEYSTORE_PATH")
-                ?: localProperties.getProperty("KEYSTORE_PATH")
+            val keystorePath =
+                System.getenv("KEYSTORE_PATH")
+                    ?: localProperties.getProperty("KEYSTORE_PATH")
             if (keystorePath != null) {
                 storeFile = file(keystorePath)
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
@@ -144,6 +145,7 @@ dependencies {
     implementation(project(":feature:pair-preview"))
     implementation(project(":feature:export-settings"))
     implementation(project(":feature:paywall"))
+    implementation(project(":feature:tutorial"))
 
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)

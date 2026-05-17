@@ -40,10 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotCard
-import com.pairshot.core.designsystem.PairShotTouchTarget
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import kotlin.math.abs
 
 private const val SWITCH_SCALE = 0.67f

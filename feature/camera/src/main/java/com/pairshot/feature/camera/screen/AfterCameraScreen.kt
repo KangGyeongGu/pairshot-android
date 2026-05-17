@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -38,9 +40,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCameraTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.spec.CameraSpec
+import com.pairshot.core.domain.tutorial.TutorialActionIds
 import com.pairshot.core.rendering.OverlayTransformCalculator
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
@@ -61,13 +64,13 @@ import com.pairshot.feature.camera.preview.CameraPreviewPane
 import com.pairshot.feature.camera.viewmodel.AfterCameraEvent
 import com.pairshot.feature.camera.viewmodel.AfterCameraViewModel
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
-import kotlinx.coroutines.delay
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import com.pairshot.core.ui.R as CoreR
 
 private val CameraShutterHeight = CameraSpec.shutterSectionHeight
-private const val ALL_COMPLETED_NAVIGATE_BACK_DELAY_MS = 2000L
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AfterCameraScreen(
     viewModel: AfterCameraViewModel,
@@ -88,7 +91,6 @@ internal fun AfterCameraScreen(
     val totalPairCount by viewModel.totalPairCount.collectAsStateWithLifecycle()
     val isRetakeMode by viewModel.isRetakeMode.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
-    val lastPairThumbnailUri by viewModel.lastPairThumbnailUri.collectAsStateWithLifecycle()
     val currentIndex by viewModel.currentIndex.collectAsStateWithLifecycle()
     val zoomUiState by viewModel.zoomUiState.collectAsStateWithLifecycle()
     val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
@@ -109,6 +111,19 @@ internal fun AfterCameraScreen(
 
     val snackbarController = remember { PairShotSnackbarController() }
     val thumbnailListState = rememberLazyListState()
+    val tutorialContext = LocalContext.current
+    val tutorialEntryPoint =
+        remember(tutorialContext) {
+            EntryPointAccessors
+                .fromApplication(
+                    tutorialContext.applicationContext,
+                    CameraScreenTutorialEntryPoint::class.java,
+                )
+        }
+    val tutorialActions = remember(tutorialEntryPoint) { tutorialEntryPoint.tutorialActionDispatcher() }
+    LaunchedEffect(Unit) {
+        tutorialActions.report(TutorialActionIds.AFTER_CAMERA_ENTERED)
+    }
 
     var overlayBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var overlayRotation by remember { mutableFloatStateOf(0f) }
@@ -228,6 +243,7 @@ internal fun AfterCameraScreen(
             when (event) {
                 is AfterCameraEvent.AfterSaved -> {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    tutorialActions.report(TutorialActionIds.AFTER_CAMERA_SHUTTER)
                     if (isRetakeMode) {
                         onNavigateBack()
                     }
@@ -235,14 +251,15 @@ internal fun AfterCameraScreen(
 
                 is AfterCameraEvent.AllCompleted -> {
                     if (isRetakeMode) return@collect
-                    snackbarController.show(
-                        SnackbarEvent(
-                            UiText.Resource(CoreR.string.snackbar_success_all_after_captured),
-                            SnackbarVariant.SUCCESS,
-                        ),
-                    )
-                    delay(ALL_COMPLETED_NAVIGATE_BACK_DELAY_MS)
-                    onNavigateBack()
+                    tutorialActions.report(TutorialActionIds.AFTER_CAMERA_ALL_COMPLETED)
+                    scope.launch {
+                        snackbarController.show(
+                            SnackbarEvent(
+                                UiText.Resource(CoreR.string.snackbar_success_all_after_captured),
+                                SnackbarVariant.SUCCESS,
+                            ),
+                        )
+                    }
                 }
 
                 is AfterCameraEvent.CaptureError -> {
@@ -352,6 +369,7 @@ internal fun AfterCameraScreen(
                     isSaving = isSaving,
                     shutterEnabled = currentPair != null,
                     height = shutterSectionHeight,
+                    shutterAnchorKey = com.pairshot.core.domain.tutorial.AnchorKey.AFTER_CAMERA_SHUTTER,
                     onToggleSettings = { viewModel.toggleSettingsPanel() },
                     onShutterClick = {
                         if (isSaving) return@CameraBottomBar
@@ -371,8 +389,10 @@ internal fun AfterCameraScreen(
                             viewModel.saveAfterPhoto(tempUri)
                         }
                     },
-                    lastPairThumbnailUri = lastPairThumbnailUri,
-                    onThumbnailClick = onNavigateBack,
+                    onThumbnailClick = {
+                        tutorialActions.report(TutorialActionIds.AFTER_CAMERA_BACK_TO_HOME)
+                        onNavigateBack()
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(bottomSpacerHeight))
@@ -424,7 +444,7 @@ internal fun AfterCameraScreen(
                 modifier =
                     Modifier
                         .align(Alignment.TopCenter)
-                        .statusBarsPadding()
+                        .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
                         .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }

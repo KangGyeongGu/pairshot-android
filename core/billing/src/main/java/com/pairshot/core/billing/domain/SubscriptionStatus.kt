@@ -3,7 +3,9 @@ package com.pairshot.core.billing.domain
 sealed interface SubscriptionStatus {
     data object Inactive : SubscriptionStatus
 
-    data class Pending(val productId: String) : SubscriptionStatus
+    data class Pending(
+        val productId: String,
+    ) : SubscriptionStatus
 
     data class Active(
         val productId: String,

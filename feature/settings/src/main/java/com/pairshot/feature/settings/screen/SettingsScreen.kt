@@ -82,6 +82,7 @@ import com.pairshot.feature.settings.locale.currentAppLocale
 import com.pairshot.feature.settings.theme.AppTheme
 import com.pairshot.feature.settings.viewmodel.SettingsUiState
 import com.pairshot.feature.settings.viewmodel.formatBytes
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
@@ -116,6 +117,7 @@ fun SettingsScreen(
     snackbarController: PairShotSnackbarController,
     showAdsConsent: Boolean,
     onAdsConsentClick: () -> Unit,
+    onReplayTutorial: () -> Unit,
     highlight: SettingsHighlight? = null,
     proSubscriptionSection: @Composable () -> Unit = {},
 ) {
@@ -198,6 +200,10 @@ fun SettingsScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.SETTINGS_SCREEN),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 CenterAlignedTopAppBar(
@@ -496,6 +502,24 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_general") {
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
+                            }
+
+                            item(key = "label_help") {
+                                SettingsSectionLabel(label = stringResource(R.string.settings_section_help))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+                            }
+
+                            item(key = "card_help") {
+                                SettingsCard {
+                                    SettingsItem(
+                                        label = stringResource(com.pairshot.feature.tutorial.R.string.tutorial_settings_replay_label),
+                                        onClick = onReplayTutorial,
+                                    )
+                                }
+                            }
+
+                            item(key = "gap_help") {
                                 Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 

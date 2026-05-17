@@ -24,14 +24,12 @@ class MigrationTest {
             PairShotDatabase::class.java,
         )
 
-    
     @Test
     fun migrate_1_to_2_validatesSchema() {
         helper.createDatabase(dbName, 1).close()
         helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2).close()
     }
 
-    
     @Test
     fun migrate_1_to_2_preservesPhotoPairs() {
         helper.createDatabase(dbName, 1).use { db ->
@@ -45,29 +43,29 @@ class MigrationTest {
             )
         }
         helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2).use { db ->
-            db.query(
-                "SELECT id, beforePhotoUri, afterPhotoUri, status, zoomLevel FROM photo_pairs ORDER BY id",
-            ).use { c ->
-                assertTrue(c.moveToNext())
-                assertEquals(1L, c.getLong(0))
-                assertEquals("content://media/1", c.getString(1))
-                assertEquals("content://media/2", c.getString(2))
-                assertEquals("PAIRED", c.getString(3))
-                assertEquals(1.0, c.getDouble(4), 0.0001)
+            db
+                .query(
+                    "SELECT id, beforePhotoUri, afterPhotoUri, status, zoomLevel FROM photo_pairs ORDER BY id",
+                ).use { c ->
+                    assertTrue(c.moveToNext())
+                    assertEquals(1L, c.getLong(0))
+                    assertEquals("content://media/1", c.getString(1))
+                    assertEquals("content://media/2", c.getString(2))
+                    assertEquals("PAIRED", c.getString(3))
+                    assertEquals(1.0, c.getDouble(4), 0.0001)
 
-                assertTrue(c.moveToNext())
-                assertEquals(2L, c.getLong(0))
-                assertEquals("content://media/3", c.getString(1))
-                assertTrue(c.isNull(2))
-                assertEquals("BEFORE_ONLY", c.getString(3))
-                assertTrue(c.isNull(4))
+                    assertTrue(c.moveToNext())
+                    assertEquals(2L, c.getLong(0))
+                    assertEquals("content://media/3", c.getString(1))
+                    assertTrue(c.isNull(2))
+                    assertEquals("BEFORE_ONLY", c.getString(3))
+                    assertTrue(c.isNull(4))
 
-                assertFalse(c.moveToNext())
-            }
+                    assertFalse(c.moveToNext())
+                }
         }
     }
 
-    
     @Test
     fun migrate_1_to_2_preservesForeignKeyRows() {
         helper.createDatabase(dbName, 1).use { db ->
@@ -103,7 +101,6 @@ class MigrationTest {
         }
     }
 
-    
     @Test
     fun migrate_2_to_3_validatesSchema() {
         helper.createDatabase(dbName, 2).close()

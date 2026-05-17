@@ -1,6 +1,5 @@
 package com.pairshot.core.ui.component
 
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.material3.MaterialTheme
@@ -9,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 
 @Composable
 fun MarqueeTitleText(

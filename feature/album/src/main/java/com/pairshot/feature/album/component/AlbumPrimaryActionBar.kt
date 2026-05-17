@@ -1,7 +1,5 @@
 package com.pairshot.feature.album.component
 
-import com.pairshot.core.designsystem.PairShotButton
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
 
 @Composable
 fun AlbumPrimaryActionBar(

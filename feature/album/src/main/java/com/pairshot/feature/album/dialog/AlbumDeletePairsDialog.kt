@@ -1,6 +1,5 @@
 package com.pairshot.feature.album.dialog
 
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +15,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.feature.album.R
 import com.pairshot.core.ui.R as CoreR

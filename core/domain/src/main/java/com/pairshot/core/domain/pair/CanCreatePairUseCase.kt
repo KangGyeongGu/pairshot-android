@@ -1,6 +1,7 @@
 package com.pairshot.core.domain.pair
 
 import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.ZoneId
@@ -11,8 +12,10 @@ class CanCreatePairUseCase
     constructor(
         private val photoPairRepository: PhotoPairRepository,
         private val membershipProvider: MembershipProvider,
+        private val tutorialModeProvider: TutorialModeProvider,
     ) {
         suspend operator fun invoke(): Result {
+            if (tutorialModeProvider.isActive.value) return Result.Allowed
             val membership = membershipProvider.current()
             if (membership.isPro) return Result.Allowed
             val sinceEpochMs = todayStartEpochMs()

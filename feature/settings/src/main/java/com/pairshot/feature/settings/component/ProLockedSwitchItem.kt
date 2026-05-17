@@ -15,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotTouchTarget
 
 private const val SWITCH_SCALE = 0.67f

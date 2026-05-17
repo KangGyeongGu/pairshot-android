@@ -1,7 +1,5 @@
 package com.pairshot.core.ui.component
 
-import com.pairshot.core.designsystem.PairShotRadius
-import com.pairshot.core.designsystem.PairShotSpacing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -19,6 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotSpacing
 
 @Composable
 fun PairShotProgressBar(

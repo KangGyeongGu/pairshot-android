@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -52,6 +53,10 @@ class AppPreferences
             val ALBUM_SORT_ORDER = stringPreferencesKey("album_sort_order")
             val APP_THEME = stringPreferencesKey("app_theme")
             val ONBOARDING_PAYWALL_SHOWN = booleanPreferencesKey("onboarding_paywall_shown")
+            val TUTORIAL_COMPLETED = booleanPreferencesKey("tutorial_completed")
+            val EXPORT_SETTINGS_TUTORIAL_COMPLETED = booleanPreferencesKey("export_settings_tutorial_completed")
+            val TUTORIAL_SANDBOX_PAIR_IDS = stringSetPreferencesKey("tutorial_sandbox_pair_ids")
+            val TUTORIAL_SANDBOX_TEMP_FILES = stringSetPreferencesKey("tutorial_sandbox_temp_files")
         }
 
         val imageQuality: Flow<String> =
@@ -279,6 +284,50 @@ class AppPreferences
         suspend fun setOnboardingPaywallShown(shown: Boolean) {
             context.appDataStore.edit { prefs ->
                 prefs[Keys.ONBOARDING_PAYWALL_SHOWN] = shown
+            }
+        }
+
+        val tutorialCompleted: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_COMPLETED] ?: false
+            }
+
+        suspend fun setTutorialCompleted(completed: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_COMPLETED] = completed
+            }
+        }
+
+        val exportSettingsTutorialCompleted: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.EXPORT_SETTINGS_TUTORIAL_COMPLETED] ?: false
+            }
+
+        suspend fun setExportSettingsTutorialCompleted(completed: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.EXPORT_SETTINGS_TUTORIAL_COMPLETED] = completed
+            }
+        }
+
+        val tutorialSandboxPairIds: Flow<Set<Long>> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_PAIR_IDS]?.mapNotNull { it.toLongOrNull() }?.toSet().orEmpty()
+            }
+
+        suspend fun setTutorialSandboxPairIds(ids: Set<Long>) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_PAIR_IDS] = ids.map { it.toString() }.toSet()
+            }
+        }
+
+        val tutorialSandboxTempFiles: Flow<Set<String>> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_TEMP_FILES].orEmpty()
+            }
+
+        suspend fun setTutorialSandboxTempFiles(paths: Set<String>) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_TEMP_FILES] = paths
             }
         }
     }

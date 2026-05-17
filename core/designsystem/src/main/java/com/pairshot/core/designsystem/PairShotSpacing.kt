@@ -2,7 +2,6 @@ package com.pairshot.core.designsystem
 
 import androidx.compose.ui.unit.dp
 
-
 object PairShotSpacing {
     val xxs = 2.dp
     val xs = 4.dp

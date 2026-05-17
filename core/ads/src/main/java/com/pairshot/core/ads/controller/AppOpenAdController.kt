@@ -8,7 +8,8 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.domain.membership.MembershipProvider
-import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.settings.OnboardingStateRepository
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,8 @@ class AppOpenAdController
         private val adsConfig: AdsConfig,
         private val adsInitializer: AdsInitializer,
         private val membershipProvider: MembershipProvider,
-        private val appSettingsRepository: AppSettingsRepository,
+        private val onboardingStateRepository: OnboardingStateRepository,
+        private val tutorialMode: TutorialModeProvider,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -46,19 +48,19 @@ class AppOpenAdController
         @Volatile
         private var firstForegroundFired: Boolean = false
 
-
         fun preload() {
             scope.launch { loadInternal() }
         }
 
         fun onForeground(activity: Activity) {
             scope.launch {
+                if (tutorialMode.isActive.value) return@launch
                 if (membershipProvider.current().isAdFree) return@launch
                 if (fullscreenAdState.isShowing()) return@launch
                 if (isWithinCooldown()) return@launch
 
                 val isColdStart = consumeColdStartFlag()
-                if (isColdStart && !appSettingsRepository.isOnboardingPaywallShown()) return@launch
+                if (isColdStart && !onboardingStateRepository.isOnboardingPaywallShown()) return@launch
 
                 val ad = ensureAdLoaded(isColdStart) ?: return@launch
 

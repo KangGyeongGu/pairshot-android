@@ -22,8 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotAppBar
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.pairpreview.R
 import com.pairshot.core.ui.R as CoreR
 

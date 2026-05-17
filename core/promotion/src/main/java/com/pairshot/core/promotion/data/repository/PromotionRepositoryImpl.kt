@@ -41,7 +41,9 @@ class PromotionRepositoryImpl
 
                 MembershipApiResult.NetworkError,
                 MembershipApiResult.ServerError,
-                -> Unit
+                -> {
+                    Unit
+                }
             }
         }
 
@@ -96,9 +98,13 @@ class PromotionRepositoryImpl
                     ActivationResult.Failure.Revoked
                 }
 
-                ActivationApiResult.NetworkError -> ActivationResult.Failure.NetworkError
+                ActivationApiResult.NetworkError -> {
+                    ActivationResult.Failure.NetworkError
+                }
 
-                ActivationApiResult.ServerError -> ActivationResult.Failure.UnknownError
+                ActivationApiResult.ServerError -> {
+                    ActivationResult.Failure.UnknownError
+                }
             }
         }
 
@@ -165,5 +171,4 @@ private fun parseStatus(raw: String): PromotionStatus? =
         else -> null
     }
 
-private fun parseIsoMillisOrNull(iso: String): Long? =
-    runCatching { Instant.parse(iso).toEpochMilli() }.getOrNull()
+private fun parseIsoMillisOrNull(iso: String): Long? = runCatching { Instant.parse(iso).toEpochMilli() }.getOrNull()

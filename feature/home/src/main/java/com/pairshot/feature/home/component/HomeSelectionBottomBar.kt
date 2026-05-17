@@ -10,9 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.component.PairShotActionBar
 import com.pairshot.core.ui.component.PairShotActionBarItem
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 
 @Composable
 fun HomeSelectionBottomBar(
@@ -30,6 +32,7 @@ fun HomeSelectionBottomBar(
             label = stringResource(R.string.common_button_share),
             onClick = onShare,
             enabled = hasSelection,
+            modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BAR_SHARE),
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Share,
@@ -47,6 +50,7 @@ fun HomeSelectionBottomBar(
             label = stringResource(R.string.common_button_save_to_device),
             onClick = onSaveToDevice,
             enabled = hasSelection,
+            modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BAR_SAVE),
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.FileDownload,
@@ -64,6 +68,7 @@ fun HomeSelectionBottomBar(
             label = stringResource(R.string.common_button_delete),
             onClick = onDelete,
             enabled = hasSelection,
+            modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BAR_DELETE),
             labelColor = MaterialTheme.colorScheme.error,
             icon = {
                 Icon(
@@ -82,6 +87,7 @@ fun HomeSelectionBottomBar(
             label = stringResource(R.string.common_button_export_settings),
             onClick = onExportSettings,
             enabled = hasSelection,
+            modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BAR_EXPORT_SETTINGS),
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Tune,
