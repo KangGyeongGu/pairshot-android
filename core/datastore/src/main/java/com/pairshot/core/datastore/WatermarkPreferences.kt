@@ -28,6 +28,8 @@ class WatermarkPreferences
     constructor(
         @ApplicationContext private val context: Context,
     ) {
+        private val defaultConfig = WatermarkConfig()
+
         private object Keys {
             val ENABLED = booleanPreferencesKey("enabled")
             val TYPE = stringPreferencesKey("type")
@@ -45,23 +47,17 @@ class WatermarkPreferences
         val watermarkConfigFlow: Flow<WatermarkConfig> =
             context.watermarkDataStore.data.map { prefs ->
                 WatermarkConfig(
-                    enabled = prefs[Keys.ENABLED] ?: false,
-                    type =
-                        prefs[Keys.TYPE]?.let { name ->
-                            runCatching { WatermarkType.valueOf(name) }.getOrNull()
-                        } ?: WatermarkType.TEXT,
-                    text = prefs[Keys.TEXT] ?: "",
-                    alpha = prefs[Keys.ALPHA] ?: 0.5f,
-                    diagonalCount = prefs[Keys.DIAGONAL_COUNT] ?: 10,
-                    repeatDensity = prefs[Keys.REPEAT_DENSITY] ?: 1.5f,
-                    textSizeRatio = prefs[Keys.TEXT_SIZE_RATIO] ?: 0.03f,
-                    logoPath = prefs[Keys.LOGO_PATH] ?: "",
-                    logoPosition =
-                        prefs[Keys.LOGO_POSITION]?.let { name ->
-                            runCatching { LogoPosition.valueOf(name) }.getOrNull()
-                        } ?: LogoPosition.CENTER,
-                    logoSizeRatio = prefs[Keys.LOGO_SIZE_RATIO] ?: 0.5f,
-                    logoAlpha = prefs[Keys.LOGO_ALPHA] ?: 0.5f,
+                    enabled = prefs[Keys.ENABLED] ?: defaultConfig.enabled,
+                    type = WatermarkType.fromName(prefs[Keys.TYPE]),
+                    text = prefs[Keys.TEXT] ?: defaultConfig.text,
+                    alpha = prefs[Keys.ALPHA] ?: defaultConfig.alpha,
+                    diagonalCount = prefs[Keys.DIAGONAL_COUNT] ?: defaultConfig.diagonalCount,
+                    repeatDensity = prefs[Keys.REPEAT_DENSITY] ?: defaultConfig.repeatDensity,
+                    textSizeRatio = prefs[Keys.TEXT_SIZE_RATIO] ?: defaultConfig.textSizeRatio,
+                    logoPath = prefs[Keys.LOGO_PATH] ?: defaultConfig.logoPath,
+                    logoPosition = LogoPosition.fromName(prefs[Keys.LOGO_POSITION]),
+                    logoSizeRatio = prefs[Keys.LOGO_SIZE_RATIO] ?: defaultConfig.logoSizeRatio,
+                    logoAlpha = prefs[Keys.LOGO_ALPHA] ?: defaultConfig.logoAlpha,
                 )
             }
 

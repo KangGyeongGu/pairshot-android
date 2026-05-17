@@ -11,6 +11,7 @@ import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import com.pairshot.core.domain.tutorial.TutorialPairTracker
+import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
@@ -416,7 +417,7 @@ class AfterCameraViewModel
 
         companion object {
             private const val SUBSCRIPTION_TIMEOUT_MS = 5_000L
-            private const val DEFAULT_OVERLAY_ALPHA = 0.35f
+            private val DEFAULT_OVERLAY_ALPHA = AppSettings.DEFAULT_OVERLAY_ALPHA
         }
     }
 

@@ -10,4 +10,11 @@ enum class LogoPosition {
     BOTTOM_LEFT,
     BOTTOM_CENTER,
     BOTTOM_RIGHT,
+    ;
+
+    companion object {
+        val DEFAULT: LogoPosition = CENTER
+
+        fun fromName(name: String?): LogoPosition = entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
 }

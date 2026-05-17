@@ -30,6 +30,8 @@ class CombinePreferences
     constructor(
         @ApplicationContext private val context: Context,
     ) {
+        private val defaultConfig = CombineConfig()
+
         private object Keys {
             val LAYOUT = stringPreferencesKey("combine_layout")
             val BORDER_ENABLED = booleanPreferencesKey("combine_border_enabled")
@@ -54,39 +56,24 @@ class CombinePreferences
         val configFlow: Flow<CombineConfig> =
             context.combineDataStore.data.map { prefs ->
                 CombineConfig(
-                    layout =
-                        prefs[Keys.LAYOUT]?.let { name ->
-                            runCatching { CombineLayout.valueOf(name) }.getOrNull()
-                        } ?: CombineLayout.HORIZONTAL,
-                    borderEnabled = prefs[Keys.BORDER_ENABLED] ?: true,
-                    borderThicknessDp = prefs[Keys.BORDER_THICKNESS] ?: 16,
-                    borderColorArgb = prefs[Keys.BORDER_COLOR_ARGB] ?: 0xFFFFFFFF.toInt(),
-                    labelEnabled = prefs[Keys.LABEL_ENABLED] ?: false,
-                    beforeLabel = prefs[Keys.BEFORE_LABEL] ?: "BEFORE",
-                    afterLabel = prefs[Keys.AFTER_LABEL] ?: "AFTER",
-                    labelPosition =
-                        prefs[Keys.LABEL_POSITION]?.let { name ->
-                            runCatching { LabelPosition.valueOf(name) }.getOrNull()
-                        } ?: LabelPosition.BOTTOM,
-                    labelSizeRatio = prefs[Keys.LABEL_SIZE_RATIO] ?: 0.05f,
-                    labelTextColorArgb = prefs[Keys.LABEL_TEXT_COLOR_ARGB] ?: 0xFF000000.toInt(),
-                    labelBgColorArgb = prefs[Keys.LABEL_BG_COLOR_ARGB] ?: 0xFF000000.toInt(),
-                    labelBgAlpha = prefs[Keys.LABEL_BG_ALPHA] ?: 0.5f,
-                    labelBgEnabled = prefs[Keys.LABEL_BG_ENABLED] ?: true,
-                    labelBgMatchesBorder = prefs[Keys.LABEL_BG_MATCHES_BORDER] ?: true,
-                    labelPositionMode =
-                        prefs[Keys.LABEL_POSITION_MODE]?.let { name ->
-                            runCatching { LabelPositionMode.valueOf(name) }.getOrNull()
-                        } ?: LabelPositionMode.FREE,
-                    beforeLabelAnchor =
-                        prefs[Keys.BEFORE_LABEL_ANCHOR]?.let { name ->
-                            runCatching { LabelAnchor.valueOf(name) }.getOrNull()
-                        } ?: LabelAnchor.TOP_LEFT,
-                    afterLabelAnchor =
-                        prefs[Keys.AFTER_LABEL_ANCHOR]?.let { name ->
-                            runCatching { LabelAnchor.valueOf(name) }.getOrNull()
-                        } ?: LabelAnchor.TOP_LEFT,
-                    labelBgCornerDp = prefs[Keys.LABEL_BG_CORNER] ?: 25,
+                    layout = CombineLayout.fromName(prefs[Keys.LAYOUT]),
+                    borderEnabled = prefs[Keys.BORDER_ENABLED] ?: defaultConfig.borderEnabled,
+                    borderThicknessDp = prefs[Keys.BORDER_THICKNESS] ?: defaultConfig.borderThicknessDp,
+                    borderColorArgb = prefs[Keys.BORDER_COLOR_ARGB] ?: defaultConfig.borderColorArgb,
+                    labelEnabled = prefs[Keys.LABEL_ENABLED] ?: defaultConfig.labelEnabled,
+                    beforeLabel = prefs[Keys.BEFORE_LABEL] ?: defaultConfig.beforeLabel,
+                    afterLabel = prefs[Keys.AFTER_LABEL] ?: defaultConfig.afterLabel,
+                    labelPosition = LabelPosition.fromName(prefs[Keys.LABEL_POSITION]),
+                    labelSizeRatio = prefs[Keys.LABEL_SIZE_RATIO] ?: defaultConfig.labelSizeRatio,
+                    labelTextColorArgb = prefs[Keys.LABEL_TEXT_COLOR_ARGB] ?: defaultConfig.labelTextColorArgb,
+                    labelBgColorArgb = prefs[Keys.LABEL_BG_COLOR_ARGB] ?: defaultConfig.labelBgColorArgb,
+                    labelBgAlpha = prefs[Keys.LABEL_BG_ALPHA] ?: defaultConfig.labelBgAlpha,
+                    labelBgEnabled = prefs[Keys.LABEL_BG_ENABLED] ?: defaultConfig.labelBgEnabled,
+                    labelBgMatchesBorder = prefs[Keys.LABEL_BG_MATCHES_BORDER] ?: defaultConfig.labelBgMatchesBorder,
+                    labelPositionMode = LabelPositionMode.fromName(prefs[Keys.LABEL_POSITION_MODE]),
+                    beforeLabelAnchor = LabelAnchor.fromName(prefs[Keys.BEFORE_LABEL_ANCHOR]),
+                    afterLabelAnchor = LabelAnchor.fromName(prefs[Keys.AFTER_LABEL_ANCHOR]),
+                    labelBgCornerDp = prefs[Keys.LABEL_BG_CORNER] ?: defaultConfig.labelBgCornerDp,
                 )
             }
 

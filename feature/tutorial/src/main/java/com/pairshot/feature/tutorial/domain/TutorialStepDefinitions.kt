@@ -62,6 +62,8 @@ object TutorialStepDefinitions {
                 anchor = null,
                 messageResId = null,
                 advance = AdvanceCondition.UserAction(TutorialActionIds.AFTER_CAMERA_ALL_COMPLETED),
+                dimAlpha = 0f,
+                actionAnchor = AnchorKey.AFTER_CAMERA_SHUTTER,
             ),
             TutorialStepDef(
                 id = TutorialStepId.AFTER_CAMERA_BACK_GUIDE,

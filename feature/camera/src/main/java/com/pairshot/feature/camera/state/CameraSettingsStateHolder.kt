@@ -27,9 +27,7 @@ class CameraSettingsStateHolder
                 CameraSettingsState(
                     gridEnabled = settings.cameraGridEnabled,
                     levelEnabled = settings.cameraLevelEnabled,
-                    flashMode =
-                        runCatching { FlashMode.valueOf(settings.cameraFlashMode) }
-                            .getOrDefault(FlashMode.OFF),
+                    flashMode = settings.cameraFlashMode,
                     nightModeEnabled = settings.cameraNightModeEnabled,
                     hdrEnabled = settings.cameraHdrEnabled,
                     aspectRatio = resolvedRatio,
@@ -155,7 +153,7 @@ class CameraSettingsStateHolder
             scope.launch {
                 appSettingsRepository.updateCameraGridEnabled(snapshot.gridEnabled)
                 appSettingsRepository.updateCameraLevelEnabled(snapshot.levelEnabled)
-                appSettingsRepository.updateCameraFlashMode(snapshot.flashMode.name)
+                appSettingsRepository.updateCameraFlashMode(snapshot.flashMode)
                 appSettingsRepository.updateCameraNightMode(snapshot.nightModeEnabled)
                 appSettingsRepository.updateCameraHdr(snapshot.hdrEnabled)
                 if (!snapshot.aspectRatioLocked) {

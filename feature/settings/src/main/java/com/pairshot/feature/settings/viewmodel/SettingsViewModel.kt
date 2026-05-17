@@ -8,13 +8,15 @@ import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.ClearCacheUseCase
 import com.pairshot.core.domain.settings.GetStorageInfoUseCase
 import com.pairshot.core.domain.settings.WatermarkRepository
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
 import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.settings.R
-import com.pairshot.feature.settings.theme.AppTheme
+import com.pairshot.feature.settings.theme.apply
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,9 +42,9 @@ sealed interface SettingsUiState {
         val cacheBytes: Long,
         val appVersion: String,
         val imageQuality: ImageQualityPreset = ImageQualityPreset.DEFAULT,
-        val fileNamePrefix: String = "PAIRSHOT",
+        val fileNamePrefix: String = AppSettings.DEFAULT_FILE_NAME_PREFIX,
         val overlayEnabled: Boolean = true,
-        val overlayAlpha: Float = 0.35f,
+        val overlayAlpha: Float = AppSettings.DEFAULT_OVERLAY_ALPHA,
     ) : SettingsUiState
 
     data class Error(

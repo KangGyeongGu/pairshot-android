@@ -13,8 +13,9 @@ import com.pairshot.core.billing.BillingRepository
 import com.pairshot.core.data.device.ExportMemoryThrottle
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.model.AppTheme
 import com.pairshot.core.promotion.domain.PromotionRepository
-import com.pairshot.feature.settings.theme.AppTheme
+import com.pairshot.feature.settings.theme.apply
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

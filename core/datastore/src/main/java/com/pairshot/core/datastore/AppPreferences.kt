@@ -10,6 +10,11 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
+import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.ImageQualityPreset
+import com.pairshot.core.model.SortOrder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -26,11 +31,8 @@ class AppPreferences
     constructor(
         @ApplicationContext private val context: Context,
     ) {
-        private companion object {
-            const val DEFAULT_OVERLAY_ALPHA = 0.35f
-            const val LEGACY_JPEG_LOW_THRESHOLD = 80
-            const val LEGACY_JPEG_BEST_THRESHOLD = 93
-        }
+        private val defaultSettings = AppSettings()
+        private val defaultExportPreset = ExportPreset()
 
         private object Keys {
             val JPEG_QUALITY = intPreferencesKey("jpeg_quality")
@@ -63,28 +65,24 @@ class AppPreferences
             context.appDataStore.data.map { prefs ->
                 prefs[Keys.IMAGE_QUALITY]
                     ?: prefs[Keys.JPEG_QUALITY]?.let { legacy ->
-                        when {
-                            legacy <= LEGACY_JPEG_LOW_THRESHOLD -> "LOW"
-                            legacy >= LEGACY_JPEG_BEST_THRESHOLD -> "BEST"
-                            else -> "HIGH"
-                        }
+                        ImageQualityPreset.fromLegacyJpegQuality(legacy).name
                     }
-                    ?: "HIGH"
+                    ?: ImageQualityPreset.DEFAULT.name
             }
 
         val fileNamePrefix: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.FILE_NAME_PREFIX] ?: "PAIRSHOT"
+                prefs[Keys.FILE_NAME_PREFIX] ?: defaultSettings.fileNamePrefix
             }
 
         val overlayEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.OVERLAY_ENABLED] ?: true
+                prefs[Keys.OVERLAY_ENABLED] ?: defaultSettings.overlayEnabled
             }
 
         val overlayAlpha: Flow<Float> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.OVERLAY_ALPHA] ?: DEFAULT_OVERLAY_ALPHA
+                prefs[Keys.OVERLAY_ALPHA] ?: defaultSettings.defaultOverlayAlpha
             }
 
         suspend fun setImageQuality(preset: String) {
@@ -114,32 +112,32 @@ class AppPreferences
 
         val cameraGridEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_GRID_ENABLED] ?: false
+                prefs[Keys.CAMERA_GRID_ENABLED] ?: defaultSettings.cameraGridEnabled
             }
 
         val cameraLevelEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_LEVEL_ENABLED] ?: false
+                prefs[Keys.CAMERA_LEVEL_ENABLED] ?: defaultSettings.cameraLevelEnabled
             }
 
         val cameraFlashMode: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_FLASH_MODE] ?: "OFF"
+                prefs[Keys.CAMERA_FLASH_MODE] ?: defaultSettings.cameraFlashMode.name
             }
 
         val cameraNightMode: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_NIGHT_MODE] ?: false
+                prefs[Keys.CAMERA_NIGHT_MODE] ?: defaultSettings.cameraNightModeEnabled
             }
 
         val cameraHdr: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_HDR] ?: false
+                prefs[Keys.CAMERA_HDR] ?: defaultSettings.cameraHdrEnabled
             }
 
         val cameraAspectRatio: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_ASPECT_RATIO] ?: "RATIO_4_3"
+                prefs[Keys.CAMERA_ASPECT_RATIO] ?: defaultSettings.cameraAspectRatio.name
             }
 
         suspend fun setCameraGridEnabled(enabled: Boolean) {
@@ -180,27 +178,27 @@ class AppPreferences
 
         val exportFormat: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_FORMAT] ?: "INDIVIDUAL"
+                prefs[Keys.EXPORT_FORMAT] ?: defaultExportPreset.format.name
             }
 
         val exportIncludeBefore: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_BEFORE] ?: false
+                prefs[Keys.EXPORT_INCLUDE_BEFORE] ?: defaultExportPreset.includeBefore
             }
 
         val exportIncludeAfter: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_AFTER] ?: false
+                prefs[Keys.EXPORT_INCLUDE_AFTER] ?: defaultExportPreset.includeAfter
             }
 
         val exportIncludeCombined: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_COMBINED] ?: true
+                prefs[Keys.EXPORT_INCLUDE_COMBINED] ?: defaultExportPreset.includeCombined
             }
 
         val exportApplyCombineConfig: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_APPLY_COMBINE_CONFIG] ?: true
+                prefs[Keys.EXPORT_APPLY_COMBINE_CONFIG] ?: defaultExportPreset.applyCombineConfig
             }
 
         suspend fun setExportFormat(format: String) {
@@ -245,12 +243,12 @@ class AppPreferences
 
         val homeSortOrder: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.HOME_SORT_ORDER] ?: "DESC"
+                prefs[Keys.HOME_SORT_ORDER] ?: SortOrder.DEFAULT.name
             }
 
         val albumSortOrder: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.ALBUM_SORT_ORDER] ?: "DESC"
+                prefs[Keys.ALBUM_SORT_ORDER] ?: SortOrder.DEFAULT.name
             }
 
         suspend fun setHomeSortOrder(value: String) {
@@ -267,7 +265,7 @@ class AppPreferences
 
         val appTheme: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.APP_THEME] ?: "SYSTEM"
+                prefs[Keys.APP_THEME] ?: AppTheme.DEFAULT.name
             }
 
         suspend fun setAppTheme(theme: String) {

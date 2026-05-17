@@ -58,6 +58,8 @@ import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTouchTarget
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
 import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
@@ -79,7 +81,6 @@ import com.pairshot.feature.settings.dialog.ThemeDialog
 import com.pairshot.feature.settings.locale.AppLocale
 import com.pairshot.feature.settings.locale.apply
 import com.pairshot.feature.settings.locale.currentAppLocale
-import com.pairshot.feature.settings.theme.AppTheme
 import com.pairshot.feature.settings.viewmodel.SettingsUiState
 import com.pairshot.feature.settings.viewmodel.formatBytes
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
@@ -88,7 +89,6 @@ import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
 private const val SWITCH_SCALE = 0.67f
-private const val DEFAULT_OVERLAY_ALPHA = 0.35f
 
 private const val HIGHLIGHT_PULSE_ON_MS = 600L
 private const val HIGHLIGHT_PULSE_OFF_MS = 400L
@@ -172,8 +172,8 @@ fun SettingsScreen(
     }
 
     val currentQuality = (uiState as? SettingsUiState.Success)?.imageQuality ?: ImageQualityPreset.DEFAULT
-    val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: "PAIRSHOT"
-    val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: DEFAULT_OVERLAY_ALPHA
+    val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: AppSettings.DEFAULT_FILE_NAME_PREFIX
+    val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: AppSettings.DEFAULT_OVERLAY_ALPHA
 
     if (showClearCacheDialog) {
         ClearCacheDialog(

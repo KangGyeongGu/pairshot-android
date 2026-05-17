@@ -22,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.model.AppTheme
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.feature.settings.R
-import com.pairshot.feature.settings.theme.AppTheme
 import com.pairshot.core.ui.R as CoreR
 
 @Composable

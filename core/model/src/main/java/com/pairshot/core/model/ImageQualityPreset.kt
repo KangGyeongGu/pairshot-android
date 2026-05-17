@@ -10,10 +10,12 @@ enum class ImageQualityPreset(
     ;
 
     companion object {
-        val DEFAULT: ImageQualityPreset = HIGH
+        val DEFAULT: ImageQualityPreset = BEST
 
         private const val LEGACY_JPEG_LOW_MAX = 80
         private const val LEGACY_JPEG_BEST_MIN = 93
+
+        fun fromName(name: String?): ImageQualityPreset = entries.firstOrNull { it.name == name } ?: DEFAULT
 
         fun fromLegacyJpegQuality(quality: Int): ImageQualityPreset =
             when {

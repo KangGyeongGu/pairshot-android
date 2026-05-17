@@ -119,7 +119,6 @@ fun TutorialOverlay() {
         currentStep
             ?.takeIf { it != TutorialStepId.DONE }
             ?.let { TutorialStepDefinitions.get(it) }
-            ?.takeIf { it.isVisible }
             ?: return
     val anchorBounds = def.anchor?.let { anchors[it] }
     val actionAnchorBounds = def.actionAnchor?.let { anchors[it] }
@@ -193,13 +192,15 @@ private fun OverlayContent(
             }
         }
 
-        MessageBalloon(
-            anchorBounds = anchorBounds,
-            overlaySize = overlaySize,
-            def = def,
-            onSkip = onSkip,
-            onNext = onNext,
-        )
+        if (def.isVisible) {
+            MessageBalloon(
+                anchorBounds = anchorBounds,
+                overlaySize = overlaySize,
+                def = def,
+                onSkip = onSkip,
+                onNext = onNext,
+            )
+        }
     }
 }
 

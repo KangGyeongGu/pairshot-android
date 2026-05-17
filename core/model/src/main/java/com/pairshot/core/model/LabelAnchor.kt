@@ -10,4 +10,11 @@ enum class LabelAnchor {
     BOTTOM_LEFT,
     BOTTOM_CENTER,
     BOTTOM_RIGHT,
+    ;
+
+    companion object {
+        val DEFAULT: LabelAnchor = TOP_LEFT
+
+        fun fromName(name: String?): LabelAnchor = entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
 }

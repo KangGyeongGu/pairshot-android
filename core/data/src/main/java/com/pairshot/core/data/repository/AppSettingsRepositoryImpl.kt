@@ -6,6 +6,7 @@ import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,7 @@ class AppSettingsRepositoryImpl
                 appPreferences.overlayAlpha,
             ) { qualityName, prefix, enabled, alpha ->
                 AppSettings(
-                    imageQuality = qualityName.toImageQualityPreset(),
+                    imageQuality = ImageQualityPreset.fromName(qualityName),
                     fileNamePrefix = prefix,
                     overlayEnabled = enabled,
                     defaultOverlayAlpha = alpha,
@@ -45,12 +46,12 @@ class AppSettingsRepositoryImpl
                 AppSettings(
                     cameraGridEnabled = grid,
                     cameraLevelEnabled = level,
-                    cameraFlashMode = flash,
+                    cameraFlashMode = FlashMode.fromName(flash),
                     cameraNightModeEnabled = night,
                     cameraHdrEnabled = hdr,
                 )
             }.combine(appPreferences.cameraAspectRatio) { partial, ratioName ->
-                partial.copy(cameraAspectRatio = ratioName.toAspectRatio())
+                partial.copy(cameraAspectRatio = AspectRatio.fromName(ratioName))
             }
 
         override val settingsFlow: Flow<AppSettings> =
@@ -79,7 +80,7 @@ class AppSettingsRepositoryImpl
 
         override suspend fun updateCameraLevelEnabled(enabled: Boolean) = appPreferences.setCameraLevelEnabled(enabled)
 
-        override suspend fun updateCameraFlashMode(mode: String) = appPreferences.setCameraFlashMode(mode)
+        override suspend fun updateCameraFlashMode(mode: FlashMode) = appPreferences.setCameraFlashMode(mode.name)
 
         override suspend fun updateCameraNightMode(enabled: Boolean) = appPreferences.setCameraNightMode(enabled)
 
@@ -112,9 +113,9 @@ class AppSettingsRepositoryImpl
             )
         }
 
-        override val homeSortOrderFlow: Flow<SortOrder> = appPreferences.homeSortOrder.map { it.toSortOrder() }
+        override val homeSortOrderFlow: Flow<SortOrder> = appPreferences.homeSortOrder.map { SortOrder.fromName(it) }
 
-        override val albumSortOrderFlow: Flow<SortOrder> = appPreferences.albumSortOrder.map { it.toSortOrder() }
+        override val albumSortOrderFlow: Flow<SortOrder> = appPreferences.albumSortOrder.map { SortOrder.fromName(it) }
 
         override suspend fun updateHomeSortOrder(order: SortOrder) = appPreferences.setHomeSortOrder(order.name)
 
@@ -124,10 +125,3 @@ class AppSettingsRepositoryImpl
 
         override suspend fun updateAppThemeName(name: String) = appPreferences.setAppTheme(name)
     }
-
-private fun String.toSortOrder(): SortOrder = runCatching { SortOrder.valueOf(this) }.getOrDefault(SortOrder.DESC)
-
-private fun String.toAspectRatio(): AspectRatio = runCatching { AspectRatio.valueOf(this) }.getOrDefault(AspectRatio.RATIO_4_3)
-
-private fun String.toImageQualityPreset(): ImageQualityPreset =
-    runCatching { ImageQualityPreset.valueOf(this) }.getOrDefault(ImageQualityPreset.DEFAULT)
