@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="promotion_dialog_title">Register promotion code</string>
+    <string name="promotion_dialog_scan_qr">Scan QR</string>
+    <string name="promotion_dialog_or_separator">OR</string>
+    <string name="promotion_dialog_input_hint">PS-30D-… or PAIRSHOT-…</string>
+    <string name="promotion_dialog_register">Register</string>
+    <string name="promotion_dialog_cancel">Cancel</string>
+    <string name="promotion_dialog_registering">Activating code…</string>
+    <string name="promotion_dialog_need_code">Need a code?</string>
+
+    <string name="promotion_qr_scanner_title">Scan promotion QR</string>
+    <string name="promotion_qr_camera_permission_required">Camera permission required</string>
+
+    <string name="promotion_error_invalid_format">Invalid code format. Please check and try again</string>
+    <string name="promotion_error_invalid_signature">Invalid code</string>
+    <string name="promotion_error_not_found">Code not found</string>
+    <string name="promotion_error_already_used">This code is in use on another device</string>
+    <string name="promotion_error_revoked">This code has expired or been revoked</string>
+    <string name="promotion_error_network">Check your internet connection and try again</string>
+    <string name="promotion_error_unknown">A temporary error occurred. Please try again later</string>
+
+    <string name="promotion_success_pro_days">%1$d-day Pro membership activated</string>
+    <string name="promotion_success_pro_unlimited">Unlimited Pro membership activated</string>
+    <string name="promotion_success_adfree_days">%1$d-day ad-free activated</string>
+    <string name="promotion_success_adfree_unlimited">Unlimited ad-free activated</string>
+
+    <string name="promotion_list_section_title">My Promotions</string>
+    <string name="promotion_list_empty">No promotions registered</string>
+    <string name="promotion_list_status_activated">Active</string>
+    <string name="promotion_list_status_expired">Expired</string>
+    <string name="promotion_list_status_revoked">Revoked</string>
+    <string name="promotion_list_status_unused">Unused</string>
+    <string name="promotion_list_unlimited">Unlimited</string>
+
+    <string name="promotion_entitlement_pro">Pro</string>
+    <string name="promotion_entitlement_ad_free">Ad-free</string>
+
+    <plurals name="promotion_list_days_format">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+</resources>

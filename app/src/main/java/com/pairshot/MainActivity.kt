@@ -14,9 +14,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,33 +25,62 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.metrics.performance.JankStats
 import androidx.metrics.performance.PerformanceMetricsState
+import androidx.navigation.compose.rememberNavController
+import com.pairshot.app.flow.AppFlowCoordinator
+import com.pairshot.app.flow.PostTutorialDecision
 import com.pairshot.app.navigation.PairShotNavHost
 import com.pairshot.app.navigation.SelectionActionViewModel
 import com.pairshot.app.navigation.SelectionMessage
+import com.pairshot.app.navigation.StartupDecisionViewModel
 import com.pairshot.app.navigation.effect.ExportShareEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.ads.initializer.AdsInitializer
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
-import com.pairshot.core.ui.component.PairShotSnackbar
+import com.pairshot.core.navigation.Paywall
+import com.pairshot.core.ui.component.PairShotSnackbarController
+import com.pairshot.core.ui.component.PairShotSnackbarHost
+import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.component.TopProgressPill
+import com.pairshot.feature.tutorial.domain.TutorialCoordinator
+import com.pairshot.feature.tutorial.ui.TutorialOverlay
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.delay
+import dagger.hilt.components.SingletonComponent
 import timber.log.Timber
+import javax.inject.Inject
 
-private const val SELECTION_MESSAGE_AUTO_DISMISS_MS = 2500L
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface RootFlowEntryPoint {
+    fun tutorialCoordinator(): TutorialCoordinator
+
+    fun appFlowCoordinator(): AppFlowCoordinator
+}
+
 private const val SNACKBAR_OFFSET_WHEN_PROGRESS_DP = 80
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var adsInitializer: AdsInitializer
+
     private lateinit var jankStats: JankStats
+    private var onStartupReady: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splash = installSplashScreen()
+        var startupReady = false
+        splash.setKeepOnScreenCondition { !startupReady }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        adsInitializer.initialize(this)
+        this.onStartupReady = { startupReady = true }
 
         val metricsStateHolder = PerformanceMetricsState.getHolderForHierarchy(window.decorView)
         jankStats =
@@ -74,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                         onRouteChanged = { route ->
                             metricsStateHolder.state?.putState("screen", route)
                         },
+                        onStartupReady = { onStartupReady?.invoke() },
                     )
                 }
             }
@@ -92,10 +120,21 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-private fun AppRootContent(onRouteChanged: (String) -> Unit) {
+private fun AppRootContent(
+    onRouteChanged: (String) -> Unit,
+    onStartupReady: () -> Unit,
+) {
     val selectionVm: SelectionActionViewModel = hiltViewModel()
+    val startupVm: StartupDecisionViewModel = hiltViewModel()
+    val plan by startupVm.plan.collectAsStateWithLifecycle()
     val progress by selectionVm.progress.collectAsStateWithLifecycle()
-    var selectionMessage by remember { mutableStateOf<SelectionMessage?>(null) }
+    val snackbarController = remember { PairShotSnackbarController() }
+
+    LaunchedEffect(plan) {
+        if (plan != null) onStartupReady()
+    }
+    val resolvedPlan = plan ?: return
+    val resolvedRoute = resolvedPlan.initialRoute
 
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -109,13 +148,38 @@ private fun AppRootContent(onRouteChanged: (String) -> Unit) {
         }
 
     LaunchedEffect(Unit) {
-        selectionVm.messages.collect { msg -> selectionMessage = msg }
+        selectionVm.messages.collect { msg ->
+            snackbarController.show(msg.toSnackbarEvent())
+        }
     }
 
-    LaunchedEffect(selectionMessage) {
-        if (selectionMessage != null) {
-            delay(SELECTION_MESSAGE_AUTO_DISMISS_MS)
-            selectionMessage = null
+    val navController = rememberNavController()
+    val rootEntryPoint =
+        remember(context) {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                RootFlowEntryPoint::class.java,
+            )
+        }
+    val tutorialCoordinator = remember(rootEntryPoint) { rootEntryPoint.tutorialCoordinator() }
+    val appFlowCoordinator = remember(rootEntryPoint) { rootEntryPoint.appFlowCoordinator() }
+
+    LaunchedEffect(tutorialCoordinator, resolvedPlan) {
+        if (resolvedPlan.startMainTutorial) {
+            tutorialCoordinator.start()
+        }
+    }
+    LaunchedEffect(tutorialCoordinator, appFlowCoordinator) {
+        tutorialCoordinator.finishedEvents.collect { event ->
+            when (appFlowCoordinator.decidePostTutorial(event.section, event.reason)) {
+                PostTutorialDecision.NavigateToOnboardingPaywall -> {
+                    navController.navigate(Paywall(dismissible = false))
+                }
+
+                PostTutorialDecision.Stay -> {
+                    Unit
+                }
+            }
         }
     }
 
@@ -142,9 +206,11 @@ private fun AppRootContent(onRouteChanged: (String) -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         PairShotNavHost(
+            navController = navController,
             onDestinationChanged = onRouteChanged,
             onShareSelected = selectionVm::shareSelection,
             onSaveSelectedToDevice = saveSelectedToDevice,
+            startDestination = resolvedRoute,
         )
 
         progress?.let { p ->
@@ -162,33 +228,36 @@ private fun AppRootContent(onRouteChanged: (String) -> Unit) {
                     Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = PairShotSpacing.snackbarTopOffset),
+                        .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
 
-        selectionMessage?.let { msg ->
-            val variant =
-                when (msg) {
-                    is SelectionMessage.Success -> SnackbarVariant.SUCCESS
-                    is SelectionMessage.Warning -> SnackbarVariant.WARNING
-                    is SelectionMessage.Error -> SnackbarVariant.ERROR
-                }
-            PairShotSnackbar(
-                message = msg.text.asString(),
-                variant = variant,
-                modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .padding(
-                            top =
-                                if (progress != null) {
-                                    SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
-                                } else {
-                                    PairShotSpacing.snackbarTopOffset
-                                },
-                        ),
-            )
-        }
+        PairShotSnackbarHost(
+            controller = snackbarController,
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(
+                        top =
+                            if (progress != null) {
+                                SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
+                            } else {
+                                PairShotSnackbarTokens.topOffset
+                            },
+                    ),
+        )
+
+        TutorialOverlay()
     }
+}
+
+private fun SelectionMessage.toSnackbarEvent(): SnackbarEvent {
+    val variant =
+        when (this) {
+            is SelectionMessage.Success -> SnackbarVariant.SUCCESS
+            is SelectionMessage.Warning -> SnackbarVariant.WARNING
+            is SelectionMessage.Error -> SnackbarVariant.ERROR
+        }
+    return SnackbarEvent(message = text, variant = variant)
 }

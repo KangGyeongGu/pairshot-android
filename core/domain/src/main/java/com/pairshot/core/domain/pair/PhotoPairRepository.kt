@@ -21,6 +21,8 @@ interface PhotoPairRepository {
 
     fun countAll(): Flow<Int>
 
+    fun countCreatedSince(sinceEpochMs: Long): Flow<Int>
+
     suspend fun saveBeforePhoto(
         tempFileUri: String,
         zoomLevel: Float?,

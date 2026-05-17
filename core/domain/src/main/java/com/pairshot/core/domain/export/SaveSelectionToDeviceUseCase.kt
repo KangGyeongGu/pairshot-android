@@ -1,5 +1,6 @@
 package com.pairshot.core.domain.export
 
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
@@ -23,6 +24,7 @@ class SaveSelectionToDeviceUseCase
     @Inject
     constructor(
         private val exportRepository: ExportRepository,
+        private val membershipProvider: MembershipProvider,
     ) {
         suspend operator fun invoke(
             pairIds: List<Long>,
@@ -33,13 +35,21 @@ class SaveSelectionToDeviceUseCase
         ): SaveToDeviceResult {
             require(pairIds.isNotEmpty()) { "no pairs to export" }
 
-            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig()
+            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
+            val effectiveFormat = enforceProFormat(preset.format)
 
-            return when (preset.format) {
+            return when (effectiveFormat) {
                 ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
                 ExportFormat.INDIVIDUAL -> saveIndividuals(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
             }
         }
+
+        private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
+            if (format == ExportFormat.ZIP && !membershipProvider.current().isPro) {
+                ExportFormat.INDIVIDUAL
+            } else {
+                format
+            }
 
         private suspend fun saveZip(
             pairIds: List<Long>,
@@ -81,11 +91,14 @@ class SaveSelectionToDeviceUseCase
                     0
                 }
 
-            val watermarkedCount =
-                if (watermarkConfig != null && (preset.includeBefore || preset.includeAfter)) {
-                    exportRepository.saveWatermarkedOriginals(
+            val individualCount =
+                if ((preset.includeBefore || preset.includeAfter) &&
+                    needsIndividualDecoration(combineConfig, watermarkConfig)
+                ) {
+                    exportRepository.saveDecoratedOriginals(
                         pairIds = pairIds,
                         preset = preset,
+                        combineConfig = combineConfig,
                         watermarkConfig = watermarkConfig,
                         onProgress = onProgress,
                     )
@@ -93,7 +106,17 @@ class SaveSelectionToDeviceUseCase
                     0
                 }
 
-            val total = combinedCount + watermarkedCount
+            val total = combinedCount + individualCount
             return if (total > 0) SaveToDeviceResult.SavedImagesToGallery(total) else SaveToDeviceResult.Nothing
         }
     }
+
+fun needsIndividualDecoration(
+    combineConfig: CombineConfig,
+    watermarkConfig: WatermarkConfig?,
+): Boolean {
+    val watermarkOn = watermarkConfig != null && watermarkConfig.enabled
+    val borderOn = combineConfig.borderEnabled
+    val labelOn = combineConfig.labelEnabled
+    return watermarkOn || borderOn || labelOn
+}

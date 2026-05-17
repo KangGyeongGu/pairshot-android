@@ -1,11 +1,14 @@
 package com.pairshot.core.ads.di
 
 import com.pairshot.core.ads.config.AdsConfig
+import com.pairshot.core.ads.controller.FullscreenAdState
 import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.NativeAdPool
 import com.pairshot.core.ads.controller.RewardedAdController
+import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
+import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -16,7 +19,11 @@ import javax.inject.Provider
 interface AdsEntryPoint {
     fun adsConfig(): AdsConfig
 
-    fun adFreeStatusProvider(): AdFreeStatusProvider
+    fun adsInitializer(): AdsInitializer
+
+    fun membershipProvider(): MembershipProvider
+
+    fun fullscreenAdState(): FullscreenAdState
 
     fun interstitialAdController(): InterstitialAdController
 
@@ -25,4 +32,6 @@ interface AdsEntryPoint {
     fun settingsPremiumGate(): SettingsPremiumGate
 
     fun nativeAdPoolProvider(): Provider<NativeAdPool>
+
+    fun tutorialModeProvider(): TutorialModeProvider
 }

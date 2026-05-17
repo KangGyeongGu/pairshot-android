@@ -73,7 +73,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.CombineLayout
 import com.pairshot.core.model.LabelAnchor
@@ -90,6 +94,7 @@ import com.pairshot.core.ui.component.SettingsSliderItem
 import com.pairshot.core.ui.component.SettingsSwitchItem
 import com.pairshot.feature.settings.R
 import com.pairshot.feature.settings.component.PositionPicker3x3Row
+import com.pairshot.feature.settings.component.ProLockedSwitchItem
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
@@ -119,8 +124,10 @@ private const val ASPECT_RATIO_VERTICAL = 0.5f
 fun CombineSettingsScreen(
     combineConfig: CombineConfig,
     watermarkConfig: WatermarkConfig,
+    isProSubscriber: Boolean,
     onCombineConfigChange: (CombineConfig) -> Unit,
     onNavigateBack: () -> Unit,
+    onProLocked: () -> Unit,
 ) {
     var borderColorPickerVisible by remember { mutableStateOf(false) }
     var labelTextColorPickerVisible by remember { mutableStateOf(false) }
@@ -203,13 +210,13 @@ fun CombineSettingsScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
                     PaddingValues(
-                        horizontal = PairShotSpacing.screenPadding,
-                        vertical = PairShotSpacing.cardPadding,
+                        horizontal = PairShotScreen.horizontalPadding,
+                        vertical = PairShotCard.innerPadding,
                     ),
             ) {
                 item(key = "label_layout") {
                     SettingsSectionLabel(label = stringResource(R.string.combine_section_alignment))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                 }
 
                 item(key = "card_layout") {
@@ -224,12 +231,12 @@ fun CombineSettingsScreen(
                 }
 
                 item(key = "gap_1") {
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 }
 
                 item(key = "label_border") {
                     SettingsSectionLabel(label = stringResource(R.string.combine_section_border))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                 }
 
                 item(key = "card_border") {
@@ -273,25 +280,34 @@ fun CombineSettingsScreen(
                 }
 
                 item(key = "gap_2") {
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 }
 
                 item(key = "label_label") {
                     SettingsSectionLabel(label = stringResource(R.string.combine_section_label))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                 }
+
+                val labelSectionsVisible = combineConfig.labelEnabled && isProSubscriber
 
                 item(key = "card_label_text") {
                     SettingsCard {
-                        SettingsSwitchItem(
-                            label = stringResource(R.string.combine_item_label_use),
-                            checked = combineConfig.labelEnabled,
-                            onCheckedChange = { checked ->
-                                onCombineConfigChange(combineConfig.copy(labelEnabled = checked))
-                            },
-                        )
+                        if (isProSubscriber) {
+                            SettingsSwitchItem(
+                                label = stringResource(R.string.combine_item_label_use),
+                                checked = combineConfig.labelEnabled,
+                                onCheckedChange = { checked ->
+                                    onCombineConfigChange(combineConfig.copy(labelEnabled = checked))
+                                },
+                            )
+                        } else {
+                            ProLockedSwitchItem(
+                                label = stringResource(R.string.combine_item_label_use),
+                                onClick = onProLocked,
+                            )
+                        }
                         AnimatedVisibility(
-                            visible = combineConfig.labelEnabled,
+                            visible = labelSectionsVisible,
                             enter = expandVertically(),
                             exit = shrinkVertically(),
                         ) {
@@ -339,21 +355,21 @@ fun CombineSettingsScreen(
 
                 item(key = "label_label_mode") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
                         Column {
-                            Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                            Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                             SettingsSectionLabel(label = stringResource(R.string.combine_section_label_mode))
-                            Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                         }
                     }
                 }
 
                 item(key = "card_label_position") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -400,21 +416,21 @@ fun CombineSettingsScreen(
 
                 item(key = "label_label_bg") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
                         Column {
-                            Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                            Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                             SettingsSectionLabel(label = stringResource(R.string.combine_section_label_background))
-                            Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                         }
                     }
                 }
 
                 item(key = "card_label_bg") {
                     AnimatedVisibility(
-                        visible = combineConfig.labelEnabled,
+                        visible = labelSectionsVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -476,12 +492,12 @@ fun CombineSettingsScreen(
                 }
 
                 item(key = "gap_3") {
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 }
 
                 item(key = "label_preview") {
                     SettingsSectionLabel(label = stringResource(R.string.combine_section_preview))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                 }
 
                 item(key = "combine_preview") {
@@ -489,7 +505,7 @@ fun CombineSettingsScreen(
                         config = combineConfig,
                         watermarkConfig = watermarkConfig,
                     )
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 }
             }
         }
@@ -506,8 +522,8 @@ private fun CombineLayoutItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -517,7 +533,7 @@ private fun CombineLayoutItem(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             CombineLayout.entries.forEach { layout ->
                 val isSelected = layout == selectedLayout
                 Box(
@@ -532,8 +548,8 @@ private fun CombineLayoutItem(
                                 },
                             ).clickable { onLayoutChange(layout) }
                             .padding(
-                                horizontal = PairShotSpacing.itemGap,
-                                vertical = PairShotSpacing.iconTextGap,
+                                horizontal = PairShotSpacing.md,
+                                vertical = PairShotSpacing.sm,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -570,8 +586,8 @@ private fun LabelPositionItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -581,7 +597,7 @@ private fun LabelPositionItem(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             LabelPosition.entries.forEach { position ->
                 val isSelected = position == selectedPosition
                 Box(
@@ -596,8 +612,8 @@ private fun LabelPositionItem(
                                 },
                             ).clickable { onPositionChange(position) }
                             .padding(
-                                horizontal = PairShotSpacing.itemGap,
-                                vertical = PairShotSpacing.iconTextGap,
+                                horizontal = PairShotSpacing.md,
+                                vertical = PairShotSpacing.sm,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -634,8 +650,8 @@ private fun LabelPositionModeItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -645,7 +661,7 @@ private fun LabelPositionModeItem(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             LabelPositionMode.entries.forEach { mode ->
                 val isSelected = mode == selectedMode
                 Box(
@@ -660,8 +676,8 @@ private fun LabelPositionModeItem(
                                 },
                             ).clickable { onModeChange(mode) }
                             .padding(
-                                horizontal = PairShotSpacing.itemGap,
-                                vertical = PairShotSpacing.iconTextGap,
+                                horizontal = PairShotSpacing.md,
+                                vertical = PairShotSpacing.sm,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -733,8 +749,8 @@ private fun LabelTextItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -777,8 +793,8 @@ private fun LabelTextItem(
                         innerTextField()
                     }
                     if (isFocused) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
+                        HorizontalDivider(color = dividerColor, thickness = PairShotStroke.hairline)
                     }
                 }
             },
@@ -797,8 +813,8 @@ private fun ColorItem(
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .height(PairShotSpacing.inputRow)
-                .padding(horizontal = PairShotSpacing.cardPadding),
+                .height(PairShotTouchTarget.large)
+                .padding(horizontal = PairShotCard.innerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -810,11 +826,11 @@ private fun ColorItem(
         Box(
             modifier =
                 Modifier
-                    .size(24.dp)
+                    .size(PairShotSpacing.xl)
                     .clip(MaterialTheme.shapes.small)
                     .background(Color(colorArgb)),
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(PairShotSpacing.sm))
         Text(
             text = "#%06X".format(colorArgb and RGB_CHANNEL_MASK),
             style = MaterialTheme.typography.bodySmall,
@@ -873,10 +889,10 @@ private fun ColorPickerContent(
     val gradientEnd = if (isGrayscale) Color.White else Color.hsv(selectedHue!!, HSV_FULL_VALUE, HSV_FULL_VALUE)
     val sliderRange = if (isGrayscale) 0f..HSV_FULL_VALUE else HSV_DARK_BRIGHTNESS_START..HSV_FULL_VALUE
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(PairShotSpacing.lg)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
         ) {
             HUE_PRESETS.forEachIndexed { idx, hue ->
                 val swatchColor =
@@ -898,7 +914,7 @@ private fun ColorPickerContent(
                                 when {
                                     isSelected -> {
                                         Modifier.border(
-                                            2.dp,
+                                            PairShotStroke.thin,
                                             MaterialTheme.colorScheme.primary,
                                             MaterialTheme.shapes.small,
                                         )
@@ -906,7 +922,7 @@ private fun ColorPickerContent(
 
                                     needsOutline -> {
                                         Modifier.border(
-                                            1.dp,
+                                            PairShotStroke.hairline,
                                             MaterialTheme.colorScheme.outlineVariant,
                                             MaterialTheme.shapes.small,
                                         )
@@ -930,7 +946,7 @@ private fun ColorPickerContent(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(12.dp)
+                            .height(PairShotSpacing.md)
                             .clip(CircleShape)
                             .background(Brush.horizontalGradient(listOf(gradientStart, gradientEnd))),
                 )
@@ -939,10 +955,10 @@ private fun ColorPickerContent(
                 Box(
                     modifier =
                         Modifier
-                            .size(16.dp)
+                            .size(PairShotSpacing.lg)
                             .clip(CircleShape)
                             .background(Color.White)
-                            .border(1.5.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                            .border(PairShotStroke.thin, MaterialTheme.colorScheme.outline, CircleShape),
                 )
             },
             modifier = Modifier.fillMaxWidth(),
@@ -951,15 +967,15 @@ private fun ColorPickerContent(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(24.dp)
+                        .size(PairShotSpacing.xl)
                         .clip(MaterialTheme.shapes.small)
                         .background(currentColor)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
+                        .border(PairShotStroke.hairline, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
             )
             Text(
                 text = "#%06X".format(currentColor.toArgb() and RGB_CHANNEL_MASK),
@@ -1041,7 +1057,7 @@ private fun LabelBgColorPickerDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.combine_dialog_bg_color_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(PairShotSpacing.lg)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -1071,15 +1087,15 @@ private fun LabelBgColorPickerDialog(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
                     ) {
                         Box(
                             modifier =
                                 Modifier
-                                    .size(24.dp)
+                                    .size(PairShotSpacing.xl)
                                     .clip(MaterialTheme.shapes.small)
                                     .background(Color(borderColorArgb))
-                                    .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
+                                    .border(PairShotStroke.hairline, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
                         )
                         Text(
                             text = "#%06X".format(borderColorArgb and RGB_CHANNEL_MASK),

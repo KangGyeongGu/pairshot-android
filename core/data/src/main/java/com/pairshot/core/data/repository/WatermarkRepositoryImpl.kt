@@ -34,7 +34,7 @@ class WatermarkRepositoryImpl
                 if (!logoDir.exists()) {
                     logoDir.mkdirs()
                 }
-                val destFile = File(logoDir, "logo.png")
+                val destFile = File(logoDir, "logo_${System.currentTimeMillis()}.png")
                 val uri = Uri.parse(sourceUri)
                 val inputStream =
                     context.contentResolver.openInputStream(uri)
@@ -45,5 +45,22 @@ class WatermarkRepositoryImpl
                     }
                 }
                 destFile.absolutePath
+            }
+
+        override suspend fun pruneOldLogoFiles(keepPath: String) =
+            withContext(Dispatchers.IO) {
+                val logoDir = File(context.filesDir, "watermark_logo")
+                if (!logoDir.exists()) return@withContext
+                logoDir.listFiles()?.forEach { existing ->
+                    if (existing.absolutePath != keepPath) existing.delete()
+                }
+            }
+
+        override suspend fun removeLogoFile() =
+            withContext(Dispatchers.IO) {
+                val logoDir = File(context.filesDir, "watermark_logo")
+                if (logoDir.exists()) {
+                    logoDir.listFiles()?.forEach { it.delete() }
+                }
             }
     }

@@ -19,6 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotAppBar
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTypographyTokens
 
@@ -28,19 +31,19 @@ private const val DISABLED_ALPHA = 0.38f
 fun PairShotActionBar(content: @Composable RowScope.() -> Unit) {
     val barColor =
         if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer
-    Surface(color = barColor, tonalElevation = 0.dp) {
+    Surface(color = barColor) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .height(PairShotSpacing.actionBar)
-                    .padding(horizontal = PairShotSpacing.screenPadding),
+                    .height(PairShotAppBar.actionBarHeight)
+                    .padding(horizontal = PairShotScreen.horizontalPadding),
             contentAlignment = Alignment.Center,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sectionGap, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xxl, Alignment.CenterHorizontally),
                 content = content,
             )
         }
@@ -65,7 +68,7 @@ fun PairShotActionBarItem(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(-6.dp),
+        verticalArrangement = Arrangement.spacedBy(-PairShotRadius.sm),
     ) {
         IconButton(onClick = onClick, enabled = enabled) {
             icon()

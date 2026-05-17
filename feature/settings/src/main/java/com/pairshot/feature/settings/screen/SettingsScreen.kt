@@ -53,7 +53,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotTouchTarget
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.navigation.SettingsHighlight
@@ -74,25 +81,20 @@ import com.pairshot.feature.settings.dialog.ThemeDialog
 import com.pairshot.feature.settings.locale.AppLocale
 import com.pairshot.feature.settings.locale.apply
 import com.pairshot.feature.settings.locale.currentAppLocale
-import com.pairshot.feature.settings.theme.AppTheme
 import com.pairshot.feature.settings.viewmodel.SettingsUiState
 import com.pairshot.feature.settings.viewmodel.formatBytes
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
 private const val SWITCH_SCALE = 0.67f
-private const val DEFAULT_JPEG_QUALITY = 85
-private const val DEFAULT_OVERLAY_ALPHA = 0.35f
-private const val JPEG_QUALITY_LOW = 75
-private const val JPEG_QUALITY_HIGH = 85
-private const val JPEG_QUALITY_BEST = 95
 
 private const val HIGHLIGHT_PULSE_ON_MS = 600L
 private const val HIGHLIGHT_PULSE_OFF_MS = 400L
 private const val HIGHLIGHT_COLOR_ALPHA = 0.3f
-private const val HIGHLIGHT_WATERMARK_INDEX = 6
-private const val HIGHLIGHT_COMBINE_INDEX = 9
+private const val HIGHLIGHT_WATERMARK_INDEX = 3
+private const val HIGHLIGHT_COMBINE_INDEX = 6
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,13 +110,16 @@ fun SettingsScreen(
     onWatermarkConfigChange: (WatermarkConfig) -> Unit,
     onWatermarkSettingsClick: () -> Unit,
     onCombineSettingsClick: () -> Unit,
-    onJpegQualityChange: (Int) -> Unit,
+    onImageQualityChange: (ImageQualityPreset) -> Unit,
     onFileNamePrefixChange: (String) -> Unit,
     onOverlayEnabledChange: (Boolean) -> Unit,
     onOverlayAlphaChange: (Float) -> Unit,
     snackbarController: PairShotSnackbarController,
+    showAdsConsent: Boolean,
+    onAdsConsentClick: () -> Unit,
+    onReplayTutorial: () -> Unit,
     highlight: SettingsHighlight? = null,
-    couponSection: @Composable () -> Unit = {},
+    proSubscriptionSection: @Composable () -> Unit = {},
 ) {
     val haptic = LocalHapticFeedback.current
     var showClearCacheDialog by remember { mutableStateOf(false) }
@@ -166,9 +171,9 @@ fun SettingsScreen(
         )
     }
 
-    val currentQuality = (uiState as? SettingsUiState.Success)?.jpegQuality ?: DEFAULT_JPEG_QUALITY
-    val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: "PAIRSHOT"
-    val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: DEFAULT_OVERLAY_ALPHA
+    val currentQuality = (uiState as? SettingsUiState.Success)?.imageQuality ?: ImageQualityPreset.DEFAULT
+    val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: AppSettings.DEFAULT_FILE_NAME_PREFIX
+    val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: AppSettings.DEFAULT_OVERLAY_ALPHA
 
     if (showClearCacheDialog) {
         ClearCacheDialog(
@@ -180,7 +185,7 @@ fun SettingsScreen(
     if (showQualityDialog) {
         ImageQualityDialog(
             currentQuality = currentQuality,
-            onQualityChange = onJpegQualityChange,
+            onQualityChange = onImageQualityChange,
             onDismiss = { showQualityDialog = false },
         )
     }
@@ -195,6 +200,10 @@ fun SettingsScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.SETTINGS_SCREEN),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 CenterAlignedTopAppBar(
@@ -249,29 +258,12 @@ fun SettingsScreen(
                 }
 
                 is SettingsUiState.Success -> {
-                    val qualityOptions =
-                        listOf(
-                            Triple(
-                                stringResource(R.string.settings_quality_low),
-                                stringResource(R.string.settings_quality_low_desc),
-                                JPEG_QUALITY_LOW,
-                            ),
-                            Triple(
-                                stringResource(R.string.settings_quality_high),
-                                stringResource(R.string.settings_quality_high_desc),
-                                JPEG_QUALITY_HIGH,
-                            ),
-                            Triple(
-                                stringResource(R.string.settings_quality_best),
-                                stringResource(R.string.settings_quality_best_desc),
-                                JPEG_QUALITY_BEST,
-                            ),
-                        )
                     val qualityLabel =
-                        qualityOptions
-                            .firstOrNull { it.third == uiState.jpegQuality }
-                            ?.first
-                            ?: "${uiState.jpegQuality}%"
+                        when (uiState.imageQuality) {
+                            ImageQualityPreset.LOW -> stringResource(R.string.settings_quality_low)
+                            ImageQualityPreset.HIGH -> stringResource(R.string.settings_quality_high)
+                            ImageQualityPreset.BEST -> stringResource(R.string.settings_quality_best)
+                        }
                     val prefixDisplay =
                         if (uiState.fileNamePrefix.isEmpty()) {
                             stringResource(R.string.settings_file_name_prefix_none)
@@ -291,50 +283,17 @@ fun SettingsScreen(
                             state = listState,
                             contentPadding =
                                 PaddingValues(
-                                    horizontal = PairShotSpacing.screenPadding,
-                                    vertical = PairShotSpacing.cardPadding,
+                                    horizontal = PairShotScreen.horizontalPadding,
+                                    vertical = PairShotCard.innerPadding,
                                 ),
                         ) {
-                            item(key = "label_general") {
-                                SettingsSectionLabel(label = stringResource(R.string.settings_section_general))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
-                            }
-
-                            item(key = "card_general") {
-                                SettingsCard {
-                                    val languageLabel =
-                                        when (currentLocale) {
-                                            AppLocale.SYSTEM -> stringResource(R.string.settings_language_system)
-                                            AppLocale.KOREAN -> stringResource(R.string.settings_language_korean)
-                                            AppLocale.ENGLISH -> stringResource(R.string.settings_language_english)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_language),
-                                        trailing = languageLabel,
-                                        onClick = { showLanguageDialog = true },
-                                    )
-                                    SettingsDivider()
-                                    val themeLabel =
-                                        when (currentTheme) {
-                                            AppTheme.SYSTEM -> stringResource(R.string.settings_theme_system)
-                                            AppTheme.LIGHT -> stringResource(R.string.settings_theme_light)
-                                            AppTheme.DARK -> stringResource(R.string.settings_theme_dark)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_theme),
-                                        trailing = themeLabel,
-                                        onClick = { showThemeDialog = true },
-                                    )
-                                }
-                            }
-
-                            item(key = "gap_general") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                            item(key = "section_pro_subscription") {
+                                proSubscriptionSection()
                             }
 
                             item(key = "label_capture") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_shooting_files))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_capture") {
@@ -350,8 +309,8 @@ fun SettingsScreen(
                                             modifier =
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .height(PairShotSpacing.inputRow)
-                                                    .padding(horizontal = PairShotSpacing.cardPadding),
+                                                    .height(PairShotTouchTarget.large)
+                                                    .padding(horizontal = PairShotCard.innerPadding),
                                             verticalAlignment = Alignment.CenterVertically,
                                         ) {
                                             Text(
@@ -416,13 +375,13 @@ fun SettingsScreen(
                                 }
                             }
 
-                            item(key = "gap_1") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                            item(key = "gap_capture") {
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_watermark") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_watermark))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_watermark") {
@@ -433,8 +392,8 @@ fun SettingsScreen(
                                         modifier =
                                             Modifier
                                                 .fillMaxWidth()
-                                                .height(PairShotSpacing.inputRow)
-                                                .padding(horizontal = PairShotSpacing.cardPadding),
+                                                .height(PairShotTouchTarget.large)
+                                                .padding(horizontal = PairShotCard.innerPadding),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
@@ -478,13 +437,13 @@ fun SettingsScreen(
                                 }
                             }
 
-                            item(key = "gap_2") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                            item(key = "gap_watermark") {
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_combine") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_combine))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_combine") {
@@ -499,16 +458,74 @@ fun SettingsScreen(
                             }
 
                             item(key = "gap_combine") {
-                                Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
-                            item(key = "section_coupon") {
-                                couponSection()
+                            item(key = "label_general") {
+                                SettingsSectionLabel(label = stringResource(R.string.settings_section_general))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+                            }
+
+                            item(key = "card_general") {
+                                SettingsCard {
+                                    val languageLabel =
+                                        when (currentLocale) {
+                                            AppLocale.SYSTEM -> stringResource(R.string.settings_language_system)
+                                            AppLocale.KOREAN -> stringResource(R.string.settings_language_korean)
+                                            AppLocale.ENGLISH -> stringResource(R.string.settings_language_english)
+                                        }
+                                    SettingsItem(
+                                        label = stringResource(R.string.settings_item_language),
+                                        trailing = languageLabel,
+                                        onClick = { showLanguageDialog = true },
+                                    )
+                                    SettingsDivider()
+                                    val themeLabel =
+                                        when (currentTheme) {
+                                            AppTheme.SYSTEM -> stringResource(R.string.settings_theme_system)
+                                            AppTheme.LIGHT -> stringResource(R.string.settings_theme_light)
+                                            AppTheme.DARK -> stringResource(R.string.settings_theme_dark)
+                                        }
+                                    SettingsItem(
+                                        label = stringResource(R.string.settings_item_theme),
+                                        trailing = themeLabel,
+                                        onClick = { showThemeDialog = true },
+                                    )
+                                    if (showAdsConsent) {
+                                        SettingsDivider()
+                                        SettingsItem(
+                                            label = stringResource(R.string.settings_item_ads_consent),
+                                            onClick = onAdsConsentClick,
+                                        )
+                                    }
+                                }
+                            }
+
+                            item(key = "gap_general") {
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
+                            }
+
+                            item(key = "label_help") {
+                                SettingsSectionLabel(label = stringResource(R.string.settings_section_help))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+                            }
+
+                            item(key = "card_help") {
+                                SettingsCard {
+                                    SettingsItem(
+                                        label = stringResource(com.pairshot.feature.tutorial.R.string.tutorial_settings_replay_label),
+                                        onClick = onReplayTutorial,
+                                    )
+                                }
+                            }
+
+                            item(key = "gap_help") {
+                                Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
                             }
 
                             item(key = "label_storage_info") {
                                 SettingsSectionLabel(label = stringResource(R.string.settings_section_storage_and_info))
-                                Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                                Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                             }
 
                             item(key = "card_storage_info") {
@@ -552,7 +569,7 @@ fun SettingsScreen(
                 Modifier
                     .align(Alignment.TopCenter)
                     .statusBarsPadding()
-                    .padding(top = PairShotSpacing.snackbarTopOffset),
+                    .padding(top = PairShotSnackbarTokens.topOffset),
         )
     }
 }

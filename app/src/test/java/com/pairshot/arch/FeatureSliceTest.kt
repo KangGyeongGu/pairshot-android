@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.pairshot.arch
 
 import com.pairshot.arch.config.DoNotIncludeAndroidGenerated
@@ -31,5 +33,13 @@ class FeatureSliceTest {
             .matching("com.pairshot.feature.(*)..")
             .should()
             .notDependOnEachOther()
-            .because("Feature modules should be independent — shared code goes to core/")
+            .ignoreDependency(
+                com.tngtech.archunit.core.domain.JavaClass.Predicates
+                    .resideOutsideOfPackage("com.pairshot.feature.tutorial.."),
+                com.tngtech.archunit.core.domain.JavaClass.Predicates
+                    .resideInAPackage("com.pairshot.feature.tutorial.."),
+            ).because(
+                "Feature modules should be independent — shared code goes to core/. " +
+                    "Tutorial is a cross-cutting overlay that other features may import.",
+            )
 }

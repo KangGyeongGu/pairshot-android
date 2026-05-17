@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.pairshot.core.designsystem.PairShotCameraTokens
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.feature.camera.permission.CameraPermissionGate
 import com.pairshot.feature.camera.screen.CameraScreen
 import com.pairshot.feature.camera.viewmodel.CameraViewModel
@@ -15,6 +16,7 @@ import com.pairshot.feature.camera.viewmodel.CameraViewModel
 @Composable
 fun CameraRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
     Box(
@@ -27,6 +29,7 @@ fun CameraRoute(
             CameraScreen(
                 viewModel = viewModel,
                 onNavigateBack = onNavigateBack,
+                onNavigateToPaywall = onNavigateToPaywall,
             )
         }
     }

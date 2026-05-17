@@ -29,24 +29,29 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pairshot.core.designsystem.PairShotAppBar
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.spec.CameraSpec
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private val FOCUS_RING_SIZE = 64.dp
-private val FOCUS_RING_STROKE = 1.dp
-private val EV_BAR_HEIGHT = 100.dp
-private val EV_BAR_WIDTH = 1.5.dp
-private val EV_SUN_SIZE = 12.dp
-private val EV_BAR_GAP = 16.dp
-private val EV_HIT_AREA_LEFT_EXPANSION = 20.dp
-private val EV_HIT_AREA_RIGHT_EXPANSION = 30.dp
-private val EV_HIT_AREA_VERTICAL_EXPANSION = 20.dp
-private val EV_TEXT_TOP_SPACING = 6.dp
-private val SUN_OUTLINE_STROKE = 1.dp
+private val FOCUS_RING_SIZE = PairShotAppBar.height
+private val FOCUS_RING_STROKE = PairShotStroke.hairline
+private val EV_BAR_HEIGHT = CameraSpec.evBarHeight
+private val EV_BAR_WIDTH = CameraSpec.evBarWidth
+private val EV_SUN_SIZE = PairShotSpacing.md
+private val EV_BAR_GAP = PairShotSpacing.lg
+private val EV_HIT_AREA_LEFT_EXPANSION = CameraSpec.evHitAreaLeftExpansion
+private val EV_HIT_AREA_RIGHT_EXPANSION = CameraSpec.evHitAreaRightExpansion
+private val EV_HIT_AREA_VERTICAL_EXPANSION = CameraSpec.evHitAreaVerticalExpansion
+private val EV_TEXT_TOP_SPACING = PairShotRadius.sm
+private val SUN_OUTLINE_STROKE = PairShotStroke.hairline
 private const val DRAG_DP_PER_EV_STEP = 30f
 private const val AUTO_HIDE_DELAY_MS = 2000L
 private const val RING_FADE_OUT_MS = 400

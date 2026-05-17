@@ -62,10 +62,15 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotGlassTokens
+import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotMotionTokens
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.PairShotTypographyTokens
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
@@ -127,12 +132,12 @@ fun CameraSettingsSheet(
             Column(
                 modifier =
                     Modifier
-                        .padding(horizontal = PairShotSpacing.cardPadding)
-                        .widthIn(max = 520.dp)
+                        .padding(horizontal = PairShotCard.innerPadding)
+                        .widthIn(max = CameraSpec.settingsSheetMaxWidth)
                         .clip(PairShotGlassTokens.shape)
                         .background(PairShotGlassTokens.surfaceColor)
                         .border(PairShotGlassTokens.border.width, PairShotGlassTokens.border.brush, PairShotGlassTokens.shape)
-                        .padding(horizontal = PairShotSpacing.screenPadding, vertical = PairShotSpacing.screenPadding)
+                        .padding(horizontal = PairShotScreen.horizontalPadding, vertical = PairShotScreen.horizontalPadding)
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() },
@@ -156,12 +161,12 @@ fun CameraSettingsSheet(
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(PairShotSpacing.md),
                 ) {
                     settingItems.chunked(SETTINGS_ITEMS_PER_ROW).forEach { rowItems ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
                         ) {
                             rowItems.forEach { item ->
                                 SettingIconItem(
@@ -183,7 +188,7 @@ fun CameraSettingsSheet(
                 }
 
                 if (overlayAlpha != null && onOverlayAlphaChange != null) {
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconSize))
+                    Spacer(modifier = Modifier.height(PairShotIconSize.md))
                     OverlayAlphaSlider(
                         alpha = overlayAlpha,
                         enabled = overlayEnabled == true,
@@ -357,12 +362,12 @@ private fun SettingIconItem(
     Column(
         modifier = clickableModifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(48.dp)
+                    .size(PairShotSpacing.xxxl)
                     .clip(CircleShape)
                     .background(
                         if (isEnabled && isActive) {
@@ -385,7 +390,7 @@ private fun SettingIconItem(
                     contentDescription = label,
                     modifier =
                         Modifier
-                            .size(24.dp)
+                            .size(PairShotSpacing.xl)
                             .graphicsLayer(scaleY = if (iconFlippedVertical) -1f else 1f),
                     tint = effectiveTint,
                 )
@@ -455,7 +460,7 @@ private fun OverlayAlphaSlider(
             thumb = {
                 SliderDefaults.Thumb(
                     interactionSource = interactionSource,
-                    thumbSize = DpSize(1.dp, 16.dp),
+                    thumbSize = DpSize(PairShotStroke.hairline, PairShotSpacing.lg),
                     colors = sliderColors,
                 )
             },
@@ -476,14 +481,14 @@ private fun OverlayAlphaSlider(
         ) {
             val warningColor = LocalPairShotExtendedColors.current.warning
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                modifier = Modifier.fillMaxWidth().padding(bottom = PairShotSpacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ErrorOutline,
                     contentDescription = null,
-                    modifier = Modifier.size(12.dp),
+                    modifier = Modifier.size(PairShotSpacing.md),
                     tint = warningColor,
                 )
                 Text(

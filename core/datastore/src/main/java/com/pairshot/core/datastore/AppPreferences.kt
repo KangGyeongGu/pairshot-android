@@ -8,7 +8,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
+import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.ImageQualityPreset
+import com.pairshot.core.model.SortOrder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,13 +31,12 @@ class AppPreferences
     constructor(
         @ApplicationContext private val context: Context,
     ) {
-        private companion object {
-            const val DEFAULT_JPEG_QUALITY = 95
-            const val DEFAULT_OVERLAY_ALPHA = 0.35f
-        }
+        private val defaultSettings = AppSettings()
+        private val defaultExportPreset = ExportPreset()
 
         private object Keys {
             val JPEG_QUALITY = intPreferencesKey("jpeg_quality")
+            val IMAGE_QUALITY = stringPreferencesKey("image_quality")
             val FILE_NAME_PREFIX = stringPreferencesKey("file_name_prefix")
             val OVERLAY_ENABLED = booleanPreferencesKey("overlay_enabled")
             val OVERLAY_ALPHA = floatPreferencesKey("overlay_alpha")
@@ -49,31 +54,41 @@ class AppPreferences
             val HOME_SORT_ORDER = stringPreferencesKey("home_sort_order")
             val ALBUM_SORT_ORDER = stringPreferencesKey("album_sort_order")
             val APP_THEME = stringPreferencesKey("app_theme")
+            val ONBOARDING_PAYWALL_SHOWN = booleanPreferencesKey("onboarding_paywall_shown")
+            val TUTORIAL_COMPLETED = booleanPreferencesKey("tutorial_completed")
+            val EXPORT_SETTINGS_TUTORIAL_COMPLETED = booleanPreferencesKey("export_settings_tutorial_completed")
+            val TUTORIAL_SANDBOX_PAIR_IDS = stringSetPreferencesKey("tutorial_sandbox_pair_ids")
+            val TUTORIAL_SANDBOX_TEMP_FILES = stringSetPreferencesKey("tutorial_sandbox_temp_files")
         }
 
-        val jpegQuality: Flow<Int> =
+        val imageQuality: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.JPEG_QUALITY] ?: DEFAULT_JPEG_QUALITY
+                prefs[Keys.IMAGE_QUALITY]
+                    ?: prefs[Keys.JPEG_QUALITY]?.let { legacy ->
+                        ImageQualityPreset.fromLegacyJpegQuality(legacy).name
+                    }
+                    ?: ImageQualityPreset.DEFAULT.name
             }
 
         val fileNamePrefix: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.FILE_NAME_PREFIX] ?: "PAIRSHOT"
+                prefs[Keys.FILE_NAME_PREFIX] ?: defaultSettings.fileNamePrefix
             }
 
         val overlayEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.OVERLAY_ENABLED] ?: true
+                prefs[Keys.OVERLAY_ENABLED] ?: defaultSettings.overlayEnabled
             }
 
         val overlayAlpha: Flow<Float> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.OVERLAY_ALPHA] ?: DEFAULT_OVERLAY_ALPHA
+                prefs[Keys.OVERLAY_ALPHA] ?: defaultSettings.defaultOverlayAlpha
             }
 
-        suspend fun setJpegQuality(quality: Int) {
+        suspend fun setImageQuality(preset: String) {
             context.appDataStore.edit { prefs ->
-                prefs[Keys.JPEG_QUALITY] = quality
+                prefs[Keys.IMAGE_QUALITY] = preset
+                prefs.remove(Keys.JPEG_QUALITY)
             }
         }
 
@@ -97,32 +112,32 @@ class AppPreferences
 
         val cameraGridEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_GRID_ENABLED] ?: false
+                prefs[Keys.CAMERA_GRID_ENABLED] ?: defaultSettings.cameraGridEnabled
             }
 
         val cameraLevelEnabled: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_LEVEL_ENABLED] ?: false
+                prefs[Keys.CAMERA_LEVEL_ENABLED] ?: defaultSettings.cameraLevelEnabled
             }
 
         val cameraFlashMode: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_FLASH_MODE] ?: "OFF"
+                prefs[Keys.CAMERA_FLASH_MODE] ?: defaultSettings.cameraFlashMode.name
             }
 
         val cameraNightMode: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_NIGHT_MODE] ?: false
+                prefs[Keys.CAMERA_NIGHT_MODE] ?: defaultSettings.cameraNightModeEnabled
             }
 
         val cameraHdr: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_HDR] ?: false
+                prefs[Keys.CAMERA_HDR] ?: defaultSettings.cameraHdrEnabled
             }
 
         val cameraAspectRatio: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.CAMERA_ASPECT_RATIO] ?: "RATIO_4_3"
+                prefs[Keys.CAMERA_ASPECT_RATIO] ?: defaultSettings.cameraAspectRatio.name
             }
 
         suspend fun setCameraGridEnabled(enabled: Boolean) {
@@ -163,27 +178,27 @@ class AppPreferences
 
         val exportFormat: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_FORMAT] ?: "INDIVIDUAL"
+                prefs[Keys.EXPORT_FORMAT] ?: defaultExportPreset.format.name
             }
 
         val exportIncludeBefore: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_BEFORE] ?: false
+                prefs[Keys.EXPORT_INCLUDE_BEFORE] ?: defaultExportPreset.includeBefore
             }
 
         val exportIncludeAfter: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_AFTER] ?: false
+                prefs[Keys.EXPORT_INCLUDE_AFTER] ?: defaultExportPreset.includeAfter
             }
 
         val exportIncludeCombined: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_INCLUDE_COMBINED] ?: true
+                prefs[Keys.EXPORT_INCLUDE_COMBINED] ?: defaultExportPreset.includeCombined
             }
 
         val exportApplyCombineConfig: Flow<Boolean> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.EXPORT_APPLY_COMBINE_CONFIG] ?: true
+                prefs[Keys.EXPORT_APPLY_COMBINE_CONFIG] ?: defaultExportPreset.applyCombineConfig
             }
 
         suspend fun setExportFormat(format: String) {
@@ -228,12 +243,12 @@ class AppPreferences
 
         val homeSortOrder: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.HOME_SORT_ORDER] ?: "DESC"
+                prefs[Keys.HOME_SORT_ORDER] ?: SortOrder.DEFAULT.name
             }
 
         val albumSortOrder: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.ALBUM_SORT_ORDER] ?: "DESC"
+                prefs[Keys.ALBUM_SORT_ORDER] ?: SortOrder.DEFAULT.name
             }
 
         suspend fun setHomeSortOrder(value: String) {
@@ -250,12 +265,67 @@ class AppPreferences
 
         val appTheme: Flow<String> =
             context.appDataStore.data.map { prefs ->
-                prefs[Keys.APP_THEME] ?: "SYSTEM"
+                prefs[Keys.APP_THEME] ?: AppTheme.DEFAULT.name
             }
 
         suspend fun setAppTheme(theme: String) {
             context.appDataStore.edit { prefs ->
                 prefs[Keys.APP_THEME] = theme
+            }
+        }
+
+        val onboardingPaywallShown: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.ONBOARDING_PAYWALL_SHOWN] ?: false
+            }
+
+        suspend fun setOnboardingPaywallShown(shown: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.ONBOARDING_PAYWALL_SHOWN] = shown
+            }
+        }
+
+        val tutorialCompleted: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_COMPLETED] ?: false
+            }
+
+        suspend fun setTutorialCompleted(completed: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_COMPLETED] = completed
+            }
+        }
+
+        val exportSettingsTutorialCompleted: Flow<Boolean> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.EXPORT_SETTINGS_TUTORIAL_COMPLETED] ?: false
+            }
+
+        suspend fun setExportSettingsTutorialCompleted(completed: Boolean) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.EXPORT_SETTINGS_TUTORIAL_COMPLETED] = completed
+            }
+        }
+
+        val tutorialSandboxPairIds: Flow<Set<Long>> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_PAIR_IDS]?.mapNotNull { it.toLongOrNull() }?.toSet().orEmpty()
+            }
+
+        suspend fun setTutorialSandboxPairIds(ids: Set<Long>) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_PAIR_IDS] = ids.map { it.toString() }.toSet()
+            }
+        }
+
+        val tutorialSandboxTempFiles: Flow<Set<String>> =
+            context.appDataStore.data.map { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_TEMP_FILES].orEmpty()
+            }
+
+        suspend fun setTutorialSandboxTempFiles(paths: Set<String>) {
+            context.appDataStore.edit { prefs ->
+                prefs[Keys.TUTORIAL_SANDBOX_TEMP_FILES] = paths
             }
         }
     }

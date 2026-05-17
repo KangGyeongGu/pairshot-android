@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
 import com.pairshot.feature.album.component.AlbumFilterRow
@@ -117,10 +118,9 @@ fun AlbumDetailScreen(
                         onPairLongPress = onPairLongPress,
                         contentPadding =
                             PaddingValues(
-                                top = 0.dp,
-                                bottom = 12.dp,
-                                start = 12.dp,
-                                end = 12.dp,
+                                bottom = PairShotSpacing.md,
+                                start = PairShotSpacing.md,
+                                end = PairShotSpacing.md,
                             ),
                         modifier = Modifier.fillMaxSize(),
                     )

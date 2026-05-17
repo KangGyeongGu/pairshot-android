@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotStroke
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -28,7 +29,7 @@ fun LevelOverlay(
 ) {
     val isLevel = abs(roll) <= LEVEL_THRESHOLD_DEGREES
     val lineColor = if (isLevel) MaterialTheme.colorScheme.primary else PairShotCameraTokens.Foreground
-    val strokeWidth = if (isLevel) 2.dp else 1.dp
+    val strokeWidth = if (isLevel) PairShotStroke.thin else PairShotStroke.hairline
     val angleText = if (isLevel) "0°" else "${roll.roundToInt()}°"
 
     Box(
@@ -39,7 +40,7 @@ fun LevelOverlay(
             modifier =
                 Modifier
                     .fillMaxWidth(LEVEL_LINE_WIDTH_FRACTION)
-                    .height(2.dp),
+                    .height(PairShotStroke.thin),
         ) {
             rotate(degrees = roll) {
                 drawLine(

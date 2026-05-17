@@ -14,8 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.pair.PairListItem
 import com.pairshot.core.domain.pair.buildPairListWithAds
@@ -23,6 +23,7 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun AlbumPairGridSection(
@@ -51,12 +52,10 @@ fun AlbumPairGridSection(
                 AdsEntryPoint::class.java,
             )
         }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint.adFreeStatusProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
     val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
-
-    val isAdFree: Boolean? by adFreeStatusProvider
-        .observeIsAdFree()
-        .collectAsStateWithLifecycle(initialValue = null)
+    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
+    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val nativeAdPool = remember(poolProvider) { poolProvider.get() }
     DisposableEffect(nativeAdPool) {
@@ -80,8 +79,8 @@ fun AlbumPairGridSection(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
-        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
     ) {
         items.forEach { entry ->
             when (entry) {

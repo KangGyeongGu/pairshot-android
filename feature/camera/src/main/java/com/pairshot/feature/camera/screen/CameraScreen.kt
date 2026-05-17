@@ -1,5 +1,6 @@
 package com.pairshot.feature.camera.screen
 
+import android.view.Surface
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,10 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
+import com.pairshot.core.domain.tutorial.TutorialActionIds
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.SnackbarEvent
@@ -24,12 +29,14 @@ import com.pairshot.feature.camera.component.ImmersiveCameraEffect
 import com.pairshot.feature.camera.viewmodel.CameraEvent
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
 import com.pairshot.feature.camera.viewmodel.CameraViewModel
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -42,16 +49,24 @@ internal fun CameraScreen(
     val sensorSession = sessionViewModel.sensorSession
 
     val beforePreviewUris by viewModel.beforePreviewUris.collectAsStateWithLifecycle()
-    val lastPairThumbnailUri by viewModel.lastPairThumbnailUri.collectAsStateWithLifecycle()
     val zoomUiState by viewModel.zoomUiState.collectAsStateWithLifecycle()
     val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
     val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
     val capabilities by cameraSession.capabilities.collectAsStateWithLifecycle()
     val roll by sensorSession.roll.collectAsStateWithLifecycle()
+    val deviceOrientation by sensorSession.deviceOrientation.collectAsStateWithLifecycle()
     val surfaceRequest by cameraSession.surfaceRequest.collectAsStateWithLifecycle()
 
     val snackbarController = remember { PairShotSnackbarController() }
     val thumbnailListState = rememberLazyListState()
+
+    val context = LocalContext.current
+    val tutorialActions =
+        remember(context) {
+            EntryPointAccessors
+                .fromApplication(context.applicationContext, CameraScreenTutorialEntryPoint::class.java)
+                .tutorialActionDispatcher()
+        }
 
     LaunchedEffect(lifecycleOwner) {
         val initial = viewModel.loadInitialSettings()
@@ -157,8 +172,18 @@ internal fun CameraScreen(
             onToggleSettings = { viewModel.toggleSettingsPanel() },
             onShutter = {
                 if (isSaving) return@CameraScreenCallbacks
-                showBlackout = true
                 scope.launch {
+                    when (viewModel.canCreatePair()) {
+                        is CanCreatePairUseCase.Result.LimitReached -> {
+                            onNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                            return@launch
+                        }
+
+                        CanCreatePairUseCase.Result.Allowed -> {
+                            Unit
+                        }
+                    }
+                    showBlackout = true
                     viewModel.startCapturing()
                     val captureResult = cameraSession.capture()
                     val tempUri = captureResult.getOrNull()
@@ -173,9 +198,19 @@ internal fun CameraScreen(
                         tempUri = tempUri,
                         zoomLevel = viewModel.zoomUiState.value.currentRatio,
                     )
+                    val actionId =
+                        when (deviceOrientation) {
+                            Surface.ROTATION_90 -> TutorialActionIds.CAMERA_SHUTTER_LANDSCAPE_LEFT
+                            Surface.ROTATION_270 -> TutorialActionIds.CAMERA_SHUTTER_LANDSCAPE_RIGHT
+                            else -> TutorialActionIds.CAMERA_SHUTTER_PORTRAIT
+                        }
+                    tutorialActions.report(actionId)
                 }
             },
-            onThumbnailClick = onNavigateBack,
+            onThumbnailClick = {
+                tutorialActions.report(TutorialActionIds.CAMERA_BACK_TO_HOME)
+                onNavigateBack()
+            },
             onToggleGrid = viewModel::toggleGrid,
             onCycleFlash = {
                 val next = viewModel.cycleFlash()
@@ -208,7 +243,6 @@ internal fun CameraScreen(
         roll = roll,
         blackoutAlpha = blackoutAlpha,
         beforePreviewUris = beforePreviewUris,
-        lastPairThumbnailUri = lastPairThumbnailUri,
         callbacks = callbacks,
         snackbarController = snackbarController,
         thumbnailListState = thumbnailListState,

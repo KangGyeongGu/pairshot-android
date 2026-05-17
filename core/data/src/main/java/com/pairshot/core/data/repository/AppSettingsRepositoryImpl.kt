@@ -6,6 +6,8 @@ import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportFormat
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.FlashMode
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -20,21 +22,19 @@ class AppSettingsRepositoryImpl
     ) : AppSettingsRepository {
         private val baseSettingsFlow: Flow<AppSettings> =
             combine(
-                appPreferences.jpegQuality,
+                appPreferences.imageQuality,
                 appPreferences.fileNamePrefix,
                 appPreferences.overlayEnabled,
                 appPreferences.overlayAlpha,
-            ) { quality, prefix, enabled, alpha ->
+            ) { qualityName, prefix, enabled, alpha ->
                 AppSettings(
-                    jpegQuality = quality,
+                    imageQuality = ImageQualityPreset.fromName(qualityName),
                     fileNamePrefix = prefix,
                     overlayEnabled = enabled,
                     defaultOverlayAlpha = alpha,
                 )
             }
 
-        // 6개 Flow 를 vararg combine 로 묶으면 Boolean / String 혼합으로 인한 타입 추론 경고가
-        // 나오므로 5-arg combine 결과를 마지막 한 Flow 와 다시 combine 해서 chain 형식 사용.
         private val cameraSettingsFlow: Flow<AppSettings> =
             combine(
                 appPreferences.cameraGridEnabled,
@@ -46,12 +46,12 @@ class AppSettingsRepositoryImpl
                 AppSettings(
                     cameraGridEnabled = grid,
                     cameraLevelEnabled = level,
-                    cameraFlashMode = flash,
+                    cameraFlashMode = FlashMode.fromName(flash),
                     cameraNightModeEnabled = night,
                     cameraHdrEnabled = hdr,
                 )
             }.combine(appPreferences.cameraAspectRatio) { partial, ratioName ->
-                partial.copy(cameraAspectRatio = ratioName.toAspectRatio())
+                partial.copy(cameraAspectRatio = AspectRatio.fromName(ratioName))
             }
 
         override val settingsFlow: Flow<AppSettings> =
@@ -68,7 +68,7 @@ class AppSettingsRepositoryImpl
 
         override suspend fun getCurrent(): AppSettings = settingsFlow.first()
 
-        override suspend fun updateJpegQuality(quality: Int) = appPreferences.setJpegQuality(quality)
+        override suspend fun updateImageQuality(preset: ImageQualityPreset) = appPreferences.setImageQuality(preset.name)
 
         override suspend fun updateFileNamePrefix(prefix: String) = appPreferences.setFileNamePrefix(prefix)
 
@@ -80,7 +80,7 @@ class AppSettingsRepositoryImpl
 
         override suspend fun updateCameraLevelEnabled(enabled: Boolean) = appPreferences.setCameraLevelEnabled(enabled)
 
-        override suspend fun updateCameraFlashMode(mode: String) = appPreferences.setCameraFlashMode(mode)
+        override suspend fun updateCameraFlashMode(mode: FlashMode) = appPreferences.setCameraFlashMode(mode.name)
 
         override suspend fun updateCameraNightMode(enabled: Boolean) = appPreferences.setCameraNightMode(enabled)
 
@@ -113,9 +113,9 @@ class AppSettingsRepositoryImpl
             )
         }
 
-        override val homeSortOrderFlow: Flow<SortOrder> = appPreferences.homeSortOrder.map { it.toSortOrder() }
+        override val homeSortOrderFlow: Flow<SortOrder> = appPreferences.homeSortOrder.map { SortOrder.fromName(it) }
 
-        override val albumSortOrderFlow: Flow<SortOrder> = appPreferences.albumSortOrder.map { it.toSortOrder() }
+        override val albumSortOrderFlow: Flow<SortOrder> = appPreferences.albumSortOrder.map { SortOrder.fromName(it) }
 
         override suspend fun updateHomeSortOrder(order: SortOrder) = appPreferences.setHomeSortOrder(order.name)
 
@@ -125,8 +125,3 @@ class AppSettingsRepositoryImpl
 
         override suspend fun updateAppThemeName(name: String) = appPreferences.setAppTheme(name)
     }
-
-private fun String.toSortOrder(): SortOrder = runCatching { SortOrder.valueOf(this) }.getOrDefault(SortOrder.DESC)
-
-private fun String.toAspectRatio(): AspectRatio =
-    runCatching { AspectRatio.valueOf(this) }.getOrDefault(AspectRatio.RATIO_4_3)

@@ -21,11 +21,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotSpacing
 
 private const val GRID_CELL_COUNT = 9
 private const val GRID_ROW_COUNT = 3
-private val CheckIconSize = 14.dp
+private val CheckIconSize = PairShotSpacing.lg
 
 @Composable
 internal fun <T> PositionPicker3x3Row(
@@ -41,8 +43,8 @@ internal fun <T> PositionPicker3x3Row(
             modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -52,15 +54,15 @@ internal fun <T> PositionPicker3x3Row(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Column(verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Column(verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             positions.chunked(GRID_ROW_COUNT).forEach { rowPositions ->
-                Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
                     rowPositions.forEach { position ->
                         val isSelected = position == selectedPosition
                         Box(
                             modifier =
                                 Modifier
-                                    .size(PairShotSpacing.iconSize)
+                                    .size(PairShotIconSize.md)
                                     .clip(MaterialTheme.shapes.extraSmall)
                                     .background(
                                         if (isSelected) {

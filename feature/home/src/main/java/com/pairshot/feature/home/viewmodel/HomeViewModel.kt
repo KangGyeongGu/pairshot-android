@@ -7,12 +7,16 @@ import com.pairshot.core.domain.album.CreateAlbumUseCase
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
+import com.pairshot.core.domain.membership.MembershipProvider
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.pair.ResolvePairNavigationTargetUseCase
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
+import com.pairshot.core.domain.tutorial.TutorialPairTracker
 import com.pairshot.core.infra.location.LocationProvider
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
@@ -27,6 +31,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -73,6 +79,7 @@ sealed interface HomeEvent {
 }
 
 @HiltViewModel
+@Suppress("LongParameterList")
 class HomeViewModel
     @Inject
     constructor(
@@ -87,7 +94,23 @@ class HomeViewModel
         private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
         private val locationProvider: LocationProvider,
         private val appSettingsRepository: AppSettingsRepository,
+        private val canCreatePairUseCase: CanCreatePairUseCase,
+        tutorialModeProvider: TutorialModeProvider,
+        tutorialPairTracker: TutorialPairTracker,
+        membershipProvider: MembershipProvider,
     ) : ViewModel() {
+        suspend fun isCameraEntryAllowed(): Boolean = canCreatePairUseCase() is CanCreatePairUseCase.Result.Allowed
+
+        val isProSubscriber: StateFlow<Boolean> =
+            membershipProvider
+                .observe()
+                .map { it.isPro }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                    initialValue = false,
+                )
+
         private val _isRefreshing = MutableStateFlow(false)
         val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
@@ -95,13 +118,17 @@ class HomeViewModel
         val mode: StateFlow<HomeMode> = _mode.asStateFlow()
 
         val pairs: StateFlow<List<PhotoPair>> =
-            photoPairRepository
-                .observeAll()
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                    initialValue = emptyList(),
-                )
+            combine(
+                photoPairRepository.observeAll(),
+                tutorialModeProvider.isActive,
+                tutorialPairTracker.trackedPairIds,
+            ) { all, tutorialActive, trackedIds ->
+                if (tutorialActive) all.filter { it.id in trackedIds } else all
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                initialValue = emptyList(),
+            )
 
         val albums: StateFlow<List<Album>> =
             albumRepository

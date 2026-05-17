@@ -32,7 +32,7 @@ class ShareSelectionUseCase
                 "at least one include option is required"
             }
 
-            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig()
+            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
 
             return exportRepository.buildShareablePayload(
                 pairIds = pairIds,

@@ -3,6 +3,8 @@ package com.pairshot.core.domain.settings
 import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.ExportPreset
+import com.pairshot.core.model.FlashMode
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
 
@@ -11,7 +13,7 @@ interface AppSettingsRepository {
 
     suspend fun getCurrent(): AppSettings
 
-    suspend fun updateJpegQuality(quality: Int)
+    suspend fun updateImageQuality(preset: ImageQualityPreset)
 
     suspend fun updateFileNamePrefix(prefix: String)
 
@@ -23,7 +25,7 @@ interface AppSettingsRepository {
 
     suspend fun updateCameraLevelEnabled(enabled: Boolean)
 
-    suspend fun updateCameraFlashMode(mode: String)
+    suspend fun updateCameraFlashMode(mode: FlashMode)
 
     suspend fun updateCameraNightMode(enabled: Boolean)
 

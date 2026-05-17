@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.ui.component.PairShotDialog
 import com.pairshot.feature.home.R
@@ -76,7 +77,7 @@ fun CreateAlbumDialog(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(PairShotSpacing.md))
                 OutlinedTextField(
                     value = albumName,
                     onValueChange = { albumName = it },

@@ -15,6 +15,7 @@ import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportPreset
 import com.pairshot.core.model.WatermarkConfig
+import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.text.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,10 +100,18 @@ class SelectionActionViewModel
             viewModelScope.launch {
                 runCatching { syncMissingSourcesUseCase() }
                     .onFailure { Timber.w(it, "syncMissingSources before share failed") }
+                val (preset, combine, watermark) = loadConfig()
+                if (watermark?.isContentMissing() == true) {
+                    _messages.emit(
+                        SelectionMessage.Warning(
+                            UiText.Resource(R.string.snackbar_warning_watermark_setup_required),
+                        ),
+                    )
+                    return@launch
+                }
                 val shareLabel = UiText.Resource(com.pairshot.R.string.progress_sharing)
                 _progress.value = Progress(shareLabel, 0, ids.size)
                 runCatching {
-                    val (preset, combine, watermark) = loadConfig()
                     val action =
                         shareSelectionUseCase(
                             pairIds = ids.toList(),
@@ -127,6 +136,14 @@ class SelectionActionViewModel
                 runCatching { syncMissingSourcesUseCase() }
                     .onFailure { Timber.w(it, "syncMissingSources before save failed") }
                 val (preset, combine, watermark) = loadConfig()
+                if (watermark?.isContentMissing() == true) {
+                    _messages.emit(
+                        SelectionMessage.Warning(
+                            UiText.Resource(R.string.snackbar_warning_watermark_setup_required),
+                        ),
+                    )
+                    return@launch
+                }
                 val hasWork =
                     runCatching {
                         hasSavableSelectionUseCase(ids.toList(), preset, watermark)

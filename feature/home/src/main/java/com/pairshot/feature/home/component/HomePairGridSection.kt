@@ -20,16 +20,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.pair.PairListItem
 import com.pairshot.core.domain.pair.buildPairListWithAds
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
 import com.pairshot.feature.home.R
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -88,17 +91,15 @@ fun HomePairGridSection(
                 )
             }
         }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint?.adFreeStatusProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint?.membershipProvider() }
     val poolProvider = remember(entryPoint) { entryPoint?.nativeAdPoolProvider() }
+    val adFreeFlow = remember(membershipProvider) { membershipProvider?.observe()?.map { it.isAdFree } }
 
     val isAdFree: Boolean? =
         if (isInspection) {
             true
         } else {
-            adFreeStatusProvider
-                ?.observeIsAdFree()
-                ?.collectAsStateWithLifecycle(initialValue = null)
-                ?.value
+            adFreeFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
         }
 
     val nativeAdPool = remember(poolProvider) { poolProvider?.get() }
@@ -117,6 +118,14 @@ fun HomePairGridSection(
             )
         }
     val totalAdSlots = remember(items) { items.count { it is PairListItem.Ad } }
+    val firstPairId =
+        remember(items) {
+            items
+                .filterIsInstance<PairListItem.Pair>()
+                .firstOrNull()
+                ?.pair
+                ?.id
+        }
 
     LaunchedEffect(totalAdSlots, isAdFree) {
         if (isAdFree == false && totalAdSlots > 0) {
@@ -128,8 +137,8 @@ fun HomePairGridSection(
         columns = GridCells.Fixed(2),
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
-        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
+        verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
     ) {
         var lastDate: LocalDate? = null
         items.forEach { entry ->
@@ -151,7 +160,7 @@ fun HomePairGridSection(
                                     Modifier
                                         .fillMaxWidth()
                                         .padding(
-                                            top = PairShotSpacing.iconTextGap,
+                                            top = PairShotSpacing.sm,
                                             bottom = PairShotSpacing.xs,
                                         ),
                             )
@@ -161,13 +170,22 @@ fun HomePairGridSection(
                         key = "pair_${pair.id}",
                         span = { GridItemSpan(1) },
                     ) {
-                        PairCard(
-                            pair = pair,
-                            isSelected = pair.id in selectedIds,
-                            isSelectionMode = selectionMode,
-                            onClick = { onPairClick(pair.id) },
-                            onLongPress = { onPairLongClick(pair.id) },
-                        )
+                        val anchorModifier =
+                            if (pair.id == firstPairId) {
+                                Modifier.tutorialAnchor(AnchorKey.HOME_PAIR_CARD_FIRST)
+                            } else {
+                                Modifier
+                            }
+                        androidx.compose.foundation.layout
+                            .Box(modifier = anchorModifier) {
+                                PairCard(
+                                    pair = pair,
+                                    isSelected = pair.id in selectedIds,
+                                    isSelectionMode = selectionMode,
+                                    onClick = { onPairClick(pair.id) },
+                                    onLongPress = { onPairLongClick(pair.id) },
+                                )
+                            }
                     }
                 }
 

@@ -8,12 +8,14 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.pairshot.core.ads.controller.AppOpenAdController
 import com.pairshot.core.ads.controller.InterstitialAdController
 import com.pairshot.core.ads.controller.RewardedAdController
-import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.lifecycle.AppOpenAdLifecycleObserver
-import com.pairshot.core.coupon.domain.CouponRepository
+import com.pairshot.core.billing.BillingRepository
+import com.pairshot.core.data.device.ExportMemoryThrottle
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
-import com.pairshot.feature.settings.theme.AppTheme
+import com.pairshot.core.model.AppTheme
+import com.pairshot.core.promotion.domain.PromotionRepository
+import com.pairshot.feature.settings.theme.apply
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,9 +32,6 @@ class PairShotApplication : Application() {
     lateinit var appSettingsRepository: AppSettingsRepository
 
     @Inject
-    lateinit var adsInitializer: AdsInitializer
-
-    @Inject
     lateinit var interstitialAdController: InterstitialAdController
 
     @Inject
@@ -45,10 +44,16 @@ class PairShotApplication : Application() {
     lateinit var appOpenAdLifecycleObserver: AppOpenAdLifecycleObserver
 
     @Inject
-    lateinit var couponRepository: CouponRepository
+    lateinit var promotionRepository: PromotionRepository
+
+    @Inject
+    lateinit var billingRepository: BillingRepository
 
     @Inject
     lateinit var syncMissingSourcesUseCase: SyncMissingSourcesUseCase
+
+    @Inject
+    lateinit var exportMemoryThrottle: ExportMemoryThrottle
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -58,17 +63,18 @@ class PairShotApplication : Application() {
             Timber.plant(Timber.DebugTree())
             installStrictMode()
         }
+        registerComponentCallbacks(exportMemoryThrottle)
         applicationScope.launch {
             val name = appSettingsRepository.appThemeNameFlow.first()
             AppTheme.fromName(name).apply()
         }
-        adsInitializer.initialize(this)
         interstitialAdController.preload()
         rewardedAdController.preload()
         appOpenAdController.preload()
         appOpenAdLifecycleObserver.register(this)
+        billingRepository.start()
         applicationScope.launch {
-            runCatching { withContext(Dispatchers.IO) { couponRepository.retryPendingIfAny() } }
+            runCatching { withContext(Dispatchers.IO) { promotionRepository.retryPendingIfAny() } }
         }
 
         registerForegroundObservers()
@@ -102,11 +108,15 @@ class PairShotApplication : Application() {
             object : DefaultLifecycleObserver {
                 override fun onStart(owner: LifecycleOwner) {
                     applicationScope.launch {
-                        runCatching { withContext(Dispatchers.IO) { couponRepository.syncStatus() } }
+                        runCatching { withContext(Dispatchers.IO) { promotionRepository.refresh() } }
                     }
                     applicationScope.launch {
                         runCatching { withContext(Dispatchers.IO) { syncMissingSourcesUseCase() } }
                             .onFailure { Timber.w(it, "syncMissingSources failed on app foreground") }
+                    }
+                    applicationScope.launch {
+                        runCatching { billingRepository.refresh() }
+                            .onFailure { Timber.w(it, "billing refresh failed on app foreground") }
                     }
                 }
             },

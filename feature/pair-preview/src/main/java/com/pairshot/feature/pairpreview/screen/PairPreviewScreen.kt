@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.designsystem.PairShotDialogTokens
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.ui.component.DeletePairConfirmDialog
@@ -45,12 +46,12 @@ fun PairPreviewScreen(
         Surface(
             modifier =
                 Modifier.size(
-                    width = PairShotSpacing.modalWidth,
-                    height = PairShotSpacing.modalHeight,
+                    width = PairShotDialogTokens.width,
+                    height = PairShotDialogTokens.height,
                 ),
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = PairShotSpacing.modalElevation,
+            shadowElevation = PairShotDialogTokens.elevation,
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 PairPreviewTopBar(

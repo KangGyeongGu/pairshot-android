@@ -50,25 +50,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.camera.R
 import kotlin.math.abs
 
-internal val BeforeStripHeight: Dp = 168.dp
+internal val BeforeStripHeight: Dp = CameraSpec.beforeStripHeight
 
-private val ACTIVE_CARD_WIDTH = 100.dp
-private val ACTIVE_CARD_HEIGHT = 134.dp
-private val CARD_SPACING = 8.dp
-private val FALLBACK_HORIZONTAL_PADDING = 20.dp
-private val PROGRESS_INDICATOR_HEIGHT = 28.dp
-private const val INACTIVE_SCALE = 0.85f
-private val INACTIVE_BORDER_WIDTH = 1.dp
-private val ACTIVE_BORDER_WIDTH = 3.dp
+private val ACTIVE_CARD_WIDTH = CameraSpec.beforeCardWidth
+private val ACTIVE_CARD_HEIGHT = CameraSpec.beforeCardHeight
+private val CARD_SPACING = CameraSpec.beforeCardSpacing
+private val FALLBACK_HORIZONTAL_PADDING = CameraSpec.beforeCardFallbackHPadding
+private val PROGRESS_INDICATOR_HEIGHT = PairShotIconSize.lg
+private const val INACTIVE_SCALE = CameraSpec.BEFORE_CARD_INACTIVE_SCALE
+private val INACTIVE_BORDER_WIDTH = PairShotStroke.hairline
+private val ACTIVE_BORDER_WIDTH = PairShotStroke.thick
 private const val TRANSFORM_ORIGIN_CENTER_X = 0.5f
 private const val TRANSFORM_ORIGIN_BOTTOM_Y = 1f
 private const val SCALE_ANIMATION_MS = 180
-private val CARD_CORNER_RADIUS = 10.dp
+private val CARD_CORNER_RADIUS = CameraSpec.beforeCardCornerRadius
 
 data class StripProgress(
     val completed: Int,

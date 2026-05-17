@@ -31,10 +31,12 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.pairshot.core.ads.config.AdsConfig
 import com.pairshot.core.ads.di.AdsEntryPoint
+import com.pairshot.core.designsystem.PairShotBanner
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
-val DefaultAdaptiveBannerFallbackHeight: Dp = 62.dp
+val DefaultAdaptiveBannerFallbackHeight: Dp = PairShotBanner.adaptiveFallbackHeight
 
 @Composable
 fun PairShotBannerAd(
@@ -54,11 +56,12 @@ fun PairShotBannerAd(
             )
         }
     val adsConfig = remember(entryPoint) { entryPoint.adsConfig() }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint.adFreeStatusProvider() }
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
+    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
+    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    val isAdFree: Boolean? by adFreeStatusProvider
-        .observeIsAdFree()
-        .collectAsStateWithLifecycle(initialValue = null)
+    val tutorialMode = remember(entryPoint) { entryPoint.tutorialModeProvider() }
+    val isTutorial by tutorialMode.isActive.collectAsStateWithLifecycle()
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -81,7 +84,7 @@ fun PairShotBannerAd(
         return
     }
 
-    if (isAdFree == true) return
+    if (isAdFree == true || isTutorial) return
 
     val adView =
         remember(context, adsConfig, adWidth) {
@@ -140,7 +143,7 @@ private fun resolveAdaptiveBannerHeight(
     density: Density,
 ): Dp {
     if (activity == null) return DefaultAdaptiveBannerFallbackHeight
-    val adSize = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp)
+    val adSize = AdSize.getInlineAdaptiveBannerAdSize(widthDp, BANNER_MAX_HEIGHT_DP)
     val heightPx = adSize.getHeightInPixels(activity)
     if (heightPx <= 0) return DefaultAdaptiveBannerFallbackHeight
     return with(density) { heightPx.toDp() }
@@ -151,13 +154,7 @@ private fun buildAdView(
     adsConfig: AdsConfig,
     widthDp: Int,
 ): AdView {
-    val activity = context.asActivityOrNull()
-    val adSize =
-        if (activity != null) {
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp)
-        } else {
-            AdSize.BANNER
-        }
+    val adSize = AdSize.getInlineAdaptiveBannerAdSize(widthDp, BANNER_MAX_HEIGHT_DP)
     return AdView(context).apply {
         layoutParams =
             ViewGroup.LayoutParams(
@@ -178,3 +175,5 @@ private tailrec fun Context.asActivityOrNull(): Activity? =
     }
 
 private const val TAG = "PairShotBannerAd"
+
+private const val BANNER_MAX_HEIGHT_DP = 60

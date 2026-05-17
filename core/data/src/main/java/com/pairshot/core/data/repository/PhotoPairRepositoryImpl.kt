@@ -11,6 +11,8 @@ import com.pairshot.core.database.entity.toEntity
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.pair.PrunePairResult
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
+import com.pairshot.core.domain.tutorial.TutorialPairTracker
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.model.PhotoPair
@@ -36,6 +38,8 @@ class PhotoPairRepositoryImpl
         private val mediaSourceVerifier: MediaSourceVerifier,
         private val fileNameGenerator: FileNameGenerator,
         private val appSettingsRepository: AppSettingsRepository,
+        private val tutorialMode: TutorialModeProvider,
+        private val tutorialPairTracker: TutorialPairTracker,
     ) : PhotoPairRepository {
         override fun observeAll(): Flow<List<PhotoPair>> =
             photoPairDao.observeAllWithCounts().map { entities ->
@@ -138,17 +142,21 @@ class PhotoPairRepositoryImpl
 
         override suspend fun delete(pair: PhotoPair) {
             withContext(Dispatchers.IO) {
-                pair.beforePhotoUri?.let {
-                    deleteGalleryUriLogOnFailure(it, "before delete failed during pair removal")
+                pair.beforePhotoUri?.let { uri ->
+                    runCatching { deleteGalleryUriLogOnFailure(uri, "before delete failed during pair removal") }
+                        .onFailure { Timber.w(it, "before gallery delete threw: %s", uri) }
                 }
-                pair.afterPhotoUri?.let {
-                    deleteGalleryUriLogOnFailure(it, "after delete failed during pair removal")
+                pair.afterPhotoUri?.let { uri ->
+                    runCatching { deleteGalleryUriLogOnFailure(uri, "after delete failed during pair removal") }
+                        .onFailure { Timber.w(it, "after gallery delete threw: %s", uri) }
                 }
                 photoPairDao.delete(pair.toEntity())
             }
         }
 
         override fun countAll(): Flow<Int> = photoPairDao.countAll()
+
+        override fun countCreatedSince(sinceEpochMs: Long): Flow<Int> = photoPairDao.countCreatedSince(sinceEpochMs)
 
         override suspend fun saveBeforePhoto(
             tempFileUri: String,
@@ -157,22 +165,28 @@ class PhotoPairRepositoryImpl
             aspectRatio: AspectRatio?,
         ): Long =
             withContext(Dispatchers.IO) {
+                val tutorialActive = tutorialMode.isActive.value
+                val savedUriString: String
                 try {
-                    val sequenceNumber = (photoPairDao.getMaxId() ?: 0L).plus(1L).toInt()
-
-                    val prefix = appSettingsRepository.getCurrent().fileNamePrefix
-                    val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
-
-                    val savedUri =
-                        mediaStoreManager.saveToGallery(
-                            tempFileUri = Uri.parse(tempFileUri),
-                            subfolder = "",
-                            displayName = fileName,
-                        )
+                    savedUriString =
+                        if (tutorialActive) {
+                            tutorialPairTracker.registerTempFile(tempFileUri)
+                            tempFileUri
+                        } else {
+                            val sequenceNumber = (photoPairDao.getMaxId() ?: 0L).plus(1L).toInt()
+                            val prefix = appSettingsRepository.getCurrent().fileNamePrefix
+                            val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
+                            mediaStoreManager
+                                .saveToGallery(
+                                    tempFileUri = Uri.parse(tempFileUri),
+                                    subfolder = "",
+                                    displayName = fileName,
+                                ).toString()
+                        }
 
                     val entity =
                         PhotoPairEntity(
-                            beforePhotoUri = savedUri.toString(),
+                            beforePhotoUri = savedUriString,
                             beforeTimestamp = System.currentTimeMillis(),
                             status = PairStatus.BEFORE_ONLY.name,
                             zoomLevel = zoomLevel,
@@ -188,16 +202,17 @@ class PhotoPairRepositoryImpl
                                 ),
                             )
                         }
+                        if (tutorialActive) tutorialPairTracker.registerPair(pairId)
                         pairId
                     } catch (e: SQLiteException) {
-                        deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE rollback failed")
+                        if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
                         throw e
                     } catch (e: IllegalStateException) {
-                        deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE rollback failed")
+                        if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
                         throw e
                     }
                 } finally {
-                    deleteTempFile(tempFileUri)
+                    if (!tutorialActive) deleteTempFile(tempFileUri)
                 }
             }
 
@@ -205,42 +220,52 @@ class PhotoPairRepositoryImpl
             pairId: Long,
             tempFileUri: String,
         ) = withContext(Dispatchers.IO) {
+            val tutorialActive = tutorialMode.isActive.value
             try {
                 val entity =
                     photoPairDao.getById(pairId)
                         ?: throw IllegalArgumentException("PhotoPair not found: $pairId")
 
-                entity.afterPhotoUri?.let { deleteGalleryUriLogOnFailure(it, "previous After photo delete failed") }
+                if (!tutorialActive) {
+                    entity.afterPhotoUri?.let {
+                        deleteGalleryUriLogOnFailure(it, "previous After photo delete failed")
+                    }
+                }
 
-                val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
-                val prefix = appSettingsRepository.getCurrent().fileNamePrefix
-                val fileName = fileNameGenerator.generateAfterFileName(sequenceNumber, prefix)
-
-                val savedUri =
-                    mediaStoreManager.saveToGallery(
-                        tempFileUri = Uri.parse(tempFileUri),
-                        subfolder = "",
-                        displayName = fileName,
-                    )
+                val savedUriString: String =
+                    if (tutorialActive) {
+                        tutorialPairTracker.registerTempFile(tempFileUri)
+                        tempFileUri
+                    } else {
+                        val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
+                        val prefix = appSettingsRepository.getCurrent().fileNamePrefix
+                        val fileName = fileNameGenerator.generateAfterFileName(sequenceNumber, prefix)
+                        mediaStoreManager
+                            .saveToGallery(
+                                tempFileUri = Uri.parse(tempFileUri),
+                                subfolder = "",
+                                displayName = fileName,
+                            ).toString()
+                    }
 
                 try {
                     val now = System.currentTimeMillis()
                     photoPairDao.update(
                         entity.copy(
-                            afterPhotoUri = savedUri.toString(),
+                            afterPhotoUri = savedUriString,
                             afterTimestamp = now,
                             status = PairStatus.PAIRED.name,
                         ),
                     )
                 } catch (e: SQLiteException) {
-                    deleteGalleryUriLogOnFailure(savedUri.toString(), "AFTER rollback failed")
+                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
                     throw e
                 } catch (e: IllegalStateException) {
-                    deleteGalleryUriLogOnFailure(savedUri.toString(), "AFTER rollback failed")
+                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
                     throw e
                 }
             } finally {
-                deleteTempFile(tempFileUri)
+                if (!tutorialActive) deleteTempFile(tempFileUri)
             }
         }
 

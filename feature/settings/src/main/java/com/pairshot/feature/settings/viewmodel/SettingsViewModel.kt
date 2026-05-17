@@ -2,17 +2,21 @@ package com.pairshot.feature.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.AppInfo
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.ClearCacheUseCase
 import com.pairshot.core.domain.settings.GetStorageInfoUseCase
 import com.pairshot.core.domain.settings.WatermarkRepository
+import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTheme
+import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.settings.R
-import com.pairshot.feature.settings.theme.AppTheme
+import com.pairshot.feature.settings.theme.apply
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,10 +41,10 @@ sealed interface SettingsUiState {
         val usedStorageBytes: Long,
         val cacheBytes: Long,
         val appVersion: String,
-        val jpegQuality: Int = 85,
-        val fileNamePrefix: String = "PAIRSHOT",
+        val imageQuality: ImageQualityPreset = ImageQualityPreset.DEFAULT,
+        val fileNamePrefix: String = AppSettings.DEFAULT_FILE_NAME_PREFIX,
         val overlayEnabled: Boolean = true,
-        val overlayAlpha: Float = 0.35f,
+        val overlayAlpha: Float = AppSettings.DEFAULT_OVERLAY_ALPHA,
     ) : SettingsUiState
 
     data class Error(
@@ -57,18 +61,29 @@ class SettingsViewModel
         private val watermarkRepository: WatermarkRepository,
         private val appSettingsRepository: AppSettingsRepository,
         private val appInfo: AppInfo,
+        membershipProvider: MembershipProvider,
     ) : ViewModel() {
-        private val _storageState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
+        val isProSubscriber: StateFlow<Boolean> =
+            membershipProvider
+                .observe()
+                .map { it.isPro }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+                    initialValue = false,
+                )
+
+        private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
 
         val uiState: StateFlow<SettingsUiState> =
             combine(
-                _storageState,
+                _uiState,
                 appSettingsRepository.settingsFlow,
             ) { storageState, appSettings ->
                 when (storageState) {
                     is SettingsUiState.Success -> {
                         storageState.copy(
-                            jpegQuality = appSettings.jpegQuality,
+                            imageQuality = appSettings.imageQuality,
                             fileNamePrefix = appSettings.fileNamePrefix,
                             overlayEnabled = appSettings.overlayEnabled,
                             overlayAlpha = appSettings.defaultOverlayAlpha,
@@ -127,7 +142,7 @@ class SettingsViewModel
             viewModelScope.launch {
                 try {
                     val info = getStorageInfoUseCase()
-                    _storageState.update {
+                    _uiState.update {
                         SettingsUiState.Success(
                             usedStorageBytes = info.usedBytes,
                             cacheBytes = info.cacheBytes,
@@ -135,7 +150,7 @@ class SettingsViewModel
                         )
                     }
                 } catch (_: Exception) {
-                    _storageState.value =
+                    _uiState.value =
                         SettingsUiState.Error(UiText.Resource(R.string.settings_error_load_failed))
                 }
             }
@@ -175,6 +190,7 @@ class SettingsViewModel
                     val path = watermarkRepository.saveLogoFile(uri)
                     val current = watermarkConfig.value
                     watermarkRepository.saveConfig(current.copy(logoPath = path))
+                    watermarkRepository.pruneOldLogoFiles(keepPath = path)
                 } catch (_: Exception) {
                     _snackbarMessage.emit(
                         SnackbarEvent(
@@ -186,9 +202,17 @@ class SettingsViewModel
             }
         }
 
-        fun updateJpegQuality(quality: Int) {
+        fun removeLogo() {
             viewModelScope.launch {
-                appSettingsRepository.updateJpegQuality(quality)
+                watermarkRepository.removeLogoFile()
+                val current = watermarkConfig.value
+                watermarkRepository.saveConfig(current.copy(logoPath = ""))
+            }
+        }
+
+        fun updateImageQuality(preset: ImageQualityPreset) {
+            viewModelScope.launch {
+                appSettingsRepository.updateImageQuality(preset)
             }
         }
 

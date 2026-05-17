@@ -55,6 +55,7 @@
 
     <!-- Snackbar: Warning -->
     <string name="snackbar_warning_nothing_to_save">No new images to save</string>
+    <string name="snackbar_warning_watermark_setup_required">Please complete watermark setup first</string>
 
     <!-- Snackbar: Error -->
     <string name="snackbar_error_capture_failed">Capture failed. Please try again</string>

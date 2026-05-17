@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.pairshot.arch
 
 import com.pairshot.arch.config.DoNotIncludeAndroidGenerated

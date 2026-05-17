@@ -40,7 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.PairShotTouchTarget
 import kotlin.math.abs
 
 private const val SWITCH_SCALE = 0.67f
@@ -58,7 +61,7 @@ fun SettingsSectionLabel(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .padding(horizontal = PairShotSpacing.iconTextGap),
+                    .padding(horizontal = PairShotSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -76,7 +79,7 @@ fun SettingsSectionLabel(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = PairShotSpacing.iconTextGap),
+                .padding(horizontal = PairShotSpacing.sm),
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -90,13 +93,13 @@ fun WarningBadge(
     val warningColor = LocalPairShotExtendedColors.current.warning
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = Icons.Outlined.ErrorOutline,
             contentDescription = null,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(PairShotSpacing.lg),
             tint = warningColor,
         )
         Text(
@@ -136,8 +139,8 @@ fun SettingsItem(
                 .fillMaxWidth()
                 .then(
                     if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
-                ).height(PairShotSpacing.inputRow)
-                .padding(horizontal = PairShotSpacing.cardPadding),
+                ).height(PairShotTouchTarget.large)
+                .padding(horizontal = PairShotCard.innerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -175,8 +178,8 @@ fun SettingsSwitchItem(
                 .fillMaxWidth()
                 .then(
                     if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier,
-                ).height(PairShotSpacing.inputRow)
-                .padding(horizontal = PairShotSpacing.cardPadding),
+                ).height(PairShotTouchTarget.large)
+                .padding(horizontal = PairShotCard.innerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -230,8 +233,8 @@ fun SettingsSliderItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
     ) {
         Row(
@@ -264,7 +267,7 @@ fun SettingsSliderItem(
             thumb = {
                 SliderDefaults.Thumb(
                     interactionSource = interactionSource,
-                    thumbSize = DpSize(1.dp, 16.dp),
+                    thumbSize = DpSize(PairShotStroke.hairline, PairShotSpacing.lg),
                 )
             },
             track = { sliderState ->
@@ -283,7 +286,7 @@ fun SettingsSliderItem(
 @Composable
 fun SettingsDivider() {
     HorizontalDivider(
-        modifier = Modifier.padding(horizontal = PairShotSpacing.cardPadding),
+        modifier = Modifier.padding(horizontal = PairShotCard.innerPadding),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 }

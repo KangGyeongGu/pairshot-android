@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType
 import com.pairshot.core.ui.component.SettingsCard
@@ -96,15 +100,17 @@ internal fun WatermarkTextSection(
 @Composable
 internal fun WatermarkTypeItem(
     selectedType: WatermarkType,
+    isProSubscriber: Boolean,
     onTypeChange: (WatermarkType) -> Unit,
+    onProLocked: () -> Unit,
 ) {
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -114,9 +120,10 @@ internal fun WatermarkTypeItem(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
             WatermarkType.entries.forEach { type ->
                 val isSelected = type == selectedType
+                val isLocked = type == WatermarkType.LOGO && !isProSubscriber
                 Box(
                     modifier =
                         Modifier
@@ -127,30 +134,37 @@ internal fun WatermarkTypeItem(
                                 } else {
                                     Color.Transparent
                                 },
-                            ).clickable { onTypeChange(type) }
-                            .padding(
-                                horizontal = PairShotSpacing.itemGap,
-                                vertical = PairShotSpacing.iconTextGap,
+                            ).clickable {
+                                if (isLocked) onProLocked() else onTypeChange(type)
+                            }.padding(
+                                horizontal = PairShotSpacing.md,
+                                vertical = PairShotSpacing.sm,
                             ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text =
-                            when (type) {
-                                WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
-                                WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
-                            },
-                        style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
-                        color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text =
+                                when (type) {
+                                    WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
+                                    WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
+                                },
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                ),
+                            color =
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                        )
+                        if (isLocked) {
+                            Spacer(modifier = Modifier.width(PairShotSpacing.sm))
+                            PairShotProBadge()
+                        }
+                    }
                 }
             }
         }
@@ -190,8 +204,8 @@ private fun WatermarkTextItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = PairShotSpacing.cardPadding,
-                    vertical = PairShotSpacing.cardPadding,
+                    horizontal = PairShotCard.innerPadding,
+                    vertical = PairShotCard.innerPadding,
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -235,8 +249,8 @@ private fun WatermarkTextItem(
                         innerTextField()
                     }
                     if (isFocused) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        HorizontalDivider(color = dividerColor, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
+                        HorizontalDivider(color = dividerColor, thickness = PairShotStroke.hairline)
                     }
                 }
             },

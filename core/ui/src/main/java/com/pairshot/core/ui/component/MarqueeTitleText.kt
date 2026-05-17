@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 
 @Composable
 fun MarqueeTitleText(
@@ -25,7 +26,7 @@ fun MarqueeTitleText(
                 iterations = Int.MAX_VALUE,
                 animationMode = MarqueeAnimationMode.Immediately,
                 repeatDelayMillis = 1_200,
-                velocity = 30.dp,
+                velocity = PairShotSpacing.xxl,
             ),
     )
 }

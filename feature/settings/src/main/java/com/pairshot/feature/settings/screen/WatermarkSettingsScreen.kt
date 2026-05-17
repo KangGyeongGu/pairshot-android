@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.designsystem.PairShotCard
+import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.WatermarkType
@@ -42,9 +44,12 @@ import com.pairshot.core.ui.R as CoreR
 @Composable
 fun WatermarkSettingsScreen(
     watermarkConfig: WatermarkConfig,
+    isProSubscriber: Boolean,
     onWatermarkConfigChange: (WatermarkConfig) -> Unit,
     onSelectLogo: () -> Unit,
+    onRemoveLogo: () -> Unit,
     onNavigateBack: () -> Unit,
+    onProLocked: () -> Unit,
     watermarkRenderer: WatermarkRenderer,
     previewSampleProvider: PreviewSampleProvider,
 ) {
@@ -84,13 +89,13 @@ fun WatermarkSettingsScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
                     PaddingValues(
-                        horizontal = PairShotSpacing.screenPadding,
-                        vertical = PairShotSpacing.cardPadding,
+                        horizontal = PairShotScreen.horizontalPadding,
+                        vertical = PairShotCard.innerPadding,
                     ),
             ) {
                 item(key = "label_basic") {
                     SettingsSectionLabel(label = stringResource(R.string.watermark_section_basic))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                 }
 
                 item(key = "card_basic") {
@@ -105,9 +110,11 @@ fun WatermarkSettingsScreen(
                         SettingsDivider()
                         WatermarkTypeItem(
                             selectedType = watermarkConfig.type,
+                            isProSubscriber = isProSubscriber,
                             onTypeChange = { type ->
                                 onWatermarkConfigChange(watermarkConfig.copy(type = type))
                             },
+                            onProLocked = onProLocked,
                         )
                     }
                 }
@@ -116,12 +123,12 @@ fun WatermarkSettingsScreen(
 
                 if (watermarkConfig.type == WatermarkType.TEXT) {
                     item(key = "label_text") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(
                             label = stringResource(R.string.watermark_item_text_settings),
                             trailingWarning = if (showWarning) stringResource(R.string.settings_warning_required) else null,
                         )
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "card_text") {
                         WatermarkTextSection(
@@ -133,32 +140,33 @@ fun WatermarkSettingsScreen(
 
                 if (watermarkConfig.type == WatermarkType.LOGO) {
                     item(key = "label_logo") {
-                        Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(
                             label = stringResource(R.string.watermark_item_logo_settings),
                             trailingWarning = if (showWarning) stringResource(R.string.settings_warning_required) else null,
                         )
-                        Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "card_logo") {
                         WatermarkLogoSection(
                             watermarkConfig = watermarkConfig,
                             onWatermarkConfigChange = onWatermarkConfigChange,
                             onSelectLogo = onSelectLogo,
+                            onRemoveLogo = onRemoveLogo,
                         )
                     }
                 }
 
                 item(key = "wm_preview") {
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                     SettingsSectionLabel(label = stringResource(R.string.watermark_section_preview))
-                    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     WatermarkPreviewSection(
                         config = watermarkConfig,
                         watermarkRenderer = watermarkRenderer,
                         previewSampleProvider = previewSampleProvider,
                     )
-                    Spacer(modifier = Modifier.height(PairShotSpacing.sectionGap))
+                    Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                 }
             }
         }

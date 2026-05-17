@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 import com.pairshot.core.ui.R as CoreR
 
@@ -28,7 +29,7 @@ fun AlbumEmptyActions(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
         ) {
             Button(
                 onClick = onCaptureBeforeClick,

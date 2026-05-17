@@ -5,6 +5,7 @@ import com.pairshot.core.data.repository.AppSettingsRepositoryImpl
 import com.pairshot.core.data.repository.CombineSettingsRepositoryImpl
 import com.pairshot.core.data.repository.ExportHistoryRepositoryImpl
 import com.pairshot.core.data.repository.ExportRepositoryImpl
+import com.pairshot.core.data.repository.OnboardingStateRepositoryImpl
 import com.pairshot.core.data.repository.PhotoPairRepositoryImpl
 import com.pairshot.core.data.repository.StorageRepositoryImpl
 import com.pairshot.core.data.repository.WatermarkRepositoryImpl
@@ -14,6 +15,7 @@ import com.pairshot.core.domain.combine.ExportHistoryRepository
 import com.pairshot.core.domain.export.ExportRepository
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.settings.OnboardingStateRepository
 import com.pairshot.core.domain.settings.StorageRepository
 import com.pairshot.core.domain.settings.WatermarkRepository
 import dagger.Binds
@@ -44,6 +46,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAppSettingsRepository(impl: AppSettingsRepositoryImpl): AppSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOnboardingStateRepository(impl: OnboardingStateRepositoryImpl): OnboardingStateRepository
 
     @Binds
     @Singleton

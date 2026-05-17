@@ -13,6 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.domain.tutorial.AnchorKey
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 
 @Composable
 fun HomePrimaryActionBar(
@@ -23,21 +27,21 @@ fun HomePrimaryActionBar(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
     ) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = PairShotSpacing.lg, vertical = PairShotSpacing.md),
         ) {
             Button(
                 onClick = onClick,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
+                        .height(PairShotButton.primaryActionHeight)
+                        .tutorialAnchor(AnchorKey.HOME_SHOOT_BUTTON),
                 shape = MaterialTheme.shapes.medium,
                 colors =
                     ButtonDefaults.buttonColors(

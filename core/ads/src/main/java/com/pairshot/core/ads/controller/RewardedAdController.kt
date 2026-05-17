@@ -7,9 +7,11 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.pairshot.core.ads.config.AdsConfig
+import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.ads.premium.SettingsPremiumGate
-import com.pairshot.core.domain.coupon.AdFreeStatusProvider
+import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.premium.PremiumFeature
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,8 +28,10 @@ class RewardedAdController
     constructor(
         @ApplicationContext private val context: Context,
         private val adsConfig: AdsConfig,
-        private val adFreeStatusProvider: AdFreeStatusProvider,
+        private val adsInitializer: AdsInitializer,
+        private val membershipProvider: MembershipProvider,
         private val gate: SettingsPremiumGate,
+        private val tutorialMode: TutorialModeProvider,
         private val fullscreenAdState: FullscreenAdState,
     ) {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -38,9 +42,7 @@ class RewardedAdController
         private var currentAd: RewardedAd? = null
 
         fun preload() {
-            scope.launch {
-                if (!adFreeStatusProvider.currentIsAdFree()) loadInternal()
-            }
+            scope.launch { loadInternal() }
         }
 
         fun showIfAvailable(
@@ -50,12 +52,16 @@ class RewardedAdController
             onSkip: () -> Unit,
         ) {
             scope.launch {
+                if (tutorialMode.isActive.value) {
+                    onReward()
+                    return@launch
+                }
                 if (gate.isUnlocked(feature)) {
                     onReward()
                     return@launch
                 }
 
-                if (adFreeStatusProvider.currentIsAdFree()) {
+                if (membershipProvider.current().isAdFree) {
                     gate.unlock(feature)
                     onReward()
                     return@launch
@@ -95,13 +101,13 @@ class RewardedAdController
                             currentAd = null
                             showing.set(false)
                             if (rewarded) onReward() else onSkip()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShowFailed = {
                             currentAd = null
                             showing.set(false)
                             onSkip()
-                            loadInternal()
+                            scope.launch { loadInternal() }
                         },
                         onShown = { currentAd = null },
                     )
@@ -116,14 +122,15 @@ class RewardedAdController
                     currentAd = null
                     showing.set(false)
                     onSkip()
-                    loadInternal()
+                    scope.launch { loadInternal() }
                 }
             }
         }
 
-        private fun loadInternal() {
+        private suspend fun loadInternal() {
             if (currentAd != null) return
             if (!loading.compareAndSet(false, true)) return
+            adsInitializer.awaitReady()
             val request = AdRequest.Builder().build()
             RewardedAd.load(
                 context,

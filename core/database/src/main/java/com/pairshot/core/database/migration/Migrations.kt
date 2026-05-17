@@ -3,13 +3,6 @@ package com.pairshot.core.database.migration
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-// Manual table-rebuild migrations must:
-//   1. copy the CREATE statement verbatim from schemas/<targetVersion>.json's createSql
-//      (every token incl. NOT NULL / DEFAULT) — never re-type by hand
-//   2. wrap the body with PRAGMA foreign_keys=OFF/ON to protect FK references during
-//      DROP+RENAME
-//   3. assert PRAGMA foreign_key_check at the end
-
 val MIGRATION_1_2: Migration =
     object : Migration(1, 2) {
         override fun migrate(db: SupportSQLiteDatabase) {

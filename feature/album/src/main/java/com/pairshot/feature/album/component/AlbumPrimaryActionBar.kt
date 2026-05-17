@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotButton
+import com.pairshot.core.designsystem.PairShotSpacing
 
 @Composable
 fun AlbumPrimaryActionBar(
@@ -23,21 +25,20 @@ fun AlbumPrimaryActionBar(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
     ) {
         Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = PairShotSpacing.lg, vertical = PairShotSpacing.md),
         ) {
             Button(
                 onClick = onClick,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
+                        .height(PairShotButton.primaryActionHeight),
                 shape = MaterialTheme.shapes.medium,
                 colors =
                     ButtonDefaults.buttonColors(

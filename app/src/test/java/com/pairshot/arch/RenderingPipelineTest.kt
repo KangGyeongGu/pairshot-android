@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.pairshot.arch
 
 import com.pairshot.arch.config.DoNotIncludeAndroidGenerated
@@ -42,4 +44,16 @@ class RenderingPipelineTest {
                     override fun test(clazz: JavaClass): Boolean = clazz.fullName == "android.graphics.BitmapFactory"
                 },
             ).because("Bitmap decoding must go through central loader in core/util — not in feature code")
+
+    @ArchTest
+    val `R-03 camera2 is only allowed inside core rendering`: ArchRule =
+        noClasses()
+            .that()
+            .resideOutsideOfPackage("com.pairshot.core.rendering..")
+            .should()
+            .dependOnClassesThat(
+                object : DescribedPredicate<JavaClass>("are android.hardware.camera2.*") {
+                    override fun test(clazz: JavaClass): Boolean = clazz.packageName == "android.hardware.camera2"
+                },
+            ).because("camera2 is forbidden outside core/rendering interop helpers (CLAUDE.md invariant)")
 }

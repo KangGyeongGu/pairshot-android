@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.camerax.compose)
     implementation(libs.camerax.extensions)
     implementation(libs.concurrent.futures.ktx)
+    implementation(libs.exifinterface)
 
     implementation(libs.play.services.location)
 

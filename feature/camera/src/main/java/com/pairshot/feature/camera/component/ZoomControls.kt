@@ -48,12 +48,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
+import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotRadius
+import com.pairshot.core.designsystem.PairShotScreen
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotStroke
+import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.feature.camera.R
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private val LensButtonSize = 36.dp
-private val LensButtonIconSize = 18.dp
+private val LensButtonSize = CameraSpec.lensButtonSize
+private val LensButtonIconSize = CameraSpec.lensButtonIconSize
 private const val ZOOM_DRAG_MIN_DELTA = 0.05f
 private const val ZOOM_DIAL_RANGE_SPAN_DP = 300f
 private const val ZOOM_RANGE_MIN_SPAN = 0.01f
@@ -170,7 +176,7 @@ fun ZoomControls(
                 modifier =
                     Modifier
                         .align(Alignment.CenterEnd)
-                        .padding(end = 12.dp),
+                        .padding(end = PairShotSpacing.md),
             ) {
                 Box(
                     modifier =
@@ -213,8 +219,8 @@ private fun ZoomPresetCard(
                 .background(
                     color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
                     shape = shape,
-                ).padding(horizontal = 4.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                ).padding(horizontal = PairShotSpacing.xs, vertical = PairShotSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(PairShotStroke.thin),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         zoomUiState.presetRatios.forEach { preset ->
@@ -226,10 +232,10 @@ private fun ZoomPresetCard(
             Box(
                 modifier =
                     Modifier
-                        .height(28.dp)
+                        .height(PairShotIconSize.lg)
                         .background(color = bgColor, shape = shape)
                         .clickable { onPresetTapped(preset) }
-                        .padding(horizontal = 10.dp),
+                        .padding(horizontal = PairShotSpacing.md),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -254,7 +260,7 @@ private fun ZoomDialWithLabel(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(PairShotStroke.thin),
     ) {
         Box(
             modifier =
@@ -262,7 +268,7 @@ private fun ZoomDialWithLabel(
                     .background(
                         color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
                         shape = MaterialTheme.shapes.small,
-                    ).padding(horizontal = 10.dp, vertical = 4.dp),
+                    ).padding(horizontal = PairShotSpacing.md, vertical = PairShotSpacing.xs),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -277,7 +283,7 @@ private fun ZoomDialWithLabel(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(20.dp),
+                    .height(PairShotScreen.horizontalPadding),
         ) {
             val centerX = size.width / 2f
             val canvasH = size.height
@@ -300,9 +306,9 @@ private fun ZoomDialWithLabel(
 
                 val isMajor = i % ZOOM_MAJOR_TICK_INTERVAL == 0
                 val tickHeightPx =
-                    if (isMajor) with(density) { 12.dp.toPx() } else with(density) { 6.dp.toPx() }
+                    if (isMajor) with(density) { PairShotSpacing.md.toPx() } else with(density) { PairShotRadius.sm.toPx() }
                 val tickWidthPx =
-                    if (isMajor) with(density) { 2.dp.toPx() } else with(density) { 1.dp.toPx() }
+                    if (isMajor) with(density) { PairShotStroke.thin.toPx() } else with(density) { PairShotStroke.hairline.toPx() }
                 val tickColor = if (isMajor) PairShotCameraTokens.Foreground else PairShotCameraTokens.Foreground.copy(alpha = 0.5f)
                 val topY = canvasH - tickHeightPx
 
@@ -314,8 +320,8 @@ private fun ZoomDialWithLabel(
                 )
             }
 
-            val indicatorH = with(density) { 18.dp.toPx() }
-            val indicatorW = with(density) { 2.dp.toPx() }
+            val indicatorH = with(density) { PairShotSpacing.lg.toPx() }
+            val indicatorW = with(density) { PairShotStroke.thin.toPx() }
             drawLine(
                 color = primaryColor,
                 start = Offset(centerX, canvasH - indicatorH),

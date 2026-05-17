@@ -2,8 +2,6 @@ package com.pairshot.feature.settings.route
 
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,10 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -22,27 +18,27 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.adsui.component.RewardedGateDialog
-import com.pairshot.core.coupon.domain.CouponStatus
-import com.pairshot.core.coupon.ui.CouponActivationUiState
-import com.pairshot.core.coupon.ui.CouponRegisterDialog
-import com.pairshot.core.coupon.ui.CouponStatusItem
-import com.pairshot.core.coupon.ui.CouponViewModel
-import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.domain.premium.PremiumFeature
+import com.pairshot.core.domain.tutorial.TutorialReplayController
 import com.pairshot.core.navigation.SettingsHighlight
+import com.pairshot.core.promotion.ui.PromotionRegisterDialog
+import com.pairshot.core.promotion.ui.PromotionViewModel
 import com.pairshot.core.ui.component.PairShotSnackbarController
-import com.pairshot.core.ui.component.SettingsCard
-import com.pairshot.core.ui.component.SettingsSectionLabel
 import com.pairshot.core.ui.component.SnackbarEvent
 import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.settings.BuildConfig
+import com.pairshot.feature.settings.R
+import com.pairshot.feature.settings.component.ProSubscriptionSection
 import com.pairshot.feature.settings.screen.SettingsScreen
 import com.pairshot.feature.settings.viewmodel.SettingsViewModel
+import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsEvent
+import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
-import com.pairshot.core.coupon.R as CouponR
 
 @Composable
 fun SettingsRoute(
@@ -50,17 +46,19 @@ fun SettingsRoute(
     onNavigateToLicense: () -> Unit,
     onNavigateToWatermarkSettings: () -> Unit,
     onNavigateToCombineSettings: () -> Unit,
+    onNavigateToPaywall: () -> Unit,
     highlight: SettingsHighlight? = null,
     viewModel: SettingsViewModel = hiltViewModel(),
-    couponViewModel: CouponViewModel = hiltViewModel(),
+    promotionViewModel: PromotionViewModel = hiltViewModel(),
+    subscriptionViewModel: SubscriptionSettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
     val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
-    val couponStatus by couponViewModel.status.collectAsStateWithLifecycle()
-    val activationState by couponViewModel.activationState.collectAsStateWithLifecycle()
-    val myCoupons by couponViewModel.myCoupons.collectAsStateWithLifecycle()
-    val myCouponsLoading by couponViewModel.myCouponsLoading.collectAsStateWithLifecycle()
+    val activationState by promotionViewModel.activationState.collectAsStateWithLifecycle()
+    val myPromotions by promotionViewModel.myPromotions.collectAsStateWithLifecycle()
+    val myPromotionsLoading by promotionViewModel.myPromotionsLoading.collectAsStateWithLifecycle()
+    val subscriptionState by subscriptionViewModel.state.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
@@ -76,40 +74,27 @@ fun SettingsRoute(
         }
     val rewardedAdController = remember(entryPoint) { entryPoint.rewardedAdController() }
     val settingsPremiumGate = remember(entryPoint) { entryPoint.settingsPremiumGate() }
-    val adFreeStatusProvider = remember(entryPoint) { entryPoint.adFreeStatusProvider() }
-    val isAdFree by adFreeStatusProvider
-        .observeIsAdFree()
-        .collectAsStateWithLifecycle(initialValue = false)
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
+    val adsInitializer = remember(entryPoint) { entryPoint.adsInitializer() }
+    val tutorialEntryPoint =
+        remember(context) {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                SettingsTutorialEntryPoint::class.java,
+            )
+        }
+    val tutorialReplay: TutorialReplayController =
+        remember(tutorialEntryPoint) { tutorialEntryPoint.tutorialReplayController() }
+    val isProFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isPro } }
+    val isPro by isProFlow.collectAsStateWithLifecycle(initialValue = false)
+    val showAdsConsent by adsInitializer.privacyOptionsRequired.collectAsStateWithLifecycle()
 
-    var showCouponDialog by remember { mutableStateOf(false) }
+    var showPromotionDialog by remember { mutableStateOf(false) }
     var showRewardedGateDialog by remember { mutableStateOf<PremiumFeature?>(null) }
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.refresh()
-        }
-    }
-
-    LaunchedEffect(activationState) {
-        val state = activationState
-        if (state is CouponActivationUiState.Success) {
-            val days = state.durationDays
-            val event =
-                if (days == null) {
-                    SnackbarEvent(
-                        UiText.Resource(CouponR.string.coupon_success_registered_unlimited),
-                        SnackbarVariant.SUCCESS,
-                    )
-                } else {
-                    SnackbarEvent(
-                        UiText.Resource(
-                            CouponR.string.coupon_success_registered_days,
-                            listOf(days.toInt()),
-                        ),
-                        SnackbarVariant.SUCCESS,
-                    )
-                }
-            snackbarController.show(event)
         }
     }
 
@@ -119,16 +104,32 @@ fun SettingsRoute(
         }
     }
 
-    if (showCouponDialog) {
-        CouponRegisterDialog(
+    LaunchedEffect("subscription-events") {
+        subscriptionViewModel.events.collect { event ->
+            val resId =
+                when (event) {
+                    SubscriptionSettingsEvent.RestoreSuccess -> R.string.settings_pro_restore_success
+                    SubscriptionSettingsEvent.RestoreEmpty -> R.string.settings_pro_restore_empty
+                }
+            val variant =
+                when (event) {
+                    SubscriptionSettingsEvent.RestoreSuccess -> SnackbarVariant.SUCCESS
+                    SubscriptionSettingsEvent.RestoreEmpty -> SnackbarVariant.WARNING
+                }
+            snackbarController.show(SnackbarEvent(UiText.Resource(resId), variant))
+        }
+    }
+
+    if (showPromotionDialog) {
+        PromotionRegisterDialog(
             activationState = activationState,
-            myCoupons = myCoupons,
-            myCouponsLoading = myCouponsLoading,
-            onActivate = { code -> couponViewModel.activate(code) },
-            onLoadMyCoupons = { couponViewModel.loadMyCoupons() },
+            myPromotions = myPromotions,
+            myPromotionsLoading = myPromotionsLoading,
+            onActivate = { code -> promotionViewModel.activate(code) },
+            onLoadMyPromotions = { promotionViewModel.loadMyPromotions() },
             onDismiss = {
-                showCouponDialog = false
-                couponViewModel.resetActivationState()
+                showPromotionDialog = false
+                promotionViewModel.resetActivationState()
             },
         )
     }
@@ -183,51 +184,71 @@ fun SettingsRoute(
         onNavigateBack = onNavigateBack,
         onWatermarkConfigChange = viewModel::updateWatermarkConfig,
         onWatermarkSettingsClick = {
-            if (isAdFree || settingsPremiumGate.isUnlocked(PremiumFeature.WATERMARK_DETAIL)) {
+            if (isPro || settingsPremiumGate.isUnlocked(PremiumFeature.WATERMARK_DETAIL)) {
                 onNavigateToWatermarkSettings()
             } else {
                 showRewardedGateDialog = PremiumFeature.WATERMARK_DETAIL
             }
         },
         onCombineSettingsClick = {
-            if (isAdFree || settingsPremiumGate.isUnlocked(PremiumFeature.COMBINE_DETAIL)) {
+            if (isPro || settingsPremiumGate.isUnlocked(PremiumFeature.COMBINE_DETAIL)) {
                 onNavigateToCombineSettings()
             } else {
                 showRewardedGateDialog = PremiumFeature.COMBINE_DETAIL
             }
         },
-        onJpegQualityChange = viewModel::updateJpegQuality,
+        onImageQualityChange = viewModel::updateImageQuality,
         onFileNamePrefixChange = viewModel::updateFileNamePrefix,
         onOverlayEnabledChange = viewModel::updateOverlayEnabled,
         onOverlayAlphaChange = viewModel::updateOverlayAlpha,
         snackbarController = snackbarController,
-        couponSection = {
-            CouponSection(
-                status = couponStatus,
-                onClick = {
-                    couponViewModel.resetActivationState()
-                    showCouponDialog = true
+        showAdsConsent = showAdsConsent,
+        onAdsConsentClick = {
+            activity?.let { act ->
+                adsInitializer.showPrivacyOptionsForm(act) { error ->
+                    if (error != null) {
+                        snackbarScope.launch {
+                            snackbarController.show(
+                                SnackbarEvent(
+                                    UiText.Resource(R.string.settings_pro_manage_failed),
+                                    SnackbarVariant.ERROR,
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        onReplayTutorial = {
+            onNavigateBack()
+            tutorialReplay.restart()
+        },
+        proSubscriptionSection = {
+            ProSubscriptionSection(
+                membership = subscriptionState.membership,
+                subscriptionStatus = subscriptionState.subscriptionStatus,
+                onLearnMore = onNavigateToPaywall,
+                onManageSubscription = {
+                    val productId = (subscriptionState.subscriptionStatus as? SubscriptionStatus.Active)?.productId
+                    runCatching {
+                        context.startActivity(subscriptionViewModel.manageSubscriptionsIntent(productId))
+                    }.onFailure {
+                        snackbarScope.launch {
+                            snackbarController.show(
+                                SnackbarEvent(
+                                    UiText.Resource(R.string.settings_pro_manage_failed),
+                                    SnackbarVariant.ERROR,
+                                ),
+                            )
+                        }
+                    }
+                },
+                onRestore = { subscriptionViewModel.restore() },
+                onPromoCode = {
+                    promotionViewModel.loadMyPromotions()
+                    showPromotionDialog = true
                 },
             )
         },
     )
-}
-
-@Composable
-private fun CouponSection(
-    status: CouponStatus,
-    onClick: () -> Unit,
-) {
-    SettingsSectionLabel(
-        label = stringResource(CouponR.string.coupon_section_title),
-    )
-    Spacer(modifier = Modifier.height(PairShotSpacing.iconTextGap))
-    SettingsCard {
-        CouponStatusItem(
-            status = status,
-            nowMillis = System.currentTimeMillis(),
-            onClick = onClick,
-        )
-    }
-    Spacer(modifier = Modifier.height(PairShotSpacing.cardPadding))
 }

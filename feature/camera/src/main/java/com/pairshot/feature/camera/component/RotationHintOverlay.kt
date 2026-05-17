@@ -30,7 +30,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.PairShotTouchTarget
 
 @Composable
 internal fun RotationHintOverlay(
@@ -72,11 +74,11 @@ internal fun RotationHintOverlay(
                         .clip(RoundedCornerShape(HintCornerRadius))
                         .background(Color.Black.copy(alpha = HINT_BACKGROUND_ALPHA))
                         .padding(
-                            horizontal = PairShotSpacing.cardPadding,
-                            vertical = PairShotSpacing.cardPadding,
+                            horizontal = PairShotCard.innerPadding,
+                            vertical = PairShotCard.innerPadding,
                         ),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(PairShotSpacing.iconTextGap),
+                verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
             ) {
                 Icon(
                     imageVector = shown.icon,
@@ -84,7 +86,7 @@ internal fun RotationHintOverlay(
                     tint = Color.White,
                     modifier =
                         Modifier
-                            .size(PairShotSpacing.touchTarget)
+                            .size(PairShotTouchTarget.standard)
                             .rotate(signedAngle)
                             .alpha(hintAlpha),
                 )
@@ -98,7 +100,7 @@ internal fun RotationHintOverlay(
     }
 }
 
-private val HintCornerRadius = 12.dp
+private val HintCornerRadius = PairShotSpacing.md
 private const val HINT_BACKGROUND_ALPHA = 0.6f
 private const val HINT_SWEEP_DEGREES = 90f
 private const val HINT_CYCLE_DURATION_MS = 2000

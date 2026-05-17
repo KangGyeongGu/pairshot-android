@@ -22,6 +22,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
@@ -79,6 +80,7 @@ fun HomeScreen(
     onNavigateToCamera: () -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    isProSubscriber: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
@@ -107,6 +109,7 @@ fun HomeScreen(
                 selectionMode = inSelectionMode,
                 selectedCount = currentSelectedCount,
                 allSelected = allSelected,
+                isProSubscriber = isProSubscriber,
                 onExitSelectionMode =
                     if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,
@@ -151,7 +154,7 @@ fun HomeScreen(
                     .padding(paddingValues),
         ) {
             PairShotBannerAd()
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
             HomeFilterRow(
                 selectedMode = mode,
                 inSelectionMode = inSelectionMode,
@@ -159,7 +162,7 @@ fun HomeScreen(
                 onModeSelected = onModeSelected,
                 onToggleSortOrder = onToggleSortOrder,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(PairShotSpacing.sm))
 
             if (listIsEmpty && !inSelectionMode) {
                 HomeEmptyAction(
@@ -170,10 +173,9 @@ fun HomeScreen(
             } else {
                 val contentPadding =
                     PaddingValues(
-                        start = 12.dp,
-                        end = 12.dp,
-                        top = 0.dp,
-                        bottom = 8.dp,
+                        start = PairShotSpacing.md,
+                        end = PairShotSpacing.md,
+                        bottom = PairShotSpacing.sm,
                     )
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,

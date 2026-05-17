@@ -9,6 +9,9 @@ import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.pair.GetLatestBeforeThumbnailUseCase
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
+import com.pairshot.core.domain.tutorial.TutorialPairTracker
+import com.pairshot.core.model.AppSettings
 import com.pairshot.core.model.AspectRatio
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
@@ -75,6 +78,8 @@ class AfterCameraViewModel
         private val appSettingsRepository: AppSettingsRepository,
         private val cameraSettings: CameraSettingsStateHolder,
         albumRepository: AlbumRepository,
+        tutorialModeProvider: TutorialModeProvider,
+        tutorialPairTracker: TutorialPairTracker,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<AfterCamera>()
         private val initialPairId: Long? = route.initialPairId
@@ -82,15 +87,15 @@ class AfterCameraViewModel
 
         private val isDateFilterActive: Boolean = albumId == null && initialPairId != null
 
-        private val _targetBeforeDate = MutableStateFlow<LocalDate?>(null)
+        private val targetBeforeDate = MutableStateFlow<LocalDate?>(null)
 
-        private val _retakeTargetPair = MutableStateFlow<PhotoPair?>(null)
+        private val retakeTargetPair = MutableStateFlow<PhotoPair?>(null)
         val isRetakeMode: StateFlow<Boolean> =
-            _retakeTargetPair
+            retakeTargetPair
                 .map { it != null }
                 .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-        private val _retakeResolved = MutableStateFlow(initialPairId == null)
+        private val retakeResolved = MutableStateFlow(initialPairId == null)
 
         val sortOrder: StateFlow<SortOrder> =
             if (albumId != null) {
@@ -122,7 +127,7 @@ class AfterCameraViewModel
                     }
 
                     initialPairId != null -> {
-                        combine(photoPairRepository.observeAll(), _targetBeforeDate) { all, date ->
+                        combine(photoPairRepository.observeAll(), targetBeforeDate) { all, date ->
                             if (date == null) 0 else all.count { it.beforeTimestamp.toLocalDate() == date }
                         }
                     }
@@ -131,7 +136,7 @@ class AfterCameraViewModel
                         photoPairRepository.countAll()
                     }
                 },
-                _retakeTargetPair,
+                retakeTargetPair,
             ) { count, retake ->
                 if (retake != null) 1 else count
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS), 0)
@@ -142,18 +147,18 @@ class AfterCameraViewModel
                     try {
                         val pair = photoPairRepository.getById(initialPairId)
                         if (pair != null && pair.status == PairStatus.PAIRED) {
-                            _retakeTargetPair.value = pair
+                            retakeTargetPair.value = pair
                         } else if (isDateFilterActive) {
-                            _targetBeforeDate.value = pair?.beforeTimestamp?.toLocalDate()
+                            targetBeforeDate.value = pair?.beforeTimestamp?.toLocalDate()
                         }
                     } finally {
-                        _retakeResolved.value = true
+                        retakeResolved.value = true
                     }
                 }
             }
         }
 
-        val unpairedPhotos: StateFlow<List<PhotoPair>> =
+        private val baseUnpairedPhotos =
             combine(
                 if (albumId != null) {
                     photoPairRepository.observeUnpairedByAlbum(albumId)
@@ -161,8 +166,8 @@ class AfterCameraViewModel
                     photoPairRepository.observeUnpaired()
                 },
                 sortOrder,
-                _targetBeforeDate,
-                _retakeTargetPair,
+                targetBeforeDate,
+                retakeTargetPair,
             ) { list, order, targetDate, retake ->
                 if (retake != null) return@combine listOf(retake)
                 val filtered =
@@ -175,6 +180,15 @@ class AfterCameraViewModel
                     SortOrder.DESC -> filtered.sortedByDescending { it.beforeTimestamp }
                     SortOrder.ASC -> filtered.sortedBy { it.beforeTimestamp }
                 }
+            }
+
+        val unpairedPhotos: StateFlow<List<PhotoPair>> =
+            combine(
+                baseUnpairedPhotos,
+                tutorialModeProvider.isActive,
+                tutorialPairTracker.trackedPairIds,
+            ) { list, tutorialActive, trackedIds ->
+                if (tutorialActive) list.filter { it.id in trackedIds } else list
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS), emptyList())
 
         val lastPairThumbnailUri: StateFlow<String?> =
@@ -352,8 +366,8 @@ class AfterCameraViewModel
 
         fun emitAllCompleted() {
             viewModelScope.launch {
-                if (!_retakeResolved.value) return@launch
-                if (_retakeTargetPair.value != null) return@launch
+                if (!retakeResolved.value) return@launch
+                if (retakeTargetPair.value != null) return@launch
                 _events.emit(AfterCameraEvent.AllCompleted)
             }
         }
@@ -403,7 +417,7 @@ class AfterCameraViewModel
 
         companion object {
             private const val SUBSCRIPTION_TIMEOUT_MS = 5_000L
-            private const val DEFAULT_OVERLAY_ALPHA = 0.35f
+            private val DEFAULT_OVERLAY_ALPHA = AppSettings.DEFAULT_OVERLAY_ALPHA
         }
     }
 
