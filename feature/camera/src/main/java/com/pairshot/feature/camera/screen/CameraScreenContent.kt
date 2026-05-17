@@ -35,6 +35,7 @@ import com.pairshot.feature.camera.component.BeforeStripHeight
 import com.pairshot.feature.camera.component.CameraSettingsSheet
 import com.pairshot.feature.camera.component.ZoomUiState
 import com.pairshot.feature.camera.state.CameraSettingsState
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 
 val CameraShutterSectionHeight = CameraSpec.shutterSectionHeight
 val CameraBottomSpacer = CameraSpec.bottomSpacer
@@ -95,7 +96,11 @@ fun CameraScreenContent(
                     exposureStepNumerator = capabilities.exposureStepNumerator,
                     exposureStepDenominator = capabilities.exposureStepDenominator,
                     selectedAspectRatio = settingsState.aspectRatio,
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_PREVIEW),
                     onZoomRatioChanged = callbacks.onZoomRatioChanged,
                     onPresetTapped = callbacks.onPresetTapped,
                     onDragEnd = callbacks.onDragEnd,

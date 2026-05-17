@@ -20,4 +20,6 @@
 
     <string name="export_warning_required">설정 필요</string>
 
+    <string name="export_settings_help_desc">튜토리얼 다시 보기</string>
+
 </resources>

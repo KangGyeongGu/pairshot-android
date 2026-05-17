@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="tutorial_msg_home_shoot">Let\'s start a BEFORE shot</string>
-    <string name="tutorial_msg_camera_portrait">Hold the device upright and take one shot</string>
-    <string name="tutorial_msg_camera_landscape_left">Rotate the device to the left and take one shot in landscape</string>
-    <string name="tutorial_msg_camera_landscape_right">Rotate the device to the right and take one shot in landscape</string>
-    <string name="tutorial_msg_camera_back">Go back to home</string>
-    <string name="tutorial_msg_home_pair_card">Tap the photo you just took</string>
-    <string name="tutorial_msg_after_overlay">Follow the overlay and rotation hint of your previous shot to finish AFTER capture</string>
-    <string name="tutorial_msg_after_shutter">Take the AFTER shot</string>
-    <string name="tutorial_msg_after_back">Capture is complete — go back to home</string>
-    <string name="tutorial_msg_home_selection_mode">Long-press a photo to enter selection mode</string>
-    <string name="tutorial_msg_selection_share">Share to SNS or messengers</string>
-    <string name="tutorial_msg_selection_save">Save to gallery or chosen location</string>
-    <string name="tutorial_msg_selection_delete">Delete selected photos</string>
-    <string name="tutorial_msg_selection_export_settings">Pick how to export</string>
-    <string name="tutorial_msg_selection_exit">Close selection mode</string>
-    <string name="tutorial_msg_settings_navigate">Check various options in settings</string>
-    <string name="tutorial_msg_settings_screen">Adjust any preference you need</string>
+    <string name="tutorial_msg_home_shoot">Let\'s start a BEFORE shot.</string>
+    <string name="tutorial_msg_camera_portrait">Hold the device upright and take one shot.</string>
+    <string name="tutorial_msg_camera_landscape_left">Rotate the device to the left and take one shot in landscape.</string>
+    <string name="tutorial_msg_camera_landscape_right">Rotate the device to the right and take one shot in landscape.</string>
+    <string name="tutorial_msg_camera_back">Go back to home.</string>
+    <string name="tutorial_msg_home_pair_card">Tap the photo you just took.</string>
+    <string name="tutorial_msg_after_strip">You can review the BEFORE shot here.</string>
+    <string name="tutorial_msg_after_overlay">Follow the overlay and rotation hint of the BEFORE shot to finish AFTER capture.</string>
+    <string name="tutorial_msg_after_shutter">Take the AFTER shot.</string>
+    <string name="tutorial_msg_after_back">Go back to home.</string>
+    <string name="tutorial_msg_home_selection_mode">Long-press a photo to enter selection mode.</string>
+    <string name="tutorial_msg_selection_share">Share to SNS or messengers.</string>
+    <string name="tutorial_msg_selection_save">Save to gallery or chosen location.</string>
+    <string name="tutorial_msg_selection_delete">Delete selected photos.</string>
+    <string name="tutorial_msg_selection_export_settings">You can configure various export options.</string>
+    <string name="tutorial_msg_selection_exit">Close selection mode.</string>
+    <string name="tutorial_msg_settings_navigate">Check various options in settings.</string>
+    <string name="tutorial_msg_settings_screen">You can tweak default options here in Settings. Let\'s wrap up the tutorial.</string>
 
-    <string name="tutorial_msg_export_include">Choose which photos to export</string>
-    <string name="tutorial_msg_export_format">Export as individual images or bundle them into a ZIP file</string>
-    <string name="tutorial_msg_export_watermark">You can apply a watermark to the exported photos</string>
-    <string name="tutorial_msg_export_combine">You can add borders and other composition to the exported photos</string>
+    <string name="tutorial_msg_export_include">Choose which photos to export.</string>
+    <string name="tutorial_msg_export_format">Export as individual images or bundle them into a ZIP file.</string>
+    <string name="tutorial_msg_export_watermark">You can apply a watermark to the exported photos.</string>
+    <string name="tutorial_msg_export_combine">You can add borders and other composition to the exported photos.</string>
 
     <string name="tutorial_button_skip">Skip</string>
     <string name="tutorial_button_next">Next ›</string>
     <string name="tutorial_button_finish">Done</string>
     <string name="tutorial_settings_replay_label">Replay tutorial</string>
+
+    <string name="tutorial_skip_confirm_title">Exit the tutorial?</string>
+    <string name="tutorial_skip_confirm_body">You can replay it anytime from Settings</string>
+    <string name="tutorial_skip_confirm_yes">Exit</string>
+    <string name="tutorial_skip_confirm_no">Continue</string>
 </resources>

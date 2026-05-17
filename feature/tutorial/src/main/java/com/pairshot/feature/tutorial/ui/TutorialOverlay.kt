@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -69,6 +70,7 @@ import dagger.hilt.components.SingletonComponent
 
 private const val SPOTLIGHT_PADDING_PX = 12f
 private const val SPOTLIGHT_CORNER_RADIUS_PX = 24f
+private const val SPOTLIGHT_STROKE_WIDTH_PX = 6f
 private const val ROTATION_ANIM_DURATION_MS = 1200
 private const val ROTATION_HINT_ICON_SIZE_DP = 56
 private const val ROTATION_LEFT_ANGLE = -90f
@@ -146,6 +148,7 @@ private fun OverlayContent(
     onSkip: () -> Unit,
 ) {
     var overlaySize by remember { mutableStateOf(IntSize.Zero) }
+    var showSkipConfirm by remember { mutableStateOf(false) }
     val isTapToAdvance = def.advance is AdvanceCondition.TapAnywhere
     val onNext: () -> Unit =
         when (def.advance) {
@@ -160,6 +163,7 @@ private fun OverlayContent(
                 .fillMaxSize()
                 .onSizeChanged { overlaySize = it },
     ) {
+        val spotlightStrokeColor = Color.White
         Canvas(
             modifier =
                 Modifier
@@ -168,7 +172,11 @@ private fun OverlayContent(
         ) {
             drawRect(color = Color.Black.copy(alpha = def.dimAlpha))
             if (anchorBounds != null) {
-                drawSpotlight(anchorBounds)
+                val anchorStroke = if (def.strokeAnchor) spotlightStrokeColor else null
+                drawSpotlight(anchorBounds, anchorStroke)
+            }
+            if (actionAnchorBounds != null && actionAnchorBounds !== anchorBounds) {
+                drawSpotlight(actionAnchorBounds, spotlightStrokeColor)
             }
         }
 
@@ -197,22 +205,75 @@ private fun OverlayContent(
                 anchorBounds = anchorBounds,
                 overlaySize = overlaySize,
                 def = def,
-                onSkip = onSkip,
+                onSkip = { showSkipConfirm = true },
                 onNext = onNext,
+            )
+        }
+
+        if (showSkipConfirm) {
+            SkipConfirmDialog(
+                onConfirm = {
+                    showSkipConfirm = false
+                    onSkip()
+                },
+                onDismiss = { showSkipConfirm = false },
             )
         }
     }
 }
 
-private fun DrawScope.drawSpotlight(bounds: AnchorBounds) {
+@Composable
+private fun SkipConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { androidx.compose.material3.Text(text = stringResource(R.string.tutorial_skip_confirm_title)) },
+        text = { androidx.compose.material3.Text(text = stringResource(R.string.tutorial_skip_confirm_body)) },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onConfirm) {
+                androidx.compose.material3.Text(
+                    text = stringResource(R.string.tutorial_skip_confirm_yes),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        dismissButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) {
+                androidx.compose.material3.Text(text = stringResource(R.string.tutorial_skip_confirm_no))
+            }
+        },
+    )
+}
+
+private fun DrawScope.drawSpotlight(
+    bounds: AnchorBounds,
+    strokeColor: Color?,
+) {
     val padding = SPOTLIGHT_PADDING_PX
+    val cornerRadius = CornerRadius(SPOTLIGHT_CORNER_RADIUS_PX, SPOTLIGHT_CORNER_RADIUS_PX)
     drawRoundRect(
         color = Color.Transparent,
         topLeft = Offset(bounds.left - padding, bounds.top - padding),
         size = Size(bounds.width + padding * 2, bounds.height + padding * 2),
-        cornerRadius = CornerRadius(SPOTLIGHT_CORNER_RADIUS_PX, SPOTLIGHT_CORNER_RADIUS_PX),
+        cornerRadius = cornerRadius,
         blendMode = BlendMode.Clear,
     )
+    if (strokeColor != null) {
+        val halfStroke = SPOTLIGHT_STROKE_WIDTH_PX / 2f
+        val strokeLeft = (bounds.left - padding).coerceAtLeast(halfStroke)
+        val strokeTop = (bounds.top - padding).coerceAtLeast(halfStroke)
+        val strokeRight = (bounds.left + bounds.width + padding).coerceAtMost(size.width - halfStroke)
+        val strokeBottom = (bounds.top + bounds.height + padding).coerceAtMost(size.height - halfStroke)
+        drawRoundRect(
+            color = strokeColor,
+            topLeft = Offset(strokeLeft, strokeTop),
+            size = Size(strokeRight - strokeLeft, strokeBottom - strokeTop),
+            cornerRadius = cornerRadius,
+            style = Stroke(width = SPOTLIGHT_STROKE_WIDTH_PX),
+        )
+    }
 }
 
 private data class TouchRect(
@@ -312,6 +373,22 @@ private fun MessageBalloon(
     onNext: () -> Unit,
 ) {
     val density = LocalDensity.current
+
+    if (def.centerMessage) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(horizontal = BALLOON_OUTER_PADDING),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            BalloonCard(def = def, onSkip = onSkip, onNext = onNext)
+        }
+        return
+    }
+
     val placeBelow =
         anchorBounds == null ||
             overlaySize.height == 0 ||
