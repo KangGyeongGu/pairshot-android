@@ -74,5 +74,6 @@ fun ExportSettingsRoute(
         onProLocked = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
         onShare = { onShare(pairIdSet) },
         onSaveToDevice = { onSaveToDevice(pairIdSet) },
+        onReplayTutorial = { tutorialCoordinator.start(TutorialSection.EXPORT_SETTINGS_INTRO) },
     )
 }

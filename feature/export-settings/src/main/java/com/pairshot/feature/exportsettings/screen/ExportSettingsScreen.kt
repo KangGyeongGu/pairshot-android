@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -74,6 +75,7 @@ fun ExportSettingsScreen(
     onProLocked: () -> Unit,
     onShare: () -> Unit,
     onSaveToDevice: () -> Unit,
+    onReplayTutorial: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -90,6 +92,14 @@ fun ExportSettingsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                             contentDescription = stringResource(CoreR.string.common_desc_back),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onReplayTutorial) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+                            contentDescription = stringResource(R.string.export_settings_help_desc),
                         )
                     }
                 },

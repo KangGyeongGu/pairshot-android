@@ -64,6 +64,7 @@ import com.pairshot.feature.camera.preview.CameraPreviewPane
 import com.pairshot.feature.camera.viewmodel.AfterCameraEvent
 import com.pairshot.feature.camera.viewmodel.AfterCameraViewModel
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import com.pairshot.core.ui.R as CoreR
@@ -351,7 +352,10 @@ internal fun AfterCameraScreen(
 
                 BeforePreviewStrip(
                     beforePreviewUris = beforePreviewUris,
-                    modifier = Modifier.height(stripSectionHeight),
+                    modifier =
+                        Modifier
+                            .height(stripSectionHeight)
+                            .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.AFTER_CAMERA_STRIP),
                     selectedIndex = if (totalCount > 0) currentIndex else null,
                     onSelectIndex = viewModel::selectIndex,
                     listState = thumbnailListState,
