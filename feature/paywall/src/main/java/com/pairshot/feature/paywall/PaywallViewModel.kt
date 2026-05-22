@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -132,12 +133,15 @@ class PaywallViewModel
 
         private fun observeEntitlement() {
             viewModelScope.launch {
-                membershipProvider.observe().collect { membership ->
-                    if (membership.isPro) {
-                        onboardingStateRepository.markOnboardingPaywallShown()
-                        _events.tryEmit(PaywallEvent.EntitlementGranted)
+                membershipProvider
+                    .observe()
+                    .drop(1)
+                    .collect { membership ->
+                        if (membership.isPro) {
+                            onboardingStateRepository.markOnboardingPaywallShown()
+                            _events.tryEmit(PaywallEvent.EntitlementGranted)
+                        }
                     }
-                }
             }
         }
     }

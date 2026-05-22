@@ -37,6 +37,7 @@ fun ProSubscriptionSection(
     membership: Membership,
     subscriptionStatus: SubscriptionStatus,
     onLearnMore: () -> Unit,
+    onViewSubscriptionOptions: () -> Unit,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onPromoCode: () -> Unit,
@@ -65,6 +66,7 @@ fun ProSubscriptionSection(
             membershipLabel = membershipLabel,
             promoTrailing = promoTrailing,
             hasActiveSubscription = hasActiveSubscription,
+            onViewSubscriptionOptions = onViewSubscriptionOptions,
             onManageSubscription = onManageSubscription,
             onRestore = onRestore,
             onPromoCode = onPromoCode,
@@ -161,12 +163,18 @@ private fun ProBlock(
     membershipLabel: String,
     promoTrailing: String?,
     hasActiveSubscription: Boolean,
+    onViewSubscriptionOptions: () -> Unit,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onPromoCode: () -> Unit,
 ) {
     SettingsCard {
         MembershipItem(value = membershipLabel)
+        SettingsDivider()
+        SettingsItem(
+            label = stringResource(R.string.settings_pro_view_options),
+            onClick = onViewSubscriptionOptions,
+        )
         if (hasActiveSubscription) {
             SettingsDivider()
             SettingsItem(

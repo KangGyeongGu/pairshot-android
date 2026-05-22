@@ -148,6 +148,7 @@
     <string name="settings_pro_membership_free">Free</string>
     <string name="settings_pro_membership_pro">Pro</string>
 
+    <string name="settings_pro_view_options">View subscription options</string>
     <string name="settings_pro_manage_subscription">Manage subscription</string>
     <string name="settings_pro_restore">Restore purchases</string>
     <string name="settings_item_promo_code">Enter promo code</string>
