@@ -12,6 +12,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.CombineLayout
 import com.pairshot.core.model.LabelAnchor
+import com.pairshot.core.model.LabelPlacement
 import com.pairshot.core.model.LabelPosition
 import com.pairshot.core.model.LabelPositionMode
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -51,6 +52,7 @@ class CombinePreferences
             val BEFORE_LABEL_ANCHOR = stringPreferencesKey("before_label_anchor")
             val AFTER_LABEL_ANCHOR = stringPreferencesKey("after_label_anchor")
             val LABEL_BG_CORNER = intPreferencesKey("label_bg_corner_dp")
+            val LABEL_PLACEMENT = stringPreferencesKey("label_placement")
         }
 
         val configFlow: Flow<CombineConfig> =
@@ -74,6 +76,7 @@ class CombinePreferences
                     beforeLabelAnchor = LabelAnchor.fromName(prefs[Keys.BEFORE_LABEL_ANCHOR]),
                     afterLabelAnchor = LabelAnchor.fromName(prefs[Keys.AFTER_LABEL_ANCHOR]),
                     labelBgCornerDp = prefs[Keys.LABEL_BG_CORNER] ?: defaultConfig.labelBgCornerDp,
+                    labelPlacement = LabelPlacement.fromName(prefs[Keys.LABEL_PLACEMENT]),
                 )
             }
 
@@ -97,6 +100,7 @@ class CombinePreferences
                 prefs[Keys.BEFORE_LABEL_ANCHOR] = config.beforeLabelAnchor.name
                 prefs[Keys.AFTER_LABEL_ANCHOR] = config.afterLabelAnchor.name
                 prefs[Keys.LABEL_BG_CORNER] = config.labelBgCornerDp
+                prefs[Keys.LABEL_PLACEMENT] = config.labelPlacement.name
             }
         }
     }

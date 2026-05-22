@@ -20,24 +20,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotSpacing
 
-private const val GRID_CELL_COUNT = 9
-private const val GRID_ROW_COUNT = 3
+private const val GRID_COLUMN_COUNT = 3
 private val CheckIconSize = PairShotSpacing.lg
 
 @Composable
-internal fun <T> PositionPicker3x3Row(
+internal fun <T> PositionPickerGridRow(
     label: String,
     positions: List<T>,
     selectedPosition: T,
     onPositionChange: (T) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    require(positions.size == GRID_CELL_COUNT) { "positions must contain exactly 9 entries" }
+    require(positions.size % GRID_COLUMN_COUNT == 0) {
+        "positions size must be a multiple of $GRID_COLUMN_COUNT"
+    }
     Row(
         modifier =
             modifier
@@ -55,7 +55,7 @@ internal fun <T> PositionPicker3x3Row(
             modifier = Modifier.weight(1f),
         )
         Column(verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
-            positions.chunked(GRID_ROW_COUNT).forEach { rowPositions ->
+            positions.chunked(GRID_COLUMN_COUNT).forEach { rowPositions ->
                 Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
                     rowPositions.forEach { position ->
                         val isSelected = position == selectedPosition

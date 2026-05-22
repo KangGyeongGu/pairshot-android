@@ -110,6 +110,10 @@
     <string name="combine_label_mode_full_width">전체 너비</string>
     <string name="combine_label_mode_free">자유 위치</string>
 
+    <string name="combine_label_placement_label">사용 방식</string>
+    <string name="combine_label_placement_inside_image">이미지 내부</string>
+    <string name="combine_label_placement_inside_border">테두리 내부</string>
+
     <string name="combine_text_input_hint">텍스트 입력</string>
     <string name="combine_preview_desc">합성 미리보기</string>
 
@@ -148,6 +152,7 @@
     <string name="settings_pro_membership_free">무료</string>
     <string name="settings_pro_membership_pro">Pro</string>
 
+    <string name="settings_pro_view_options">구독 옵션 보기</string>
     <string name="settings_pro_manage_subscription">구독 관리</string>
     <string name="settings_pro_restore">구매 복원</string>
     <string name="settings_item_promo_code">프로모션 코드</string>

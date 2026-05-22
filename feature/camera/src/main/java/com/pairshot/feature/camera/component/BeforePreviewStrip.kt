@@ -4,7 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -53,9 +53,11 @@ import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.spec.CameraSpec
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.camera.R
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlin.math.abs
 
 internal val BeforeStripHeight: Dp = CameraSpec.beforeStripHeight
@@ -84,6 +86,7 @@ fun BeforePreviewStrip(
     modifier: Modifier = Modifier,
     selectedIndex: Int? = null,
     onSelectIndex: ((Int) -> Unit)? = null,
+    onLongPressIndex: ((Int) -> Unit)? = null,
     listState: LazyListState = rememberLazyListState(),
     emptyMessage: String = stringResource(R.string.camera_strip_empty),
     stripHeight: Dp = BeforeStripHeight,
@@ -193,7 +196,7 @@ fun BeforePreviewStrip(
                             val borderWidth = if (isSelected) ACTIVE_BORDER_WIDTH else INACTIVE_BORDER_WIDTH
                             val borderColor =
                                 if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
+                                    PairShotCameraTokens.SelectionHighlight
                                 } else {
                                     MaterialTheme.colorScheme.outlineVariant
                                 }
@@ -221,8 +224,23 @@ fun BeforePreviewStrip(
                                             color = borderColor,
                                             shape = RoundedCornerShape(CARD_CORNER_RADIUS),
                                         ).then(
+                                            if (isSelected) {
+                                                Modifier.tutorialAnchor(AnchorKey.AFTER_CAMERA_SELECTED_CARD)
+                                            } else {
+                                                Modifier
+                                            },
+                                        ).then(
                                             if (onSelectIndex != null) {
-                                                Modifier.clickable { onSelectIndex(index) }
+                                                Modifier.combinedClickable(
+                                                    onClick = { onSelectIndex(index) },
+                                                    onLongClick =
+                                                        onLongPressIndex?.let { callback ->
+                                                            {
+                                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                                callback(index)
+                                                            }
+                                                        },
+                                                )
                                             } else {
                                                 Modifier
                                             },

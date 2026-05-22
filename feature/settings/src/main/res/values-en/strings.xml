@@ -110,6 +110,10 @@
     <string name="combine_label_mode_full_width">Full width</string>
     <string name="combine_label_mode_free">Free position</string>
 
+    <string name="combine_label_placement_label">Placement</string>
+    <string name="combine_label_placement_inside_image">Inside image</string>
+    <string name="combine_label_placement_inside_border">Inside border</string>
+
     <string name="combine_text_input_hint">Enter text</string>
     <string name="combine_preview_desc">Combine preview</string>
 
@@ -148,6 +152,7 @@
     <string name="settings_pro_membership_free">Free</string>
     <string name="settings_pro_membership_pro">Pro</string>
 
+    <string name="settings_pro_view_options">View subscription options</string>
     <string name="settings_pro_manage_subscription">Manage subscription</string>
     <string name="settings_pro_restore">Restore purchases</string>
     <string name="settings_item_promo_code">Enter promo code</string>

@@ -16,6 +16,10 @@
         <item quantity="other">%1$d / %2$d complete</item>
     </plurals>
 
+    <!-- Before Full Preview -->
+    <string name="camera_before_full_preview_desc">View Before photo in full screen</string>
+    <string name="camera_before_full_preview_close">Close</string>
+
     <!-- Permission -->
     <string name="camera_permission_title">Camera permission required</string>
     <string name="camera_permission_message">PairShot needs camera access to take photos.</string>

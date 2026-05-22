@@ -228,6 +228,7 @@ fun SettingsRoute(
                 membership = subscriptionState.membership,
                 subscriptionStatus = subscriptionState.subscriptionStatus,
                 onLearnMore = onNavigateToPaywall,
+                onViewSubscriptionOptions = onNavigateToPaywall,
                 onManageSubscription = {
                     val productId = (subscriptionState.subscriptionStatus as? SubscriptionStatus.Active)?.productId
                     runCatching {
