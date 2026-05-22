@@ -28,7 +28,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -81,9 +80,11 @@ import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.CombineLayout
 import com.pairshot.core.model.LabelAnchor
+import com.pairshot.core.model.LabelPlacement
 import com.pairshot.core.model.LabelPosition
 import com.pairshot.core.model.LabelPositionMode
 import com.pairshot.core.model.WatermarkConfig
+import com.pairshot.core.model.withLabelPlacement
 import com.pairshot.core.rendering.CombinePreviewEntryPoint
 import com.pairshot.core.rendering.CombinePreviewRenderer
 import com.pairshot.core.ui.component.PairShotDialog
@@ -93,8 +94,9 @@ import com.pairshot.core.ui.component.SettingsSectionLabel
 import com.pairshot.core.ui.component.SettingsSliderItem
 import com.pairshot.core.ui.component.SettingsSwitchItem
 import com.pairshot.feature.settings.R
-import com.pairshot.feature.settings.component.PositionPicker3x3Row
+import com.pairshot.feature.settings.component.PositionPickerGridRow
 import com.pairshot.feature.settings.component.ProLockedSwitchItem
+import com.pairshot.feature.settings.component.SegmentedToggleRow
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
@@ -221,10 +223,18 @@ fun CombineSettingsScreen(
 
                 item(key = "card_layout") {
                     SettingsCard {
-                        CombineLayoutItem(
-                            selectedLayout = combineConfig.layout,
-                            onLayoutChange = { layout ->
+                        SegmentedToggleRow(
+                            label = stringResource(R.string.combine_direction_label),
+                            entries = CombineLayout.entries,
+                            selected = combineConfig.layout,
+                            onSelect = { layout ->
                                 onCombineConfigChange(combineConfig.copy(layout = layout))
+                            },
+                            labelOf = { layout ->
+                                when (layout) {
+                                    CombineLayout.HORIZONTAL -> stringResource(R.string.combine_direction_horizontal)
+                                    CombineLayout.VERTICAL -> stringResource(R.string.combine_direction_vertical)
+                                }
                             },
                         )
                     }
@@ -247,6 +257,7 @@ fun CombineSettingsScreen(
                             onCheckedChange = { checked ->
                                 onCombineConfigChange(combineConfig.copy(borderEnabled = checked))
                             },
+                            enabled = !(combineConfig.labelEnabled && combineConfig.labelPlacement == LabelPlacement.INSIDE_BORDER),
                         )
                         AnimatedVisibility(
                             visible = combineConfig.borderEnabled,
@@ -375,48 +386,106 @@ fun CombineSettingsScreen(
                     ) {
                         Column {
                             SettingsCard {
-                                LabelPositionModeItem(
-                                    selectedMode = combineConfig.labelPositionMode,
-                                    onModeChange = { mode ->
-                                        onCombineConfigChange(combineConfig.copy(labelPositionMode = mode))
+                                SegmentedToggleRow(
+                                    label = stringResource(R.string.combine_label_placement_label),
+                                    entries = LabelPlacement.entries,
+                                    selected = combineConfig.labelPlacement,
+                                    onSelect = { placement ->
+                                        onCombineConfigChange(combineConfig.withLabelPlacement(placement))
+                                    },
+                                    labelOf = { placement ->
+                                        when (placement) {
+                                            LabelPlacement.INSIDE_IMAGE -> stringResource(R.string.combine_label_placement_inside_image)
+                                            LabelPlacement.INSIDE_BORDER -> stringResource(R.string.combine_label_placement_inside_border)
+                                        }
                                     },
                                 )
-                                if (combineConfig.labelPositionMode == LabelPositionMode.FULL_WIDTH) {
-                                    SettingsDivider()
-                                    LabelPositionItem(
-                                        selectedPosition = combineConfig.labelPosition,
-                                        onPositionChange = { position ->
-                                            onCombineConfigChange(combineConfig.copy(labelPosition = position))
-                                        },
-                                    )
-                                } else {
-                                    SettingsDivider()
-                                    PositionPicker3x3Row(
-                                        label = stringResource(R.string.combine_item_position_before),
-                                        positions = labelAnchorOrder,
-                                        selectedPosition = combineConfig.beforeLabelAnchor,
-                                        onPositionChange = { anchor ->
-                                            onCombineConfigChange(combineConfig.copy(beforeLabelAnchor = anchor))
-                                        },
-                                    )
-                                    SettingsDivider()
-                                    PositionPicker3x3Row(
-                                        label = stringResource(R.string.combine_item_position_after),
-                                        positions = labelAnchorOrder,
-                                        selectedPosition = combineConfig.afterLabelAnchor,
-                                        onPositionChange = { anchor ->
-                                            onCombineConfigChange(combineConfig.copy(afterLabelAnchor = anchor))
-                                        },
-                                    )
+                                when (combineConfig.labelPlacement) {
+                                    LabelPlacement.INSIDE_IMAGE -> {
+                                        SettingsDivider()
+                                        SegmentedToggleRow(
+                                            label = stringResource(R.string.combine_label_mode_label),
+                                            entries = LabelPositionMode.entries,
+                                            selected = combineConfig.labelPositionMode,
+                                            onSelect = { mode ->
+                                                onCombineConfigChange(combineConfig.copy(labelPositionMode = mode))
+                                            },
+                                            labelOf = { mode ->
+                                                when (mode) {
+                                                    LabelPositionMode.FULL_WIDTH -> stringResource(R.string.combine_label_mode_full_width)
+                                                    LabelPositionMode.FREE -> stringResource(R.string.combine_label_mode_free)
+                                                }
+                                            },
+                                        )
+                                        if (combineConfig.labelPositionMode == LabelPositionMode.FULL_WIDTH) {
+                                            SettingsDivider()
+                                            SegmentedToggleRow(
+                                                label = stringResource(R.string.combine_label_position_label),
+                                                entries = LabelPosition.entries,
+                                                selected = combineConfig.labelPosition,
+                                                onSelect = { position ->
+                                                    onCombineConfigChange(combineConfig.copy(labelPosition = position))
+                                                },
+                                                labelOf = { position ->
+                                                    when (position) {
+                                                        LabelPosition.TOP -> stringResource(R.string.combine_label_position_top)
+                                                        LabelPosition.BOTTOM -> stringResource(R.string.combine_label_position_bottom)
+                                                    }
+                                                },
+                                            )
+                                        } else {
+                                            SettingsDivider()
+                                            PositionPickerGridRow(
+                                                label = stringResource(R.string.combine_item_position_before),
+                                                positions = labelAnchorOrder,
+                                                selectedPosition = combineConfig.beforeLabelAnchor,
+                                                onPositionChange = { anchor ->
+                                                    onCombineConfigChange(combineConfig.copy(beforeLabelAnchor = anchor))
+                                                },
+                                            )
+                                            SettingsDivider()
+                                            PositionPickerGridRow(
+                                                label = stringResource(R.string.combine_item_position_after),
+                                                positions = labelAnchorOrder,
+                                                selectedPosition = combineConfig.afterLabelAnchor,
+                                                onPositionChange = { anchor ->
+                                                    onCombineConfigChange(combineConfig.copy(afterLabelAnchor = anchor))
+                                                },
+                                            )
+                                        }
+                                    }
+
+                                    LabelPlacement.INSIDE_BORDER -> {
+                                        SettingsDivider()
+                                        PositionPickerGridRow(
+                                            label = stringResource(R.string.combine_item_position_before),
+                                            positions = borderLabelAnchorOrder,
+                                            selectedPosition = combineConfig.beforeLabelAnchor,
+                                            onPositionChange = { anchor ->
+                                                onCombineConfigChange(combineConfig.copy(beforeLabelAnchor = anchor))
+                                            },
+                                        )
+                                        SettingsDivider()
+                                        PositionPickerGridRow(
+                                            label = stringResource(R.string.combine_item_position_after),
+                                            positions = borderLabelAnchorOrder,
+                                            selectedPosition = combineConfig.afterLabelAnchor,
+                                            onPositionChange = { anchor ->
+                                                onCombineConfigChange(combineConfig.copy(afterLabelAnchor = anchor))
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
+                val labelBgSectionVisible = labelSectionsVisible && combineConfig.labelPlacement == LabelPlacement.INSIDE_IMAGE
+
                 item(key = "label_label_bg") {
                     AnimatedVisibility(
-                        visible = labelSectionsVisible,
+                        visible = labelBgSectionVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -430,7 +499,7 @@ fun CombineSettingsScreen(
 
                 item(key = "card_label_bg") {
                     AnimatedVisibility(
-                        visible = labelSectionsVisible,
+                        visible = labelBgSectionVisible,
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
@@ -512,198 +581,6 @@ fun CombineSettingsScreen(
     }
 }
 
-@Composable
-private fun CombineLayoutItem(
-    selectedLayout: CombineLayout,
-    onLayoutChange: (CombineLayout) -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.combine_direction_label),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
-            CombineLayout.entries.forEach { layout ->
-                val isSelected = layout == selectedLayout
-                Box(
-                    modifier =
-                        Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            ).clickable { onLayoutChange(layout) }
-                            .padding(
-                                horizontal = PairShotSpacing.md,
-                                vertical = PairShotSpacing.sm,
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text =
-                            when (layout) {
-                                CombineLayout.HORIZONTAL -> stringResource(R.string.combine_direction_horizontal)
-                                CombineLayout.VERTICAL -> stringResource(R.string.combine_direction_vertical)
-                            },
-                        style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
-                        color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LabelPositionItem(
-    selectedPosition: LabelPosition,
-    onPositionChange: (LabelPosition) -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.combine_label_position_label),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
-            LabelPosition.entries.forEach { position ->
-                val isSelected = position == selectedPosition
-                Box(
-                    modifier =
-                        Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            ).clickable { onPositionChange(position) }
-                            .padding(
-                                horizontal = PairShotSpacing.md,
-                                vertical = PairShotSpacing.sm,
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text =
-                            when (position) {
-                                LabelPosition.TOP -> stringResource(R.string.combine_label_position_top)
-                                LabelPosition.BOTTOM -> stringResource(R.string.combine_label_position_bottom)
-                            },
-                        style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
-                        color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LabelPositionModeItem(
-    selectedMode: LabelPositionMode,
-    onModeChange: (LabelPositionMode) -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.combine_label_mode_label),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(PairShotSpacing.sm)) {
-            LabelPositionMode.entries.forEach { mode ->
-                val isSelected = mode == selectedMode
-                Box(
-                    modifier =
-                        Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            ).clickable { onModeChange(mode) }
-                            .padding(
-                                horizontal = PairShotSpacing.md,
-                                vertical = PairShotSpacing.sm,
-                            ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text =
-                            when (mode) {
-                                LabelPositionMode.FULL_WIDTH -> stringResource(R.string.combine_label_mode_full_width)
-                                LabelPositionMode.FREE -> stringResource(R.string.combine_label_mode_free)
-                            },
-                        style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
-                        color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                    )
-                }
-            }
-        }
-    }
-}
-
 private val labelAnchorOrder =
     listOf(
         LabelAnchor.TOP_LEFT,
@@ -716,6 +593,11 @@ private val labelAnchorOrder =
         LabelAnchor.BOTTOM_CENTER,
         LabelAnchor.BOTTOM_RIGHT,
     )
+
+private val borderLabelAnchorOrder =
+    labelAnchorOrder.filterNot {
+        it == LabelAnchor.MIDDLE_LEFT || it == LabelAnchor.MIDDLE_CENTER || it == LabelAnchor.MIDDLE_RIGHT
+    }
 
 @Composable
 private fun LabelTextItem(

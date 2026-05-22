@@ -8,6 +8,7 @@ data class CombineConfig(
     val labelEnabled: Boolean = false,
     val beforeLabel: String = "BEFORE",
     val afterLabel: String = "AFTER",
+    val labelPlacement: LabelPlacement = LabelPlacement.INSIDE_IMAGE,
     val labelPositionMode: LabelPositionMode = LabelPositionMode.FREE,
     val labelPosition: LabelPosition = LabelPosition.BOTTOM,
     val beforeLabelAnchor: LabelAnchor = LabelAnchor.TOP_LEFT,

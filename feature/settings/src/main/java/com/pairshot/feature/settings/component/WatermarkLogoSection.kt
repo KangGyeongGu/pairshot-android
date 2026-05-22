@@ -70,7 +70,7 @@ internal fun WatermarkLogoSection(
             )
         }
         SettingsDivider()
-        PositionPicker3x3Row(
+        PositionPickerGridRow(
             label = stringResource(R.string.watermark_field_position),
             positions = logoPositionOrder,
             selectedPosition = watermarkConfig.logoPosition,
