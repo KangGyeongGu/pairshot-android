@@ -64,6 +64,13 @@ object TutorialStepDefinitions {
                 nextButtonLabelResId = R.string.tutorial_button_next,
             ),
             TutorialStepDef(
+                id = TutorialStepId.AFTER_CAMERA_SELECTED_CARD_GUIDE,
+                anchor = AnchorKey.AFTER_CAMERA_SELECTED_CARD,
+                messageResId = R.string.tutorial_msg_after_selected_card,
+                advance = AdvanceCondition.UserAction(TutorialActionIds.AFTER_CAMERA_BEFORE_PREVIEW_OPENED),
+                dimAlpha = TutorialStepDef.CAMERA_DIM_ALPHA,
+            ),
+            TutorialStepDef(
                 id = TutorialStepId.AFTER_CAMERA_SHUTTER_GUIDE,
                 anchor = AnchorKey.AFTER_CAMERA_OVERLAY,
                 messageResId = R.string.tutorial_msg_after_overlay,
@@ -141,6 +148,7 @@ object TutorialStepDefinitions {
                 showSkip = false,
                 nextButtonLabelResId = R.string.tutorial_button_finish,
                 centerMessage = true,
+                strokeAnchor = false,
             ),
         )
 

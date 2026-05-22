@@ -52,6 +52,7 @@ import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.camera.R
 import com.pairshot.feature.camera.chrome.CameraBottomBar
+import com.pairshot.feature.camera.component.BeforePhotoFullPreview
 import com.pairshot.feature.camera.component.BeforePreviewStrip
 import com.pairshot.feature.camera.component.BeforeStripHeight
 import com.pairshot.feature.camera.component.CameraSettingsSheet
@@ -128,6 +129,7 @@ internal fun AfterCameraScreen(
 
     var overlayBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var overlayRotation by remember { mutableFloatStateOf(0f) }
+    var beforePreviewUriForFullView by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(overlayInputs.pair?.beforePhotoUri, overlayInputs.lensFacing) {
         val pair = overlayInputs.pair
@@ -358,6 +360,12 @@ internal fun AfterCameraScreen(
                             .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.AFTER_CAMERA_STRIP),
                     selectedIndex = if (totalCount > 0) currentIndex else null,
                     onSelectIndex = viewModel::selectIndex,
+                    onLongPressIndex = { idx ->
+                        beforePreviewUris.getOrNull(idx)?.let {
+                            beforePreviewUriForFullView = it
+                            tutorialActions.report(TutorialActionIds.AFTER_CAMERA_BEFORE_PREVIEW_OPENED)
+                        }
+                    },
                     listState = thumbnailListState,
                     emptyMessage = stringResource(R.string.camera_strip_empty_after),
                     stripHeight = stripSectionHeight,
@@ -450,6 +458,14 @@ internal fun AfterCameraScreen(
                         .align(Alignment.TopCenter)
                         .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
                         .padding(top = PairShotSnackbarTokens.topOffset),
+            )
+        }
+
+        beforePreviewUriForFullView?.let { uri ->
+            BeforePhotoFullPreview(
+                uri = uri,
+                bottomAnchor = shutterSectionHeight + bottomSpacerHeight,
+                onDismiss = { beforePreviewUriForFullView = null },
             )
         }
     }

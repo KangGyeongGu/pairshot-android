@@ -7,6 +7,7 @@
     <string name="tutorial_msg_camera_back">Go back to home.</string>
     <string name="tutorial_msg_home_pair_card">Tap the photo you just took.</string>
     <string name="tutorial_msg_after_strip">You can review the BEFORE shot here.</string>
+    <string name="tutorial_msg_after_selected_card">Long-press the current BEFORE card to view the original in full size. Try it once.</string>
     <string name="tutorial_msg_after_overlay">Follow the overlay and rotation hint of the BEFORE shot to finish AFTER capture.</string>
     <string name="tutorial_msg_after_shutter">Take the AFTER shot.</string>
     <string name="tutorial_msg_after_back">Go back to home.</string>
