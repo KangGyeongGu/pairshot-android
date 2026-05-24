@@ -23,6 +23,6 @@ fun CombineSettingsRoute(
         isProSubscriber = isProSubscriber,
         onCombineConfigChange = viewModel::updateCombineConfig,
         onNavigateBack = onNavigateBack,
-        onProLocked = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
+        onProLock = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
     )
 }

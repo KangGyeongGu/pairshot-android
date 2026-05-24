@@ -31,9 +31,9 @@ import com.pairshot.core.ui.R as CoreR
 @Composable
 fun PairPreviewTopBar(
     onClose: () -> Unit,
-    onShareSelected: () -> Unit,
+    onShareSelection: () -> Unit,
     onNavigateToAfterCamera: () -> Unit,
-    onDeleteRequested: () -> Unit,
+    onDeleteRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -79,7 +79,7 @@ fun PairPreviewTopBar(
                         },
                         onClick = {
                             menuExpanded = false
-                            onShareSelected()
+                            onShareSelection()
                         },
                     )
                     DropdownMenuItem(
@@ -104,7 +104,7 @@ fun PairPreviewTopBar(
                         },
                         onClick = {
                             menuExpanded = false
-                            onDeleteRequested()
+                            onDeleteRequest()
                         },
                     )
                 }

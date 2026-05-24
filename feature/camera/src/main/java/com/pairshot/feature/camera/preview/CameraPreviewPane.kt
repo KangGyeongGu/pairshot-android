@@ -54,15 +54,15 @@ internal fun CameraPreviewPane(
     currentExposureIndex: Int,
     exposureStepNumerator: Int,
     exposureStepDenominator: Int,
-    modifier: Modifier = Modifier,
-    selectedAspectRatio: AspectRatio? = null,
-    onZoomRatioChanged: (Float) -> Unit,
-    onPresetTapped: (Float) -> Unit,
+    onZoomRatioChange: (Float) -> Unit,
+    onPresetTap: (Float) -> Unit,
     onDragEnd: () -> Unit,
     onExposureReset: () -> Unit,
     onExposureAdjust: (Int) -> Unit,
     onTapToFocus: (x: Float, y: Float, viewWidth: Int, viewHeight: Int) -> Unit,
     onToggleLens: () -> Unit,
+    modifier: Modifier = Modifier,
+    selectedAspectRatio: AspectRatio? = null,
     overlayContent: (@Composable () -> Unit)? = null,
 ) {
     val latestZoomRatio = rememberUpdatedState(zoomUiState.currentRatio)
@@ -76,7 +76,7 @@ internal fun CameraPreviewPane(
                     val newRatio =
                         (latestZoomRatio.value * zoom)
                             .coerceIn(zoomUiState.minRatio, zoomUiState.maxRatio)
-                    onZoomRatioChanged(newRatio)
+                    onZoomRatioChange(newRatio)
                 }
             },
     ) {
@@ -183,8 +183,8 @@ internal fun CameraPreviewPane(
 
                 ZoomControls(
                     zoomUiState = zoomUiState,
-                    onZoomRatioChanged = onZoomRatioChanged,
-                    onPresetTapped = onPresetTapped,
+                    onZoomRatioChange = onZoomRatioChange,
+                    onPresetTap = onPresetTap,
                     onDragEnd = onDragEnd,
                     onToggleLens = onToggleLens,
                     modifier =

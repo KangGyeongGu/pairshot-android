@@ -330,9 +330,13 @@ constructor(
 
     suspend fun setCurrentTutorialStep(stepName: String?) {
         context.appDataStore.edit { prefs ->
-            if (stepName == null) prefs.remove(
-                Keys.CURRENT_TUTORIAL_STEP
-            ) else prefs[Keys.CURRENT_TUTORIAL_STEP] = stepName
+            if (stepName == null) {
+                prefs.remove(
+                    Keys.CURRENT_TUTORIAL_STEP
+                )
+            } else {
+                prefs[Keys.CURRENT_TUTORIAL_STEP] = stepName
+            }
         }
     }
 

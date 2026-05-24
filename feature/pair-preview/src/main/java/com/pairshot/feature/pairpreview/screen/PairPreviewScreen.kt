@@ -29,13 +29,13 @@ fun PairPreviewScreen(
     onLivePreviewRetry: () -> Unit,
     showDeleteDialog: Boolean,
     onClose: () -> Unit,
-    onShareSelected: () -> Unit,
+    onShareSelection: () -> Unit,
     onNavigateToAfterCamera: () -> Unit,
     onNavigateToBeforeRetake: () -> Unit,
-    onDeleteRequested: () -> Unit,
+    onDeleteRequest: () -> Unit,
     onDeleteAll: () -> Unit,
     onDeleteCombinedOnly: () -> Unit,
-    onDeleteDismissed: () -> Unit,
+    onDeleteDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -55,9 +55,9 @@ fun PairPreviewScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 PairPreviewTopBar(
                     onClose = onClose,
-                    onShareSelected = onShareSelected,
+                    onShareSelection = onShareSelection,
                     onNavigateToAfterCamera = onNavigateToAfterCamera,
-                    onDeleteRequested = onDeleteRequested,
+                    onDeleteRequest = onDeleteRequest,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -98,7 +98,7 @@ fun PairPreviewScreen(
             combinedCount = if (hasCombined) 1 else 0,
             onDeleteAll = onDeleteAll,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
-            onDismiss = onDeleteDismissed,
+            onDismiss = onDeleteDismiss,
         )
     }
 }

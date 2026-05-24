@@ -3,6 +3,14 @@ package com.pairshot.core.rendering
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.CombineLayout
 import com.pairshot.core.model.LabelAnchor
+import com.pairshot.core.rendering.internal.BorderInsets
+import com.pairshot.core.rendering.internal.LabelRect
+import com.pairshot.core.rendering.internal.VerticalAlignment
+import com.pairshot.core.rendering.internal.computeBorderRegion
+import com.pairshot.core.rendering.internal.computeSingleBorderRegion
+import com.pairshot.core.rendering.internal.resolveBorderLabelEdgePx
+import com.pairshot.core.rendering.internal.resolveLabelFontSize
+import com.pairshot.core.rendering.internal.toBorderVerticalAlignment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

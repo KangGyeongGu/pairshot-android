@@ -101,7 +101,7 @@ internal fun WatermarkTypeItem(
     selectedType: WatermarkType,
     isProSubscriber: Boolean,
     onTypeChange: (WatermarkType) -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
 ) {
     Row(
         modifier =
@@ -134,7 +134,7 @@ internal fun WatermarkTypeItem(
                                 Color.Transparent
                             },
                         ).clickable {
-                            if (isLocked) onProLocked() else onTypeChange(type)
+                            if (isLocked) onProLock() else onTypeChange(type)
                         }.padding(
                             horizontal = PairShotSpacing.md,
                             vertical = PairShotSpacing.sm,

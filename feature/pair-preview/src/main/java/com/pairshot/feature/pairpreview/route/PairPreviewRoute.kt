@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,13 +47,14 @@ internal interface PairPreviewRenderEntryPoint {
 @Composable
 fun PairPreviewRoute(
     onDismiss: () -> Unit,
-    onShareSelected: (pairId: Long) -> Unit,
+    onShareSelection: (pairId: Long) -> Unit,
     onNavigateToAfterCamera: (pairId: Long) -> Unit,
     onNavigateToBeforeRetake: (pairId: Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PairPreviewViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
 
     val context = LocalContext.current
     val composer =
@@ -67,7 +70,7 @@ fun PairPreviewRoute(
 
     var livePreviewBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var livePreviewFailed by remember { mutableStateOf(false) }
-    var retryToken by remember { mutableStateOf(0) }
+    var retryToken by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(livePreviewInputs, retryToken) {
         val inputs = livePreviewInputs
@@ -111,7 +114,7 @@ fun PairPreviewRoute(
 
     LaunchedEffect(Unit) {
         viewModel.deleteComplete.collect {
-            onDismiss()
+            currentOnDismiss()
         }
     }
 
@@ -159,13 +162,13 @@ fun PairPreviewRoute(
                         onLivePreviewRetry = { retryToken += 1 },
                         showDeleteDialog = state.showDeleteDialog,
                         onClose = onDismiss,
-                        onShareSelected = { onShareSelected(viewModel.pairId) },
+                        onShareSelection = { onShareSelection(viewModel.pairId) },
                         onNavigateToAfterCamera = { onNavigateToAfterCamera(viewModel.pairId) },
                         onNavigateToBeforeRetake = { onNavigateToBeforeRetake(viewModel.pairId) },
-                        onDeleteRequested = viewModel::showDeleteDialog,
+                        onDeleteRequest = viewModel::showDeleteDialog,
                         onDeleteAll = viewModel::deletePair,
                         onDeleteCombinedOnly = viewModel::deleteCombinedOnly,
-                        onDeleteDismissed = viewModel::dismissDeleteDialog,
+                        onDeleteDismiss = viewModel::dismissDeleteDialog,
                     )
                 }
             }

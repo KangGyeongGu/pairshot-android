@@ -32,6 +32,7 @@ fun CreateAlbumDialog(
     onFetchLocation: () -> Unit,
     onConfirm: (name: String, address: String?, latitude: Double?, longitude: Double?) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var albumName by remember { mutableStateOf(currentLocation?.shortAddress ?: "") }
 
@@ -61,6 +62,7 @@ fun CreateAlbumDialog(
     }
 
     PairShotDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         title = {
             Text(

@@ -10,7 +10,7 @@ import com.pairshot.core.ui.component.PairShotSwitchListItem
 import com.pairshot.core.ui.component.SettingsCard
 import com.pairshot.core.ui.component.SettingsDivider
 
-@AccessibilityPreviews
+@PreviewAccessibility
 @Composable
 @Suppress("UnusedPrivateMember")
 private fun PairShotListItemAccessibilityPreview() {

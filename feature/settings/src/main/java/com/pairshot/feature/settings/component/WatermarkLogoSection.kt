@@ -31,11 +31,12 @@ import com.pairshot.core.ui.component.SettingsDivider
 import com.pairshot.core.ui.component.SettingsItem
 import com.pairshot.core.ui.component.SettingsSliderItem
 import com.pairshot.feature.settings.R
+import kotlinx.collections.immutable.persistentListOf
 import java.io.File
 import kotlin.math.roundToInt
 
 private val logoPositionOrder =
-    listOf(
+    persistentListOf(
         LogoPosition.TOP_LEFT,
         LogoPosition.TOP_CENTER,
         LogoPosition.TOP_RIGHT,

@@ -126,10 +126,14 @@ private val licenseItems =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LicenseScreen(onNavigateBack: () -> Unit) {
+fun LicenseScreen(
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
 
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(

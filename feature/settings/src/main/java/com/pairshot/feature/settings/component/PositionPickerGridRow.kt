@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.semantics
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotSpacing
+import kotlinx.collections.immutable.ImmutableList
 
 private const val GRID_COLUMN_COUNT = 3
 private val CheckIconSize = PairShotSpacing.lg
@@ -30,7 +31,7 @@ private val CheckIconSize = PairShotSpacing.lg
 @Composable
 internal fun <T> PositionPickerGridRow(
     label: String,
-    positions: List<T>,
+    positions: ImmutableList<T>,
     selectedPosition: T,
     onPositionChange: (T) -> Unit,
     modifier: Modifier = Modifier,

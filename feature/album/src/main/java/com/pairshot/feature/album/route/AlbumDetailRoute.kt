@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,23 +27,31 @@ fun AlbumDetailRoute(
     onNavigateToCamera: (albumId: Long) -> Unit,
     onNavigateToPairPicker: (albumId: Long) -> Unit,
     onNavigateToExportSettings: (pairIds: Set<Long>) -> Unit,
-    onShareSelected: (pairIds: Set<Long>) -> Unit,
-    onSaveSelectedToDevice: (pairIds: Set<Long>) -> Unit,
+    onShareSelection: (pairIds: Set<Long>) -> Unit,
+    onSaveSelectionToDevice: (pairIds: Set<Long>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
+    val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
+    val currentOnNavigateToPairPreview by rememberUpdatedState(onNavigateToPairPreview)
+    val currentOnNavigateToAfterCamera by rememberUpdatedState(onNavigateToAfterCamera)
+    val currentOnNavigateToBeforeRetake by rememberUpdatedState(onNavigateToBeforeRetake)
+    val currentOnNavigateToCamera by rememberUpdatedState(onNavigateToCamera)
+    val currentOnNavigateToPairPicker by rememberUpdatedState(onNavigateToPairPicker)
+
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
             when (event) {
-                is AlbumDetailEvent.NavigateBack -> onNavigateBack()
-                is AlbumDetailEvent.NavigateToPairPreview -> onNavigateToPairPreview(event.pairId)
-                is AlbumDetailEvent.NavigateToAfterCamera -> onNavigateToAfterCamera(event.pairId, event.albumId)
-                is AlbumDetailEvent.NavigateToBeforeRetake -> onNavigateToBeforeRetake(event.pairId)
-                is AlbumDetailEvent.NavigateToCamera -> onNavigateToCamera(event.albumId)
-                is AlbumDetailEvent.NavigateToPairPicker -> onNavigateToPairPicker(event.albumId)
+                is AlbumDetailEvent.NavigateBack -> currentOnNavigateBack()
+                is AlbumDetailEvent.NavigateToPairPreview -> currentOnNavigateToPairPreview(event.pairId)
+                is AlbumDetailEvent.NavigateToAfterCamera ->
+                    currentOnNavigateToAfterCamera(event.pairId, event.albumId)
+                is AlbumDetailEvent.NavigateToBeforeRetake -> currentOnNavigateToBeforeRetake(event.pairId)
+                is AlbumDetailEvent.NavigateToCamera -> currentOnNavigateToCamera(event.albumId)
+                is AlbumDetailEvent.NavigateToPairPicker -> currentOnNavigateToPairPicker(event.albumId)
             }
         }
     }
@@ -73,8 +82,8 @@ fun AlbumDetailRoute(
                 onExitSelectionMode = viewModel::exitSelectionMode,
                 onCaptureBeforeClick = viewModel::onFabClick,
                 onAddPairsClick = viewModel::onAddPairsClick,
-                onShareClick = { onShareSelected(state.selectedIds) },
-                onSaveToDeviceClick = { onSaveSelectedToDevice(state.selectedIds) },
+                onShareClick = { onShareSelection(state.selectedIds) },
+                onSaveToDeviceClick = { onSaveSelectionToDevice(state.selectedIds) },
                 onDeleteClick = viewModel::showDeletePairsDialog,
                 onExportSettingsClick = { onNavigateToExportSettings(state.selectedIds) },
                 onRenameClick = viewModel::showRenameDialog,

@@ -36,6 +36,7 @@ import com.pairshot.feature.settings.viewmodel.SettingsViewModel
 import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsEvent
 import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
@@ -124,7 +125,7 @@ fun SettingsRoute(
     if (showPromotionDialog) {
         PromotionRegisterDialog(
             activationState = activationState,
-            myPromotions = myPromotions,
+            myPromotions = myPromotions.toImmutableList(),
             myPromotionsLoading = myPromotionsLoading,
             onActivate = { code -> promotionViewModel.activate(code) },
             onLoadMyPromotions = { promotionViewModel.loadMyPromotions() },

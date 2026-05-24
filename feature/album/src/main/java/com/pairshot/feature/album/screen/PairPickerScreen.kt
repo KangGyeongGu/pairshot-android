@@ -25,6 +25,8 @@ import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
 import com.pairshot.feature.album.component.PairPickerGridSection
 import com.pairshot.feature.album.viewmodel.PairPickerUiState
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,9 +97,9 @@ fun PairPickerScreen(
         },
     ) { innerPadding ->
         PairPickerGridSection(
-            pairs = state.pairs,
-            selectedIds = state.selectedIds,
-            alreadyInAlbumIds = state.alreadyInAlbumIds,
+            pairs = state.pairs.toImmutableList(),
+            selectedIds = state.selectedIds.toImmutableSet(),
+            alreadyInAlbumIds = state.alreadyInAlbumIds.toImmutableSet(),
             onToggle = onToggle,
             contentPadding =
             androidx.compose.foundation.layout.PaddingValues(

@@ -48,7 +48,7 @@ fun WatermarkSettingsRoute(
         onSelectLogo = { logoPickerLauncher.launch(arrayOf("image/*")) },
         onRemoveLogo = viewModel::removeLogo,
         onNavigateBack = onNavigateBack,
-        onProLocked = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
+        onProLock = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
         watermarkRenderer = watermarkRenderer,
         previewSampleProvider = previewSampleProvider,
     )

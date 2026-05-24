@@ -49,11 +49,13 @@ fun WatermarkSettingsScreen(
     onSelectLogo: () -> Unit,
     onRemoveLogo: () -> Unit,
     onNavigateBack: () -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
     watermarkRenderer: WatermarkRenderer,
     previewSampleProvider: PreviewSampleProvider,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
@@ -114,7 +116,7 @@ fun WatermarkSettingsScreen(
                             onTypeChange = { type ->
                                 onWatermarkConfigChange(watermarkConfig.copy(type = type))
                             },
-                            onProLocked = onProLocked,
+                            onProLock = onProLock,
                         )
                     }
                 }

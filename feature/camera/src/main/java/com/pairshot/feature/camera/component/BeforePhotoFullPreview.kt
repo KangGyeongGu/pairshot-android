@@ -44,6 +44,7 @@ fun BeforePhotoFullPreview(
     uri: String,
     bottomAnchor: Dp,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler { onDismiss() }
 
@@ -59,7 +60,7 @@ fun BeforePhotoFullPreview(
 
     BoxWithConstraints(
         modifier =
-        Modifier
+        modifier
             .fillMaxSize()
             .clickable(
                 interactionSource = scrimInteraction,

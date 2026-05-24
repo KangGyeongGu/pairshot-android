@@ -47,7 +47,7 @@ class ZoomStateHolder {
         _zoomUiState.update { it.copy(currentRatio = clamped) }
     }
 
-    fun onPresetTapped(preset: Float) {
+    fun onPresetTap(preset: Float) {
         _zoomUiState.update {
             it.copy(
                 currentRatio = preset,

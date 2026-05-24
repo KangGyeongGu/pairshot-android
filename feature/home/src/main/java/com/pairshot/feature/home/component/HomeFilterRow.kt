@@ -26,7 +26,7 @@ fun HomeFilterRow(
     selectedMode: HomeMode,
     inSelectionMode: Boolean,
     sortOrder: SortOrder,
-    onModeSelected: (HomeMode) -> Unit,
+    onModeChange: (HomeMode) -> Unit,
     onToggleSortOrder: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,7 +50,7 @@ fun HomeFilterRow(
                     }
                 FilterChip(
                     selected = selectedMode == mode,
-                    onClick = { onModeSelected(mode) },
+                    onClick = { onModeChange(mode) },
                     label = {
                         Text(
                             text = label,

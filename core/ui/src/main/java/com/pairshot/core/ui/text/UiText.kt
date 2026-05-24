@@ -6,17 +6,19 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 sealed class UiText {
     data class Resource(
         @param:StringRes val resId: Int,
-        val args: List<Any> = emptyList(),
+        val args: ImmutableList<Any> = persistentListOf(),
     ) : UiText()
 
     data class Plural(
         @param:PluralsRes val resId: Int,
         val count: Int,
-        val args: List<Any> = emptyList(),
+        val args: ImmutableList<Any> = persistentListOf(),
     ) : UiText()
 
     data class Dynamic(
@@ -42,7 +44,7 @@ sealed class UiText {
 @Composable
 private fun resolveCompose(
     resId: Int,
-    args: List<Any>,
+    args: ImmutableList<Any>,
 ): String =
     when {
         args.isEmpty() -> stringResource(resId)
@@ -55,7 +57,7 @@ private fun resolveCompose(
 private fun resolvePluralCompose(
     resId: Int,
     count: Int,
-    args: List<Any>,
+    args: ImmutableList<Any>,
 ): String =
     when {
         args.isEmpty() -> pluralStringResource(resId, count)
@@ -67,7 +69,7 @@ private fun resolvePluralCompose(
 private fun resolveContext(
     context: Context,
     resId: Int,
-    args: List<Any>,
+    args: ImmutableList<Any>,
 ): String =
     when {
         args.isEmpty() -> context.getString(resId)
@@ -80,7 +82,7 @@ private fun resolvePluralContext(
     context: Context,
     resId: Int,
     count: Int,
-    args: List<Any>,
+    args: ImmutableList<Any>,
 ): String =
     when {
         args.isEmpty() -> context.resources.getQuantityString(resId, count)

@@ -37,14 +37,16 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.album.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 
 private const val PAIR_CARD_ASPECT_RATIO = PairCardSpec.ASPECT_RATIO
 
 @Composable
 fun PairPickerGridSection(
-    pairs: List<PhotoPair>,
-    selectedIds: Set<Long>,
-    alreadyInAlbumIds: Set<Long>,
+    pairs: ImmutableList<PhotoPair>,
+    selectedIds: ImmutableSet<Long>,
+    alreadyInAlbumIds: ImmutableSet<Long>,
     onToggle: (Long) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,

@@ -13,4 +13,4 @@ import androidx.compose.ui.tooling.preview.Preview
     device = "spec:width=320dp,height=640dp,dpi=320",
     showBackground = true,
 )
-annotation class AccessibilityPreviews
+annotation class PreviewAccessibility

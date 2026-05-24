@@ -114,7 +114,7 @@ fun ProfiledAsyncImage(
 }
 
 @Composable
-private fun ErrorPlaceholder(modifier: Modifier) {
+private fun ErrorPlaceholder(modifier: Modifier = Modifier) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         ErrorContent()
     }

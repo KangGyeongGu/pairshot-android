@@ -32,6 +32,8 @@ import com.pairshot.core.ui.component.PairCard
 import com.pairshot.feature.home.R
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
@@ -59,8 +61,8 @@ private fun formatDateLabel(
 
 @Composable
 fun HomePairGridSection(
-    pairs: List<PhotoPair>,
-    selectedIds: Set<Long>,
+    pairs: ImmutableList<PhotoPair>,
+    selectedIds: ImmutableSet<Long>,
     selectionMode: Boolean,
     sortOrder: SortOrder,
     onPairClick: (Long) -> Unit,

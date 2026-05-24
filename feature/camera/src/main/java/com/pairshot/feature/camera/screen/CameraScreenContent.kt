@@ -34,13 +34,14 @@ import com.pairshot.feature.camera.component.CameraSettingsSheet
 import com.pairshot.feature.camera.component.ZoomUiState
 import com.pairshot.feature.camera.state.CameraSettingsState
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
+import kotlinx.collections.immutable.ImmutableList
 
 val CameraShutterSectionHeight = CameraSpec.shutterSectionHeight
 val CameraBottomSpacer = CameraSpec.bottomSpacer
 
 data class CameraScreenCallbacks(
-    val onZoomRatioChanged: (Float) -> Unit,
-    val onPresetTapped: (Float) -> Unit,
+    val onZoomRatioChange: (Float) -> Unit,
+    val onPresetTap: (Float) -> Unit,
     val onDragEnd: () -> Unit,
     val onExposureReset: () -> Unit,
     val onExposureAdjust: (Int) -> Unit,
@@ -68,12 +69,13 @@ fun CameraScreenContent(
     capabilities: CameraCapabilities,
     roll: Float,
     blackoutAlpha: Float,
-    beforePreviewUris: List<String>,
+    beforePreviewUris: ImmutableList<String>,
     callbacks: CameraScreenCallbacks,
+    modifier: Modifier = Modifier,
     snackbarController: PairShotSnackbarController = remember { PairShotSnackbarController() },
     thumbnailListState: LazyListState = rememberLazyListState(),
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(PairShotCameraTokens.Letterbox)) {
+    Box(modifier = modifier.fillMaxSize().background(PairShotCameraTokens.Letterbox)) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
@@ -99,8 +101,8 @@ fun CameraScreenContent(
                         .fillMaxWidth()
                         .weight(1f)
                         .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_PREVIEW),
-                    onZoomRatioChanged = callbacks.onZoomRatioChanged,
-                    onPresetTapped = callbacks.onPresetTapped,
+                    onZoomRatioChange = callbacks.onZoomRatioChange,
+                    onPresetTap = callbacks.onPresetTap,
                     onDragEnd = callbacks.onDragEnd,
                     onExposureReset = callbacks.onExposureReset,
                     onExposureAdjust = callbacks.onExposureAdjust,

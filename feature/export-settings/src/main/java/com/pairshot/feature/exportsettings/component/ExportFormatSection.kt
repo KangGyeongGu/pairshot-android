@@ -28,7 +28,7 @@ fun ExportFormatSection(
     format: ExportFormat,
     isProSubscriber: Boolean,
     onFormatChange: (ExportFormat) -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
 ) {
     SettingsCard {
         ExportFormatRadioItem(
@@ -43,7 +43,7 @@ fun ExportFormatSection(
             selected = format == ExportFormat.ZIP,
             locked = !isProSubscriber,
             onClick = {
-                if (isProSubscriber) onFormatChange(ExportFormat.ZIP) else onProLocked()
+                if (isProSubscriber) onFormatChange(ExportFormat.ZIP) else onProLock()
             },
         )
     }

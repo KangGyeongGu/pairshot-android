@@ -27,10 +27,13 @@ import com.pairshot.core.designsystem.PairShotTypographyTokens
 private const val DISABLED_ALPHA = 0.38f
 
 @Composable
-fun PairShotActionBar(content: @Composable RowScope.() -> Unit) {
+fun PairShotActionBar(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
     val barColor =
         if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainer
-    Surface(color = barColor) {
+    Surface(modifier = modifier, color = barColor) {
         Box(
             modifier =
             Modifier

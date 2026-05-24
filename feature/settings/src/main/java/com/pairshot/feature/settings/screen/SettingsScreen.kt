@@ -94,6 +94,7 @@ fun SettingsScreen(
     showAdsConsent: Boolean,
     onAdsConsentClick: () -> Unit,
     onReplayTutorial: () -> Unit,
+    modifier: Modifier = Modifier,
     highlight: SettingsHighlight? = null,
     proSubscriptionSection: @Composable () -> Unit = {},
 ) {
@@ -182,7 +183,7 @@ fun SettingsScreen(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier =
             Modifier

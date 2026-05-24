@@ -39,22 +39,24 @@ import com.pairshot.feature.home.component.HomeSelectionBottomBar
 import com.pairshot.feature.home.component.HomeTopBar
 import com.pairshot.feature.home.dialog.CreateAlbumDialog
 import com.pairshot.feature.home.viewmodel.HomeMode
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import com.pairshot.core.ui.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     mode: HomeMode,
-    pairs: List<PhotoPair>,
-    albums: List<Album>,
+    pairs: ImmutableList<PhotoPair>,
+    albums: ImmutableList<Album>,
     selectionMode: Boolean,
-    selectedIds: Set<Long>,
+    selectedIds: ImmutableSet<Long>,
     albumSelectionMode: Boolean,
-    selectedAlbumIds: Set<Long>,
+    selectedAlbumIds: ImmutableSet<Long>,
     currentLocation: LocationResult?,
     showCreateAlbumDialog: Boolean,
     sortOrder: SortOrder,
-    onModeSelected: (HomeMode) -> Unit,
+    onModeChange: (HomeMode) -> Unit,
     onToggleSortOrder: () -> Unit,
     onPairClick: (Long) -> Unit,
     onPairLongClick: (Long) -> Unit,
@@ -68,7 +70,7 @@ fun HomeScreen(
     onToggleSelectAll: () -> Unit,
     onShare: () -> Unit,
     onSaveToDevice: () -> Unit,
-    onDeleteSelected: () -> Unit,
+    onDeleteSelection: () -> Unit,
     onDeleteCombinedOnly: () -> Unit,
     onExportSettings: () -> Unit,
     onCreateAlbumClick: () -> Unit,
@@ -158,7 +160,7 @@ fun HomeScreen(
                 selectedMode = mode,
                 inSelectionMode = inSelectionMode,
                 sortOrder = sortOrder,
-                onModeSelected = onModeSelected,
+                onModeChange = onModeChange,
                 onToggleSortOrder = onToggleSortOrder,
             )
             Spacer(modifier = Modifier.height(PairShotSpacing.sm))
@@ -229,7 +231,7 @@ fun HomeScreen(
             combinedCount = combinedInSelection,
             onDeleteAll = {
                 showDeleteConfirmDialog = false
-                onDeleteSelected()
+                onDeleteSelection()
             },
             onDeleteCombinedOnly = {
                 showDeleteConfirmDialog = false

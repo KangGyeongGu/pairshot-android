@@ -25,6 +25,7 @@ import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.home.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -294,7 +295,7 @@ constructor(
                         UiText.Plural(
                             resId = R.plurals.home_event_delete_result,
                             count = result.deleted + result.failed,
-                            args = listOf(result.deleted, result.failed),
+                            args = persistentListOf<Any>(result.deleted, result.failed),
                         ),
                     ),
                 )
@@ -313,7 +314,7 @@ constructor(
         }
     }
 
-    fun onShareSelected() {
+    fun onShareSelection() {
         val ids = _selectedIds.value.toSet()
         if (ids.isEmpty()) return
         viewModelScope.launch {

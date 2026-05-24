@@ -46,6 +46,8 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 private const val SPOTLIGHT_PADDING_PX = 12f
 private const val SPOTLIGHT_CORNER_RADIUS_PX = 24f
@@ -148,7 +150,10 @@ private fun OverlayContent(
                     },
             )
         } else if (def.advance is AdvanceCondition.UserAction && overlaySize != IntSize.Zero) {
-            val allowed = listOfNotNull(anchorBounds, actionAnchorBounds)
+            val allowed = persistentListOf<AnchorBounds>().builder().apply {
+                anchorBounds?.let { add(it) }
+                actionAnchorBounds?.let { add(it) }
+            }.build()
             if (allowed.isNotEmpty()) {
                 SpotlightTouchBlocker(
                     allowedAnchors = allowed,
@@ -286,7 +291,7 @@ private fun AnchorBounds.toAllowedTouchRect(
 
 @Composable
 private fun BoxScope.SpotlightTouchBlocker(
-    allowedAnchors: List<AnchorBounds>,
+    allowedAnchors: ImmutableList<AnchorBounds>,
     overlaySize: IntSize,
     stepId: TutorialStepId,
 ) {

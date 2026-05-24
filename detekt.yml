@@ -149,6 +149,11 @@ Compose:
     active: true
   ComposableNaming:
     active: true
+  CompositionLocalAllowlist:
+    active: true
+    allowedCompositionLocals:
+      - LocalAppTextScale
+      - LocalPairShotExtendedColors
   ContentEmitterReturningValues:
     active: true
   DefaultsVisibility:

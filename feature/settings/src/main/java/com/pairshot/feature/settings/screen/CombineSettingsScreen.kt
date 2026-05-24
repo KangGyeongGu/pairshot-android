@@ -56,6 +56,7 @@ import com.pairshot.feature.settings.component.ProLockedSwitchItem
 import com.pairshot.feature.settings.component.SegmentedToggleRow
 import com.pairshot.feature.settings.component.borderLabelAnchorOrder
 import com.pairshot.feature.settings.component.labelAnchorOrder
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
@@ -67,7 +68,8 @@ fun CombineSettingsScreen(
     isProSubscriber: Boolean,
     onCombineConfigChange: (CombineConfig) -> Unit,
     onNavigateBack: () -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var borderColorPickerVisible by remember { mutableStateOf(false) }
     var labelTextColorPickerVisible by remember { mutableStateOf(false) }
@@ -117,6 +119,7 @@ fun CombineSettingsScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
@@ -165,7 +168,7 @@ fun CombineSettingsScreen(
                     SettingsCard {
                         SegmentedToggleRow(
                             label = stringResource(R.string.combine_direction_label),
-                            entries = CombineLayout.entries,
+                            entries = CombineLayout.entries.toImmutableList(),
                             selected = combineConfig.layout,
                             onSelect = { layout ->
                                 onCombineConfigChange(combineConfig.copy(layout = layout))
@@ -254,7 +257,7 @@ fun CombineSettingsScreen(
                         } else {
                             ProLockedSwitchItem(
                                 label = stringResource(R.string.combine_item_label_use),
-                                onClick = onProLocked,
+                                onClick = onProLock,
                             )
                         }
                         AnimatedVisibility(
@@ -328,7 +331,7 @@ fun CombineSettingsScreen(
                             SettingsCard {
                                 SegmentedToggleRow(
                                     label = stringResource(R.string.combine_label_placement_label),
-                                    entries = LabelPlacement.entries,
+                                    entries = LabelPlacement.entries.toImmutableList(),
                                     selected = combineConfig.labelPlacement,
                                     onSelect = { placement ->
                                         onCombineConfigChange(combineConfig.withLabelPlacement(placement))
@@ -349,7 +352,7 @@ fun CombineSettingsScreen(
                                         SettingsDivider()
                                         SegmentedToggleRow(
                                             label = stringResource(R.string.combine_label_mode_label),
-                                            entries = LabelPositionMode.entries,
+                                            entries = LabelPositionMode.entries.toImmutableList(),
                                             selected = combineConfig.labelPositionMode,
                                             onSelect = { mode ->
                                                 onCombineConfigChange(combineConfig.copy(labelPositionMode = mode))
@@ -369,7 +372,7 @@ fun CombineSettingsScreen(
                                             SettingsDivider()
                                             SegmentedToggleRow(
                                                 label = stringResource(R.string.combine_label_position_label),
-                                                entries = LabelPosition.entries,
+                                                entries = LabelPosition.entries.toImmutableList(),
                                                 selected = combineConfig.labelPosition,
                                                 onSelect = { position ->
                                                     onCombineConfigChange(combineConfig.copy(labelPosition = position))

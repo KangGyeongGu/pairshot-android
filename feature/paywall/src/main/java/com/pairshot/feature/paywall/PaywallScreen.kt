@@ -70,12 +70,13 @@ fun PaywallScreen(
     onRetryLoad: () -> Unit,
     termsUrl: String,
     privacyUrl: String,
+    modifier: Modifier = Modifier,
     snackbarController: PairShotSnackbarController = remember { PairShotSnackbarController() },
 ) {
     val uriHandler = LocalUriHandler.current
     if (!dismissible) BackHandler { }
 
-    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding()) {
+    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding()) {
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {

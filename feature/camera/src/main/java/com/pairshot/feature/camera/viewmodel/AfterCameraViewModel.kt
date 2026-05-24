@@ -267,8 +267,8 @@ constructor(
         zoomHolder.updateZoomRatio(ratio)
     }
 
-    fun onPresetTapped(preset: Float) {
-        zoomHolder.onPresetTapped(preset)
+    fun onPresetTap(preset: Float) {
+        zoomHolder.onPresetTap(preset)
     }
 
     fun applyCustomRatio() {

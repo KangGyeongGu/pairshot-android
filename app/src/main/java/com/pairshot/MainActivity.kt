@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -100,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     AppRootContent(
-                        onRouteChanged = { route ->
+                        onRouteChange = { route ->
                             metricsStateHolder.state?.putState("screen", route)
                         },
                         onStartupReady = { onStartupReady?.invoke() },
@@ -123,17 +124,18 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 private fun AppRootContent(
-    onRouteChanged: (String) -> Unit,
+    onRouteChange: (String) -> Unit,
     onStartupReady: () -> Unit,
+    selectionVm: SelectionActionViewModel = hiltViewModel(),
+    startupVm: StartupDecisionViewModel = hiltViewModel(),
 ) {
-    val selectionVm: SelectionActionViewModel = hiltViewModel()
-    val startupVm: StartupDecisionViewModel = hiltViewModel()
     val plan by startupVm.plan.collectAsStateWithLifecycle()
     val progress by selectionVm.progress.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
+    val currentOnStartupReady by rememberUpdatedState(onStartupReady)
 
     LaunchedEffect(plan) {
-        if (plan != null) onStartupReady()
+        if (plan != null) currentOnStartupReady()
     }
     val resolvedPlan = plan ?: return
     val resolvedRoute = resolvedPlan.initialRoute
@@ -210,9 +212,9 @@ private fun AppRootContent(
     Box(modifier = Modifier.fillMaxSize()) {
         PairShotNavHost(
             navController = navController,
-            onDestinationChanged = onRouteChanged,
-            onShareSelected = selectionVm::shareSelection,
-            onSaveSelectedToDevice = saveSelectedToDevice,
+            onDestinationChange = onRouteChange,
+            onShareSelection = selectionVm::shareSelection,
+            onSaveSelectionToDevice = saveSelectedToDevice,
             startDestination = resolvedRoute,
         )
 

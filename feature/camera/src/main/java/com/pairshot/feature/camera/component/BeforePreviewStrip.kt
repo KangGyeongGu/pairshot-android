@@ -56,6 +56,7 @@ import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.camera.R
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
+import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.abs
 
 internal val BeforeStripHeight: Dp = CameraSpec.beforeStripHeight
@@ -80,7 +81,7 @@ data class StripProgress(
 
 @Composable
 fun BeforePreviewStrip(
-    beforePreviewUris: List<String>,
+    beforePreviewUris: ImmutableList<String>,
     modifier: Modifier = Modifier,
     selectedIndex: Int? = null,
     onSelectIndex: ((Int) -> Unit)? = null,

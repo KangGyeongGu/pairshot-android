@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +66,7 @@ import com.pairshot.feature.camera.viewmodel.AfterCameraViewModel
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import com.pairshot.core.ui.R as CoreR
 
@@ -73,8 +75,8 @@ private val CameraShutterHeight = CameraSpec.shutterSectionHeight
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AfterCameraScreen(
-    viewModel: AfterCameraViewModel,
     onNavigateBack: () -> Unit,
+    viewModel: AfterCameraViewModel = hiltViewModel(),
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -82,6 +84,7 @@ internal fun AfterCameraScreen(
     val haptic = LocalHapticFeedback.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
+    val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
 
     val cameraSession = sessionViewModel.cameraSession
     val sensorSession = sessionViewModel.sensorSession
@@ -246,7 +249,7 @@ internal fun AfterCameraScreen(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     tutorialActions.report(TutorialActionIds.AFTER_CAMERA_SHUTTER)
                     if (isRetakeMode) {
-                        onNavigateBack()
+                        currentOnNavigateBack()
                     }
                 }
 
@@ -310,12 +313,12 @@ internal fun AfterCameraScreen(
                     exposureStepDenominator = capabilities.exposureStepDenominator,
                     selectedAspectRatio = settingsState.aspectRatio,
                     modifier = Modifier.fillMaxWidth().weight(1f),
-                    onZoomRatioChanged = { newRatio ->
+                    onZoomRatioChange = { newRatio ->
                         viewModel.updateZoomRatio(newRatio)
                         cameraSession.setZoom(newRatio)
                     },
-                    onPresetTapped = { preset ->
-                        viewModel.onPresetTapped(preset)
+                    onPresetTap = { preset ->
+                        viewModel.onPresetTap(preset)
                         cameraSession.setZoom(viewModel.zoomUiState.value.currentRatio)
                     },
                     onDragEnd = { viewModel.applyCustomRatio() },
@@ -351,7 +354,7 @@ internal fun AfterCameraScreen(
                 )
 
                 BeforePreviewStrip(
-                    beforePreviewUris = beforePreviewUris,
+                    beforePreviewUris = beforePreviewUris.toImmutableList(),
                     modifier =
                     Modifier
                         .height(stripSectionHeight)
@@ -401,7 +404,7 @@ internal fun AfterCameraScreen(
                     },
                     onThumbnailClick = {
                         tutorialActions.report(TutorialActionIds.AFTER_CAMERA_BACK_TO_HOME)
-                        onNavigateBack()
+                        currentOnNavigateBack()
                     },
                 )
 

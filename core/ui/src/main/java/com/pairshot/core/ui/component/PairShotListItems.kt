@@ -154,6 +154,7 @@ fun SettingsSliderItem(
     valueRange: ClosedFloatingPointRange<Float>,
     valueLabel: (Float) -> String,
     onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
     steps: Int = 0,
     onLiveUpdate: ((Float) -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
@@ -168,7 +169,7 @@ fun SettingsSliderItem(
 
     Column(
         modifier =
-        Modifier
+        modifier
             .fillMaxWidth()
             .padding(
                 horizontal = PairShotCard.innerPadding,
@@ -222,9 +223,9 @@ fun SettingsSliderItem(
 }
 
 @Composable
-fun SettingsDivider() {
+fun SettingsDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
-        modifier = Modifier.padding(horizontal = PairShotCard.innerPadding),
+        modifier = modifier.padding(horizontal = PairShotCard.innerPadding),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 }

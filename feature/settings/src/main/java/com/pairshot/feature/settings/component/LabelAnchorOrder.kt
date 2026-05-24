@@ -1,9 +1,11 @@
 package com.pairshot.feature.settings.component
 
 import com.pairshot.core.model.LabelAnchor
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 internal val labelAnchorOrder =
-    listOf(
+    persistentListOf(
         LabelAnchor.TOP_LEFT,
         LabelAnchor.TOP_CENTER,
         LabelAnchor.TOP_RIGHT,
@@ -18,4 +20,4 @@ internal val labelAnchorOrder =
 internal val borderLabelAnchorOrder =
     labelAnchorOrder.filterNot {
         it == LabelAnchor.MIDDLE_LEFT || it == LabelAnchor.MIDDLE_CENTER || it == LabelAnchor.MIDDLE_RIGHT
-    }
+    }.toImmutableList()

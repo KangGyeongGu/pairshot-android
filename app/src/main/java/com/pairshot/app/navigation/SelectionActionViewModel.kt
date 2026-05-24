@@ -19,6 +19,7 @@ import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.ui.R
 import com.pairshot.core.ui.text.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -209,7 +210,7 @@ constructor(
                         SelectionMessage.Success(
                             UiText.Resource(
                                 R.string.snackbar_success_saved_zip,
-                                listOf(result.displayName),
+                                persistentListOf<Any>(result.displayName),
                             ),
                         ),
                     )

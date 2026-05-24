@@ -23,12 +23,14 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.coroutines.flow.map
 
 @Composable
 fun AlbumPairGridSection(
-    pairs: List<PhotoPair>,
-    selectedIds: Set<Long>,
+    pairs: ImmutableList<PhotoPair>,
+    selectedIds: ImmutableSet<Long>,
     isSelectionMode: Boolean,
     sortOrder: SortOrder,
     onPairClick: (Long) -> Unit,

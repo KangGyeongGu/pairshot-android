@@ -70,8 +70,8 @@ private const val ZOOM_MAJOR_TICK_INTERVAL = 10
 @Composable
 fun ZoomControls(
     zoomUiState: ZoomUiState,
-    onZoomRatioChanged: (Float) -> Unit,
-    onPresetTapped: (Float) -> Unit,
+    onZoomRatioChange: (Float) -> Unit,
+    onPresetTap: (Float) -> Unit,
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     onToggleLens: (() -> Unit)? = null,
@@ -80,7 +80,7 @@ fun ZoomControls(
     val density = LocalDensity.current
     val haptic = LocalHapticFeedback.current
     val latestRatio by rememberUpdatedState(zoomUiState.currentRatio)
-    val latestOnZoomChanged by rememberUpdatedState(onZoomRatioChanged)
+    val latestOnZoomChanged by rememberUpdatedState(onZoomRatioChange)
     val latestOnDragEnd by rememberUpdatedState(onDragEnd)
 
     val rangeSpanPx = with(density) { ZOOM_DIAL_RANGE_SPAN_DP.dp.toPx() }
@@ -161,7 +161,7 @@ fun ZoomControls(
                 ) {
                     ZoomPresetCard(
                         zoomUiState = zoomUiState,
-                        onPresetTapped = onPresetTapped,
+                        onPresetTap = onPresetTap,
                     )
                 }
             }
@@ -202,7 +202,7 @@ fun ZoomControls(
 @Composable
 private fun ZoomPresetCard(
     zoomUiState: ZoomUiState,
-    onPresetTapped: (Float) -> Unit,
+    onPresetTap: (Float) -> Unit,
 ) {
     val primary = MaterialTheme.colorScheme.primary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
@@ -234,7 +234,7 @@ private fun ZoomPresetCard(
                 Modifier
                     .height(PairShotIconSize.lg)
                     .background(color = bgColor, shape = shape)
-                    .clickable { onPresetTapped(preset) }
+                    .clickable { onPresetTap(preset) }
                     .padding(horizontal = PairShotSpacing.md),
                 contentAlignment = Alignment.Center,
             ) {

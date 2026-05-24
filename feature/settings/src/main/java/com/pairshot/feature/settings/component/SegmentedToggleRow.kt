@@ -17,11 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun <T> SegmentedToggleRow(
     label: String,
-    entries: List<T>,
+    entries: ImmutableList<T>,
     selected: T,
     onSelect: (T) -> Unit,
     labelOf: @Composable (T) -> String,

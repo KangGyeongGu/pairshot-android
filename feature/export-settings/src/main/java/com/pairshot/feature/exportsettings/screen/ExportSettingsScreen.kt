@@ -71,12 +71,14 @@ fun ExportSettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToWatermarkSettings: () -> Unit,
     onNavigateToCombineSettings: () -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
     onShare: () -> Unit,
     onSaveToDevice: () -> Unit,
     onReplayTutorial: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
@@ -158,7 +160,7 @@ fun ExportSettingsScreen(
                                 format = format,
                                 isProSubscriber = isProSubscriber,
                                 onFormatChange = onFormatChange,
-                                onProLocked = onProLocked,
+                                onProLock = onProLock,
                             )
                         }
                     }

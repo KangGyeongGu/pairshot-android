@@ -6,6 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,7 +26,7 @@ private const val PRIVACY_URL = "https://pairshot.kangkyeonggu.com/privacy"
 fun PaywallRoute(
     dismissible: Boolean,
     onDismiss: () -> Unit,
-    onEntitled: () -> Unit,
+    onEntitlement: () -> Unit,
     trigger: PaywallTrigger = PaywallTrigger.NONE,
     viewModel: PaywallViewModel = hiltViewModel(),
 ) {
@@ -33,6 +34,7 @@ fun PaywallRoute(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarController = remember { PairShotSnackbarController() }
+    val currentOnEntitlement by rememberUpdatedState(onEntitlement)
 
     LaunchedEffect(trigger) {
         val messageRes =
@@ -67,7 +69,7 @@ fun PaywallRoute(
         viewModel.events.collect { event ->
             when (event) {
                 PaywallEvent.EntitlementGranted -> {
-                    onEntitled()
+                    currentOnEntitlement()
                 }
 
                 PaywallEvent.AlreadyOwned -> {
@@ -77,7 +79,7 @@ fun PaywallRoute(
                             SnackbarVariant.SUCCESS,
                         ),
                     )
-                    onEntitled()
+                    currentOnEntitlement()
                 }
 
                 is PaywallEvent.PurchaseFailed -> {
@@ -90,7 +92,7 @@ fun PaywallRoute(
                 }
 
                 PaywallEvent.RestoreSuccess -> {
-                    onEntitled()
+                    currentOnEntitlement()
                 }
 
                 PaywallEvent.RestoreEmpty -> {
@@ -103,7 +105,7 @@ fun PaywallRoute(
                 }
 
                 PaywallEvent.ContinuedFree -> {
-                    onEntitled()
+                    currentOnEntitlement()
                 }
             }
         }

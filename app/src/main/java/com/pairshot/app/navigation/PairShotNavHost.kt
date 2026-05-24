@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -45,19 +47,21 @@ import com.pairshot.feature.settings.screen.LicenseScreen
 
 @Composable
 fun PairShotNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    onDestinationChanged: (String) -> Unit = {},
-    onShareSelected: (Set<Long>) -> Unit = {},
-    onSaveSelectedToDevice: (Set<Long>) -> Unit = {},
+    onDestinationChange: (String) -> Unit = {},
+    onShareSelection: (Set<Long>) -> Unit = {},
+    onSaveSelectionToDevice: (Set<Long>) -> Unit = {},
     startDestination: Any = Camera(),
 ) {
+    val currentOnDestinationChange by rememberUpdatedState(onDestinationChange)
     DisposableEffect(navController) {
         val listener =
             NavController.OnDestinationChangedListener { _, destination, _ ->
                 val route =
                     destination.route?.substringAfterLast(".")?.substringBefore("?")
                         ?: "Unknown"
-                onDestinationChanged(route)
+                currentOnDestinationChange(route)
             }
         navController.addOnDestinationChangedListener(listener)
         onDispose { navController.removeOnDestinationChangedListener(listener) }
@@ -67,7 +71,7 @@ fun PairShotNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier =
-        Modifier
+        modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         enterTransition = {
@@ -102,8 +106,8 @@ fun PairShotNavHost(
                 onNavigateToExportSettings = { ids ->
                     navController.navigate(ExportSettings(ids.joinToString(",")))
                 },
-                onShareSelected = onShareSelected,
-                onSaveToDevice = onSaveSelectedToDevice,
+                onShareSelection = onShareSelection,
+                onSaveToDevice = onSaveSelectionToDevice,
             )
         }
         composable<AlbumDetail> {
@@ -123,8 +127,8 @@ fun PairShotNavHost(
                 onNavigateToExportSettings = { ids ->
                     navController.navigate(ExportSettings(ids.joinToString(",")))
                 },
-                onShareSelected = onShareSelected,
-                onSaveSelectedToDevice = onSaveSelectedToDevice,
+                onShareSelection = onShareSelection,
+                onSaveSelectionToDevice = onSaveSelectionToDevice,
             )
         }
         composable<PairPicker> {
@@ -160,7 +164,7 @@ fun PairShotNavHost(
                         }
                     }
                 },
-                onEntitled = {
+                onEntitlement = {
                     if (paywall.dismissible) {
                         navController.popBackStack()
                     } else {
@@ -186,7 +190,7 @@ fun PairShotNavHost(
         ) {
             PairPreviewRoute(
                 onDismiss = { navController.popBackStack() },
-                onShareSelected = { pairId -> onShareSelected(setOf(pairId)) },
+                onShareSelection = { pairId -> onShareSelection(setOf(pairId)) },
                 onNavigateToAfterCamera = { pairId ->
                     navController.navigate(AfterCamera(initialPairId = pairId))
                 },
@@ -207,8 +211,8 @@ fun PairShotNavHost(
                 onNavigateToPaywall = { trigger ->
                     navController.navigate(Paywall(dismissible = true, trigger = trigger))
                 },
-                onShare = onShareSelected,
-                onSaveToDevice = onSaveSelectedToDevice,
+                onShare = onShareSelection,
+                onSaveToDevice = onSaveSelectionToDevice,
             )
         }
         composable<Settings> {
