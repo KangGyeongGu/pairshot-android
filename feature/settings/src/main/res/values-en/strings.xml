@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Settings Screen -->
     <string name="settings_error_load_failed">Couldn\'t load settings</string>
     <string name="settings_section_shooting_files">Shooting and files</string>
     <string name="settings_section_watermark">Watermark</string>
@@ -10,22 +9,27 @@
     <string name="settings_section_help">Help</string>
     <string name="settings_section_storage_and_info">Storage and app info</string>
 
-    <!-- Language -->
     <string name="settings_item_language">Language</string>
     <string name="settings_dialog_language_title">Select language</string>
     <string name="settings_language_system">System default</string>
     <string name="settings_language_korean">한국어</string>
     <string name="settings_language_english">English</string>
 
-    <!-- Theme -->
     <string name="settings_item_theme">System theme</string>
 
-    <!-- Ads consent (UMP) -->
     <string name="settings_item_ads_consent">Manage ad consent</string>
     <string name="settings_dialog_theme_title">Select theme</string>
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+
+    <string name="settings_item_text_scale">Text size</string>
+    <string name="settings_dialog_text_scale_title">Select text size</string>
+    <string name="settings_dialog_text_scale_description">Set the in-app text size independently of your device settings.</string>
+    <string name="settings_text_scale_small">Small</string>
+    <string name="settings_text_scale_normal">Default</string>
+    <string name="settings_text_scale_large">Large</string>
+    <string name="settings_text_scale_extra_large">Extra large</string>
 
     <string name="settings_item_image_quality">Export quality</string>
     <string name="settings_item_file_name_prefix">File name prefix</string>
@@ -43,7 +47,6 @@
     <string name="settings_warning_required">Setup required</string>
     <string name="settings_warning_opacity_high">75% or lower recommended</string>
 
-    <!-- Quality options -->
     <string name="settings_quality_low">Low (75%)</string>
     <string name="settings_quality_low_desc">Smaller file size</string>
     <string name="settings_quality_high">High (85%)</string>
@@ -51,10 +54,8 @@
     <string name="settings_quality_best">Best (100%)</string>
     <string name="settings_quality_best_desc">Maximum quality</string>
 
-    <!-- License Screen -->
     <string name="license_title">Licenses</string>
 
-    <!-- Watermark Settings Screen -->
     <string name="watermark_settings_title">Watermark settings</string>
     <string name="watermark_section_basic">Basic settings</string>
     <string name="watermark_section_preview">Preview</string>
@@ -77,7 +78,6 @@
     <string name="watermark_text_input_hint">Enter text</string>
     <string name="watermark_preview_desc">Watermark preview</string>
 
-    <!-- Combine Settings Screen -->
     <string name="combine_settings_title">Combine settings</string>
     <string name="combine_section_alignment">Alignment</string>
     <string name="combine_section_border">Border</string>
@@ -121,7 +121,6 @@
     <string name="combine_dialog_bg_color_title">Background color</string>
     <string name="combine_dialog_match_border_color">Match border color</string>
 
-    <!-- Settings Dialogs -->
     <string name="settings_dialog_overlay_opacity_title">Default overlay opacity</string>
     <string name="settings_dialog_cache_clear_title">Clear cache</string>
     <string name="settings_dialog_cache_clear_message">Clear cache?\nThumbnails will be deleted and regenerated.</string>
@@ -133,7 +132,6 @@
     <string name="settings_dialog_prefix_required">Please enter a prefix</string>
     <string name="settings_dialog_reset_default">Reset to default</string>
 
-    <!-- Pro Subscription Section -->
     <string name="settings_section_pro_subscription">Subscription</string>
     <string name="settings_pro_title">PairShot Pro</string>
     <string name="settings_pro_free_title">PairShot Pro</string>

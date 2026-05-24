@@ -21,34 +21,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.model.AppTextScale
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.feature.settings.R
-import com.pairshot.feature.settings.locale.AppLocale
 import com.pairshot.core.ui.R as CoreR
 
 @Composable
-internal fun LanguageDialog(
-    current: AppLocale,
-    onSelect: (AppLocale) -> Unit,
+internal fun TextScaleDialog(
+    current: AppTextScale,
+    onSelect: (AppTextScale) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var selected by remember { mutableStateOf(current) }
 
     PairShotBottomSheet(onDismissRequest = onDismiss) {
         Text(
-            text = stringResource(R.string.settings_dialog_language_title),
+            text = stringResource(R.string.settings_dialog_text_scale_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
+        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
+        Text(
+            text = stringResource(R.string.settings_dialog_text_scale_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Spacer(modifier = Modifier.height(PairShotSpacing.md))
 
-        AppLocale.entries.forEach { option ->
-            val labelRes =
-                when (option) {
-                    AppLocale.SYSTEM -> R.string.settings_language_system
-                    AppLocale.KOREAN -> R.string.settings_language_korean
-                    AppLocale.ENGLISH -> R.string.settings_language_english
-                }
+        AppTextScale.entries.forEach { option ->
+            val labelRes = option.labelResId()
             Row(
                 modifier =
                 Modifier
@@ -96,3 +97,11 @@ internal fun LanguageDialog(
         }
     }
 }
+
+private fun AppTextScale.labelResId(): Int =
+    when (this) {
+        AppTextScale.SMALL -> R.string.settings_text_scale_small
+        AppTextScale.NORMAL -> R.string.settings_text_scale_normal
+        AppTextScale.LARGE -> R.string.settings_text_scale_large
+        AppTextScale.EXTRA_LARGE -> R.string.settings_text_scale_extra_large
+    }

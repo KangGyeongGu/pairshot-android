@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
@@ -160,19 +159,19 @@ internal fun ImageQualityDialog(
         qualityOptions().forEach { option ->
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { selectedQuality = option.value }
-                        .padding(vertical = PairShotSpacing.sm),
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { selectedQuality = option.value }
+                    .padding(vertical = PairShotSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
                     selected = selectedQuality == option.value,
                     onClick = { selectedQuality = option.value },
                     colors =
-                        RadioButtonDefaults.colors(
-                            selectedColor = MaterialTheme.colorScheme.primary,
-                        ),
+                    RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
                 Column(modifier = Modifier.padding(start = PairShotSpacing.sm)) {
                     Text(
@@ -231,11 +230,11 @@ internal fun FileNamePrefixDialog(
                 TransformedText(
                     text = AnnotatedString(original.text + "_"),
                     offsetMapping =
-                        object : OffsetMapping {
-                            override fun originalToTransformed(offset: Int) = offset
+                    object : OffsetMapping {
+                        override fun originalToTransformed(offset: Int) = offset
 
-                            override fun transformedToOriginal(offset: Int) = offset.coerceAtMost(original.text.length)
-                        },
+                        override fun transformedToOriginal(offset: Int) = offset.coerceAtMost(original.text.length)
+                    },
                 )
             }
         }
@@ -255,26 +254,26 @@ internal fun FileNamePrefixDialog(
                 },
                 singleLine = true,
                 textStyle =
-                    MaterialTheme.typography.bodyLarge.copy(
-                        color = onSurfaceColor,
-                    ),
+                MaterialTheme.typography.bodyLarge.copy(
+                    color = onSurfaceColor,
+                ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 visualTransformation = underscoreSuffix,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester)
-                        .padding(bottom = PairShotSpacing.xs)
-                        .drawBehind {
-                            val lineColor = if (isError) errorColor else outlineColor
-                            drawLine(
-                                color = lineColor,
-                                start = Offset(0f, size.height),
-                                end = Offset(size.width, size.height),
-                                strokeWidth = PairShotStroke.hairline.toPx(),
-                            )
-                        },
+                Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .padding(bottom = PairShotSpacing.xs)
+                    .drawBehind {
+                        val lineColor = if (isError) errorColor else outlineColor
+                        drawLine(
+                            color = lineColor,
+                            start = Offset(0f, size.height),
+                            end = Offset(size.width, size.height),
+                            strokeWidth = PairShotStroke.hairline.toPx(),
+                        )
+                    },
                 decorationBox = { innerTextField ->
                     Box(
                         modifier = Modifier.heightIn(min = InputFieldMinHeight),
@@ -292,7 +291,7 @@ internal fun FileNamePrefixDialog(
                 },
             )
         }
-        Box(modifier = Modifier.height(InputErrorHeight)) {
+        Box(modifier = Modifier.heightIn(min = InputErrorHeight)) {
             if (isError) {
                 Text(
                     text = stringResource(R.string.settings_dialog_prefix_required),

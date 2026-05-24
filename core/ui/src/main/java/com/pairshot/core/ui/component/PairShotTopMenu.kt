@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.ModalShape
 import com.pairshot.core.designsystem.PairShotMenu
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.ProvideAppTextScaleDensity
 
 private const val MENU_WIDTH_FRACTION = 0.48f
 
@@ -46,12 +46,14 @@ fun PairShotTopMenu(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         shadowElevation = PairShotMenu.elevation,
         border =
-            BorderStroke(
-                PairShotMenu.borderWidth,
-                MaterialTheme.colorScheme.outlineVariant,
-            ),
-        content = content,
-    )
+        BorderStroke(
+            PairShotMenu.borderWidth,
+            MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        val scope = this
+        ProvideAppTextScaleDensity { scope.content() }
+    }
 }
 
 @Composable

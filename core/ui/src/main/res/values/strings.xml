@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Common Buttons -->
     <string name="common_button_cancel">취소</string>
     <string name="common_button_confirm">확인</string>
     <string name="common_button_delete">삭제</string>
@@ -11,7 +10,6 @@
     <string name="common_button_save_to_device">기기저장</string>
     <string name="common_button_export_settings">내보내기설정</string>
 
-    <!-- Common Accessibility (contentDescription) -->
     <string name="common_desc_back">뒤로가기</string>
     <string name="common_desc_settings">설정</string>
     <string name="common_desc_more">더보기</string>
@@ -20,19 +18,15 @@
     <string name="common_label_sort_descending">최신순</string>
     <string name="common_label_sort_ascending">오래된순</string>
 
-    <!-- Common Titles -->
     <string name="common_title_settings">설정</string>
 
-    <!-- PairCard -->
     <string name="pair_card_desc_scheduled">촬영 예정</string>
     <string name="pair_card_desc_combined">합성 완료</string>
     <string name="pair_card_desc_before">Before</string>
     <string name="pair_card_desc_after">After</string>
 
-    <!-- ProfiledAsyncImage -->
     <string name="image_file_missing">파일 없음</string>
 
-    <!-- Dialog: Delete Pair -->
     <string name="dialog_delete_pair_method_title">삭제 방식 선택</string>
     <plurals name="dialog_delete_pair_summary">
         <item quantity="other">%1$d개 선택됨, %2$d개 합성본.</item>
@@ -44,18 +38,15 @@
         <item quantity="other">%1$d개 페어를 삭제하시겠어요?</item>
     </plurals>
 
-    <!-- Snackbar: Success -->
     <string name="snackbar_success_all_after_captured">모든 After 촬영이 완료되었습니다</string>
     <string name="snackbar_success_cache_cleared">캐시를 정리했습니다</string>
     <string name="snackbar_success_saved_to_device">기기에 저장했습니다</string>
     <string name="snackbar_success_saved_zip">%1$s 저장 완료</string>
     <string name="snackbar_info_save_cancelled">저장이 취소되었습니다</string>
 
-    <!-- Snackbar: Warning -->
     <string name="snackbar_warning_nothing_to_save">저장할 새 이미지가 없습니다</string>
     <string name="snackbar_warning_watermark_setup_required">워터마크 설정을 먼저 완료해주세요</string>
 
-    <!-- Snackbar: Error -->
     <string name="snackbar_error_capture_failed">촬영에 실패했습니다. 다시 시도해주세요</string>
     <string name="snackbar_error_save_failed">저장에 실패했습니다. 다시 시도해주세요</string>
     <string name="snackbar_error_unknown">오류가 발생했습니다. 다시 시도해주세요</string>

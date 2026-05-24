@@ -48,4 +48,8 @@ interface AppSettingsRepository {
     val appThemeNameFlow: Flow<String>
 
     suspend fun updateAppThemeName(name: String)
+
+    val appTextScaleNameFlow: Flow<String>
+
+    suspend fun updateAppTextScaleName(name: String)
 }

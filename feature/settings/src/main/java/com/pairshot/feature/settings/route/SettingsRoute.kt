@@ -55,6 +55,7 @@ fun SettingsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
     val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
+    val appTextScale by viewModel.appTextScale.collectAsStateWithLifecycle()
     val activationState by promotionViewModel.activationState.collectAsStateWithLifecycle()
     val myPromotions by promotionViewModel.myPromotions.collectAsStateWithLifecycle()
     val myPromotionsLoading by promotionViewModel.myPromotionsLoading.collectAsStateWithLifecycle()
@@ -170,8 +171,10 @@ fun SettingsRoute(
         uiState = uiState,
         watermarkConfig = watermarkConfig,
         currentTheme = appTheme,
+        currentTextScale = appTextScale,
         highlight = highlight,
         onThemeChange = viewModel::updateAppTheme,
+        onTextScaleChange = viewModel::updateAppTextScale,
         onClearCache = viewModel::clearCache,
         onLicenseClick = onNavigateToLicense,
         onPrivacyPolicyClick = {

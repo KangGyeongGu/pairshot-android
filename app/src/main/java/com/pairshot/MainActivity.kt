@@ -34,10 +34,10 @@ import com.pairshot.app.navigation.SelectionMessage
 import com.pairshot.app.navigation.StartupDecisionViewModel
 import com.pairshot.app.navigation.effect.ExportShareEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
+import com.pairshot.app.shell.AppShellViewModel
 import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.ads.initializer.AdsInitializer
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTheme
 import com.pairshot.core.navigation.Paywall
 import com.pairshot.core.ui.component.PairShotSnackbarController
@@ -92,7 +92,9 @@ class MainActivity : AppCompatActivity() {
         metricsStateHolder.state?.putState("screen", "Camera")
 
         setContent {
-            PairShotTheme {
+            val shellVm: AppShellViewModel = hiltViewModel()
+            val textScale by shellVm.textScale.collectAsStateWithLifecycle()
+            PairShotTheme(textScale = textScale) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -185,7 +187,8 @@ private fun AppRootContent(
 
     val saveSelectedToDevice =
         remember(interstitialAdController, activity, selectionVm) {
-            { ids: Set<Long> ->
+            {
+                    ids: Set<Long> ->
                 val act = activity
                 if (act == null) {
                     selectionVm.saveSelectionToDevice(ids)
@@ -216,36 +219,36 @@ private fun AppRootContent(
         progress?.let { p ->
             TopProgressPill(
                 label =
-                    pluralStringResource(
-                        R.plurals.progress_label_with_count,
-                        p.total,
-                        p.label.asString(),
-                        p.total,
-                    ),
+                pluralStringResource(
+                    R.plurals.progress_label_with_count,
+                    p.total,
+                    p.label.asString(),
+                    p.total,
+                ),
                 progress = if (p.total > 0) p.current.toFloat() / p.total else 0f,
                 progressText = "${p.current}/${p.total}",
                 modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .padding(top = PairShotSnackbarTokens.topOffset),
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
 
         PairShotSnackbarHost(
             controller = snackbarController,
             modifier =
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(
-                        top =
-                            if (progress != null) {
-                                SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
-                            } else {
-                                PairShotSnackbarTokens.topOffset
-                            },
-                    ),
+            Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(
+                    top =
+                    if (progress != null) {
+                        SNACKBAR_OFFSET_WHEN_PROGRESS_DP.dp
+                    } else {
+                        PairShotSnackbarTokens.topOffset
+                    },
+                ),
         )
 
         TutorialOverlay()

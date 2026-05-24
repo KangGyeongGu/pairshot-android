@@ -7,6 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.pairshot.core.model.AppTextScale
 
 data class PairShotExtendedColors(
     val success: androidx.compose.ui.graphics.Color,
@@ -68,6 +69,7 @@ private val LightColorScheme =
 @Composable
 fun PairShotTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    textScale: AppTextScale = AppTextScale.DEFAULT,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
@@ -78,12 +80,17 @@ fun PairShotTheme(
             PairShotExtendedColors(success = LightSuccess, warning = LightWarning)
         }
 
-    CompositionLocalProvider(LocalPairShotExtendedColors provides extendedColors) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = PairShotTypography,
-            shapes = PairShotShapes,
-            content = content,
-        )
+    CompositionLocalProvider(
+        LocalPairShotExtendedColors provides extendedColors,
+        LocalAppTextScale provides textScale,
+    ) {
+        ProvideAppTextScaleDensity {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                typography = PairShotTypography,
+                shapes = PairShotShapes,
+                content = content,
+            )
+        }
     }
 }

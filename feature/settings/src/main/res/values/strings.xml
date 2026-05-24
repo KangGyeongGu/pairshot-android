@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Settings Screen -->
     <string name="settings_error_load_failed">설정을 불러올 수 없습니다</string>
     <string name="settings_section_shooting_files">촬영 및 파일</string>
     <string name="settings_section_watermark">워터마크</string>
@@ -10,22 +9,27 @@
     <string name="settings_section_help">도움말</string>
     <string name="settings_section_storage_and_info">저장공간 및 앱 정보</string>
 
-    <!-- Language -->
     <string name="settings_item_language">언어</string>
     <string name="settings_dialog_language_title">언어 선택</string>
     <string name="settings_language_system">시스템 기본값</string>
     <string name="settings_language_korean">한국어</string>
     <string name="settings_language_english">English</string>
 
-    <!-- Theme -->
     <string name="settings_item_theme">시스템 테마</string>
 
-    <!-- Ads consent (UMP) -->
     <string name="settings_item_ads_consent">광고 동의 변경</string>
     <string name="settings_dialog_theme_title">테마 선택</string>
     <string name="settings_theme_system">시스템 기본값</string>
     <string name="settings_theme_light">라이트</string>
     <string name="settings_theme_dark">다크</string>
+
+    <string name="settings_item_text_scale">텍스트 크기</string>
+    <string name="settings_dialog_text_scale_title">텍스트 크기 선택</string>
+    <string name="settings_dialog_text_scale_description">기기 설정과 독립적으로 앱의 글자 크기를 결정합니다.</string>
+    <string name="settings_text_scale_small">작게</string>
+    <string name="settings_text_scale_normal">보통</string>
+    <string name="settings_text_scale_large">크게</string>
+    <string name="settings_text_scale_extra_large">아주 크게</string>
 
     <string name="settings_item_image_quality">내보내기 품질</string>
     <string name="settings_item_file_name_prefix">파일명 접두어</string>
@@ -43,7 +47,6 @@
     <string name="settings_warning_required">설정 필요</string>
     <string name="settings_warning_opacity_high">75% 이하 권장</string>
 
-    <!-- Quality options -->
     <string name="settings_quality_low">낮음 (75%)</string>
     <string name="settings_quality_low_desc">파일 크기 작음</string>
     <string name="settings_quality_high">높음 (85%)</string>
@@ -51,10 +54,8 @@
     <string name="settings_quality_best">최상 (100%)</string>
     <string name="settings_quality_best_desc">최대 품질</string>
 
-    <!-- License Screen -->
     <string name="license_title">라이선스</string>
 
-    <!-- Watermark Settings Screen -->
     <string name="watermark_settings_title">워터마크 설정</string>
     <string name="watermark_section_basic">기본 설정</string>
     <string name="watermark_section_preview">미리보기</string>
@@ -77,7 +78,6 @@
     <string name="watermark_text_input_hint">텍스트 입력</string>
     <string name="watermark_preview_desc">워터마크 미리보기</string>
 
-    <!-- Combine Settings Screen -->
     <string name="combine_settings_title">합성 설정</string>
     <string name="combine_section_alignment">정렬</string>
     <string name="combine_section_border">테두리</string>
@@ -121,7 +121,6 @@
     <string name="combine_dialog_bg_color_title">배경 색상</string>
     <string name="combine_dialog_match_border_color">테두리색상과 일치</string>
 
-    <!-- Settings Dialogs -->
     <string name="settings_dialog_overlay_opacity_title">오버레이 기본 투명도</string>
     <string name="settings_dialog_cache_clear_title">캐시 초기화</string>
     <string name="settings_dialog_cache_clear_message">캐시를 초기화하시겠습니까?\n썸네일이 삭제되며, 다시 생성됩니다.</string>
@@ -133,7 +132,6 @@
     <string name="settings_dialog_prefix_required">접두어를 입력해주세요</string>
     <string name="settings_dialog_reset_default">기본값으로 초기화</string>
 
-    <!-- Pro Subscription Section -->
     <string name="settings_section_pro_subscription">구독</string>
     <string name="settings_pro_title">PairShot Pro</string>
     <string name="settings_pro_free_title">PairShot Pro</string>
