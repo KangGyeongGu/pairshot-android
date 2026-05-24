@@ -21,95 +21,102 @@ sealed interface SaveToDeviceResult {
 }
 
 class SaveSelectionToDeviceUseCase
-    @Inject
-    constructor(
-        private val exportRepository: ExportRepository,
-        private val membershipProvider: MembershipProvider,
-    ) {
-        suspend operator fun invoke(
-            pairIds: List<Long>,
-            preset: ExportPreset,
-            watermarkConfig: WatermarkConfig?,
-            combineConfig: CombineConfig,
-            onProgress: (current: Int, total: Int) -> Unit = { _, _ -> },
-        ): SaveToDeviceResult {
-            require(pairIds.isNotEmpty()) { "no pairs to export" }
+@Inject
+constructor(
+    private val galleryExportRepository: GalleryExportRepository,
+    private val zipExportRepository: ZipExportRepository,
+    private val membershipProvider: MembershipProvider,
+) {
+    suspend operator fun invoke(
+        pairIds: List<Long>,
+        preset: ExportPreset,
+        watermarkConfig: WatermarkConfig?,
+        combineConfig: CombineConfig,
+        onProgress: (current: Int, total: Int) -> Unit = { _, _ -> },
+    ): SaveToDeviceResult {
+        require(pairIds.isNotEmpty()) { "no pairs to export" }
 
-            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
-            val effectiveFormat = enforceProFormat(preset.format)
+        val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
+        val effectiveFormat = enforceProFormat(preset.format)
 
-            return when (effectiveFormat) {
-                ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
-                ExportFormat.INDIVIDUAL -> saveIndividuals(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
-            }
+        return when (effectiveFormat) {
+            ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
+            ExportFormat.INDIVIDUAL -> saveIndividuals(
+                pairIds,
+                preset,
+                effectiveCombine,
+                watermarkConfig,
+                onProgress
+            )
+        }
+    }
+
+    private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
+        if (format == ExportFormat.ZIP && !membershipProvider.current().isPro) {
+            ExportFormat.INDIVIDUAL
+        } else {
+            format
         }
 
-        private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
-            if (format == ExportFormat.ZIP && !membershipProvider.current().isPro) {
-                ExportFormat.INDIVIDUAL
+    private suspend fun saveZip(
+        pairIds: List<Long>,
+        preset: ExportPreset,
+        combineConfig: CombineConfig,
+        watermarkConfig: WatermarkConfig?,
+        onProgress: (current: Int, total: Int) -> Unit,
+    ): SaveToDeviceResult {
+        val prepared =
+            zipExportRepository.prepareZipForSave(
+                pairIds = pairIds,
+                preset = preset,
+                combineConfig = combineConfig,
+                watermarkConfig = watermarkConfig,
+                onProgress = onProgress,
+            ) ?: return SaveToDeviceResult.Nothing
+        return SaveToDeviceResult.ZipReadyForSave(
+            filePath = prepared.filePath,
+            suggestedName = prepared.suggestedName,
+        )
+    }
+
+    private suspend fun saveIndividuals(
+        pairIds: List<Long>,
+        preset: ExportPreset,
+        combineConfig: CombineConfig,
+        watermarkConfig: WatermarkConfig?,
+        onProgress: (current: Int, total: Int) -> Unit,
+    ): SaveToDeviceResult {
+        val combinedCount =
+            if (preset.includeCombined) {
+                galleryExportRepository.composeCombinedForGallery(
+                    pairIds = pairIds,
+                    combineConfig = combineConfig,
+                    watermarkConfig = watermarkConfig,
+                    onProgress = onProgress,
+                )
             } else {
-                format
+                0
             }
 
-        private suspend fun saveZip(
-            pairIds: List<Long>,
-            preset: ExportPreset,
-            combineConfig: CombineConfig,
-            watermarkConfig: WatermarkConfig?,
-            onProgress: (current: Int, total: Int) -> Unit,
-        ): SaveToDeviceResult {
-            val prepared =
-                exportRepository.prepareZipForSave(
+        val individualCount =
+            if ((preset.includeBefore || preset.includeAfter) &&
+                needsIndividualDecoration(combineConfig, watermarkConfig)
+            ) {
+                galleryExportRepository.saveDecoratedOriginals(
                     pairIds = pairIds,
                     preset = preset,
                     combineConfig = combineConfig,
                     watermarkConfig = watermarkConfig,
                     onProgress = onProgress,
-                ) ?: return SaveToDeviceResult.Nothing
-            return SaveToDeviceResult.ZipReadyForSave(
-                filePath = prepared.filePath,
-                suggestedName = prepared.suggestedName,
-            )
-        }
+                )
+            } else {
+                0
+            }
 
-        private suspend fun saveIndividuals(
-            pairIds: List<Long>,
-            preset: ExportPreset,
-            combineConfig: CombineConfig,
-            watermarkConfig: WatermarkConfig?,
-            onProgress: (current: Int, total: Int) -> Unit,
-        ): SaveToDeviceResult {
-            val combinedCount =
-                if (preset.includeCombined) {
-                    exportRepository.composeCombinedForGallery(
-                        pairIds = pairIds,
-                        combineConfig = combineConfig,
-                        watermarkConfig = watermarkConfig,
-                        onProgress = onProgress,
-                    )
-                } else {
-                    0
-                }
-
-            val individualCount =
-                if ((preset.includeBefore || preset.includeAfter) &&
-                    needsIndividualDecoration(combineConfig, watermarkConfig)
-                ) {
-                    exportRepository.saveDecoratedOriginals(
-                        pairIds = pairIds,
-                        preset = preset,
-                        combineConfig = combineConfig,
-                        watermarkConfig = watermarkConfig,
-                        onProgress = onProgress,
-                    )
-                } else {
-                    0
-                }
-
-            val total = combinedCount + individualCount
-            return if (total > 0) SaveToDeviceResult.SavedImagesToGallery(total) else SaveToDeviceResult.Nothing
-        }
+        val total = combinedCount + individualCount
+        return if (total > 0) SaveToDeviceResult.SavedImagesToGallery(total) else SaveToDeviceResult.Nothing
     }
+}
 
 fun needsIndividualDecoration(
     combineConfig: CombineConfig,

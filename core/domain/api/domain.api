@@ -1,0 +1,541 @@
+public abstract interface class com/pairshot/core/domain/album/AlbumRepository {
+	public abstract fun addPairs (JLjava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun create (Lcom/pairshot/core/model/Album;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun delete (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAlbumIdsForPair (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAll ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getById (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun observePairs (J)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun removePairs (JLjava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun update (Lcom/pairshot/core/model/Album;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/album/CreateAlbumUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;)V
+	public final fun invoke (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lcom/pairshot/core/domain/album/CreateAlbumUseCase;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/album/DeleteAlbumUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;Lcom/pairshot/core/domain/pair/PhotoPairRepository;)V
+	public final fun invoke (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/album/RenameAlbumUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;)V
+	public final fun invoke (JLjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/combine/CombineSettingsRepository {
+	public abstract fun getConfig (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getConfigFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun saveConfig (Lcom/pairshot/core/model/CombineConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/combine/DeleteCombinedPhotosUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/combine/ExportHistoryRepository;)V
+	public final fun invoke (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/combine/ExportHistoryRepository {
+	public abstract fun deleteByPairIds (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun deleteByPairIdsAndKind (Ljava/util/List;Lcom/pairshot/core/model/ExportHistoryKind;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun findByPairIds (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun findByPairIdsAndKind (Ljava/util/List;Lcom/pairshot/core/model/ExportHistoryKind;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun insert (Lcom/pairshot/core/model/ExportHistoryEntry;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/export/ExportAction {
+}
+
+public final class com/pairshot/core/domain/export/ExportAction$ShareImages : com/pairshot/core/domain/export/ExportAction {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lcom/pairshot/core/domain/export/ExportAction$ShareImages;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/ExportAction$ShareImages;Ljava/util/List;ILjava/lang/Object;)Lcom/pairshot/core/domain/export/ExportAction$ShareImages;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getUris ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/export/ExportAction$ShareZip : com/pairshot/core/domain/export/ExportAction {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/pairshot/core/domain/export/ExportAction$ShareZip;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/ExportAction$ShareZip;Ljava/lang/String;ILjava/lang/Object;)Lcom/pairshot/core/domain/export/ExportAction$ShareZip;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFilePath ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/pairshot/core/domain/export/GalleryExportRepository {
+	public abstract fun composeCombinedForGallery (Ljava/util/List;Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveDecoratedOriginals (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/export/HasSavableSelectionUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/pair/PhotoPairRepository;)V
+	public final fun invoke (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/export/PreparedZip {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lcom/pairshot/core/domain/export/PreparedZip;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/PreparedZip;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/pairshot/core/domain/export/PreparedZip;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFilePath ()Ljava/lang/String;
+	public final fun getSuggestedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/export/SaveSelectionToDeviceUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/export/GalleryExportRepository;Lcom/pairshot/core/domain/export/ZipExportRepository;Lcom/pairshot/core/domain/membership/MembershipProvider;)V
+	public final fun invoke (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/WatermarkConfig;Lcom/pairshot/core/model/CombineConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lcom/pairshot/core/domain/export/SaveSelectionToDeviceUseCase;Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/WatermarkConfig;Lcom/pairshot/core/model/CombineConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/export/SaveSelectionToDeviceUseCaseKt {
+	public static final fun needsIndividualDecoration (Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;)Z
+}
+
+public abstract interface class com/pairshot/core/domain/export/SaveToDeviceResult {
+}
+
+public final class com/pairshot/core/domain/export/SaveToDeviceResult$Nothing : com/pairshot/core/domain/export/SaveToDeviceResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/export/SaveToDeviceResult$Nothing;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/export/SaveToDeviceResult$SavedImagesToGallery : com/pairshot/core/domain/export/SaveToDeviceResult {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lcom/pairshot/core/domain/export/SaveToDeviceResult$SavedImagesToGallery;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/SaveToDeviceResult$SavedImagesToGallery;IILjava/lang/Object;)Lcom/pairshot/core/domain/export/SaveToDeviceResult$SavedImagesToGallery;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCount ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/export/SaveToDeviceResult$ZipReadyForSave : com/pairshot/core/domain/export/SaveToDeviceResult {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lcom/pairshot/core/domain/export/SaveToDeviceResult$ZipReadyForSave;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/SaveToDeviceResult$ZipReadyForSave;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/pairshot/core/domain/export/SaveToDeviceResult$ZipReadyForSave;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFilePath ()Ljava/lang/String;
+	public final fun getSuggestedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/pairshot/core/domain/export/ShareExportRepository {
+	public abstract fun buildShareablePayload (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/export/ShareSelectionUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/export/ShareExportRepository;)V
+	public final fun invoke (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/WatermarkConfig;Lcom/pairshot/core/model/CombineConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lcom/pairshot/core/domain/export/ShareSelectionUseCase;Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/WatermarkConfig;Lcom/pairshot/core/model/CombineConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/export/ZipExportRepository {
+	public abstract fun discardPreparedZip (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun prepareZipForSave (Ljava/util/List;Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/membership/Membership {
+	public static final field Companion Lcom/pairshot/core/domain/membership/Membership$Companion;
+	public fun <init> (ZZLjava/lang/Long;Ljava/lang/Long;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Ljava/lang/Long;
+	public final fun component4 ()Ljava/lang/Long;
+	public final fun copy (ZZLjava/lang/Long;Ljava/lang/Long;)Lcom/pairshot/core/domain/membership/Membership;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/membership/Membership;ZZLjava/lang/Long;Ljava/lang/Long;ILjava/lang/Object;)Lcom/pairshot/core/domain/membership/Membership;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdFreeExpiresAtEpochMillis ()Ljava/lang/Long;
+	public final fun getProExpiresAtEpochMillis ()Ljava/lang/Long;
+	public fun hashCode ()I
+	public final fun isAdFree ()Z
+	public final fun isPro ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/membership/Membership$Companion {
+	public final fun getFree ()Lcom/pairshot/core/domain/membership/Membership;
+}
+
+public abstract interface class com/pairshot/core/domain/membership/MembershipProvider {
+	public abstract fun current (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun observe ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class com/pairshot/core/domain/pair/CanCreatePairUseCase {
+	public static final field Companion Lcom/pairshot/core/domain/pair/CanCreatePairUseCase$Companion;
+	public static final field FREE_DAILY_LIMIT I
+	public fun <init> (Lcom/pairshot/core/domain/pair/PhotoPairRepository;Lcom/pairshot/core/domain/membership/MembershipProvider;Lcom/pairshot/core/domain/tutorial/TutorialModeProvider;)V
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/pair/CanCreatePairUseCase$Companion {
+}
+
+public abstract interface class com/pairshot/core/domain/pair/CanCreatePairUseCase$Result {
+}
+
+public final class com/pairshot/core/domain/pair/CanCreatePairUseCase$Result$Allowed : com/pairshot/core/domain/pair/CanCreatePairUseCase$Result {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/CanCreatePairUseCase$Result$Allowed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/CanCreatePairUseCase$Result$LimitReached : com/pairshot/core/domain/pair/CanCreatePairUseCase$Result {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lcom/pairshot/core/domain/pair/CanCreatePairUseCase$Result$LimitReached;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/CanCreatePairUseCase$Result$LimitReached;IIILjava/lang/Object;)Lcom/pairshot/core/domain/pair/CanCreatePairUseCase$Result$LimitReached;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCurrent ()I
+	public final fun getLimit ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/DeletePairsResult {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lcom/pairshot/core/domain/pair/DeletePairsResult;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/DeletePairsResult;IIILjava/lang/Object;)Lcom/pairshot/core/domain/pair/DeletePairsResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeleted ()I
+	public final fun getFailed ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/DeletePairsUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/pair/PhotoPairRepository;Lcom/pairshot/core/domain/combine/ExportHistoryRepository;)V
+	public final fun invoke (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/pair/GetLatestBeforeThumbnailUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/pair/PhotoPairRepository;)V
+	public final fun invoke ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public abstract interface class com/pairshot/core/domain/pair/PairListItem {
+}
+
+public final class com/pairshot/core/domain/pair/PairListItem$Ad : com/pairshot/core/domain/pair/PairListItem {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lcom/pairshot/core/domain/pair/PairListItem$Ad;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/PairListItem$Ad;IILjava/lang/Object;)Lcom/pairshot/core/domain/pair/PairListItem$Ad;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSlotIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PairListItem$Pair : com/pairshot/core/domain/pair/PairListItem {
+	public fun <init> (Lcom/pairshot/core/model/PhotoPair;)V
+	public final fun component1 ()Lcom/pairshot/core/model/PhotoPair;
+	public final fun copy (Lcom/pairshot/core/model/PhotoPair;)Lcom/pairshot/core/domain/pair/PairListItem$Pair;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/PairListItem$Pair;Lcom/pairshot/core/model/PhotoPair;ILjava/lang/Object;)Lcom/pairshot/core/domain/pair/PairListItem$Pair;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPair ()Lcom/pairshot/core/model/PhotoPair;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PairListWithAdsKt {
+	public static final fun buildPairListWithAds (Ljava/util/List;ZLkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static synthetic fun buildPairListWithAds$default (Ljava/util/List;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/util/List;
+}
+
+public abstract interface class com/pairshot/core/domain/pair/PairNavigationTarget {
+}
+
+public final class com/pairshot/core/domain/pair/PairNavigationTarget$AfterCamera : com/pairshot/core/domain/pair/PairNavigationTarget {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/pairshot/core/domain/pair/PairNavigationTarget$AfterCamera;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/PairNavigationTarget$AfterCamera;JILjava/lang/Object;)Lcom/pairshot/core/domain/pair/PairNavigationTarget$AfterCamera;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPairId ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PairNavigationTarget$BeforeRetakeCamera : com/pairshot/core/domain/pair/PairNavigationTarget {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/pairshot/core/domain/pair/PairNavigationTarget$BeforeRetakeCamera;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/PairNavigationTarget$BeforeRetakeCamera;JILjava/lang/Object;)Lcom/pairshot/core/domain/pair/PairNavigationTarget$BeforeRetakeCamera;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPairId ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PairNavigationTarget$PairPreview : com/pairshot/core/domain/pair/PairNavigationTarget {
+	public fun <init> (J)V
+	public final fun component1 ()J
+	public final fun copy (J)Lcom/pairshot/core/domain/pair/PairNavigationTarget$PairPreview;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/PairNavigationTarget$PairPreview;JILjava/lang/Object;)Lcom/pairshot/core/domain/pair/PairNavigationTarget$PairPreview;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPairId ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/pairshot/core/domain/pair/PhotoPairRepository {
+	public abstract fun countAll ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun countCreatedSince (J)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun delete (Lcom/pairshot/core/model/PhotoPair;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getById (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getByIds (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun observeAll ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun observeById (J)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun observeUnpaired ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun observeUnpairedByAlbum (J)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun pruneAllMissingSources (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun pruneMissingSources (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun replaceBeforePhoto (JLjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveAfterPhoto (JLjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveBeforePhoto (Ljava/lang/String;Ljava/lang/Float;Ljava/lang/Long;Lcom/pairshot/core/model/AspectRatio;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun saveBeforePhoto$default (Lcom/pairshot/core/domain/pair/PhotoPairRepository;Ljava/lang/String;Ljava/lang/Float;Ljava/lang/Long;Lcom/pairshot/core/model/AspectRatio;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/pair/PhotoPairRepository$DefaultImpls {
+	public static synthetic fun saveBeforePhoto$default (Lcom/pairshot/core/domain/pair/PhotoPairRepository;Ljava/lang/String;Ljava/lang/Float;Ljava/lang/Long;Lcom/pairshot/core/model/AspectRatio;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/pair/PrunePairResult {
+}
+
+public final class com/pairshot/core/domain/pair/PrunePairResult$AfterDropped : com/pairshot/core/domain/pair/PrunePairResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/PrunePairResult$AfterDropped;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PrunePairResult$BeforeDropped : com/pairshot/core/domain/pair/PrunePairResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/PrunePairResult$BeforeDropped;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PrunePairResult$DeletedEntirely : com/pairshot/core/domain/pair/PrunePairResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/PrunePairResult$DeletedEntirely;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PrunePairResult$Healthy : com/pairshot/core/domain/pair/PrunePairResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/PrunePairResult$Healthy;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/PrunePairResult$NotFound : com/pairshot/core/domain/pair/PrunePairResult {
+	public static final field INSTANCE Lcom/pairshot/core/domain/pair/PrunePairResult$NotFound;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/ResolvePairNavigationTargetUseCase {
+	public fun <init> ()V
+	public final fun invoke (Lcom/pairshot/core/model/PhotoPair;)Lcom/pairshot/core/domain/pair/PairNavigationTarget;
+}
+
+public final class com/pairshot/core/domain/pair/SyncMissingSourcesResult {
+	public fun <init> (III)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (III)Lcom/pairshot/core/domain/pair/SyncMissingSourcesResult;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/pair/SyncMissingSourcesResult;IIIILjava/lang/Object;)Lcom/pairshot/core/domain/pair/SyncMissingSourcesResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAfterDropped ()I
+	public final fun getAnyChanged ()Z
+	public final fun getBeforeDropped ()I
+	public final fun getDeletedEntirely ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/pair/SyncMissingSourcesUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/pair/PhotoPairRepository;)V
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/premium/PremiumFeature : java/lang/Enum {
+	public static final field COMBINE_DETAIL Lcom/pairshot/core/domain/premium/PremiumFeature;
+	public static final field WATERMARK_DETAIL Lcom/pairshot/core/domain/premium/PremiumFeature;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/domain/premium/PremiumFeature;
+	public static fun values ()[Lcom/pairshot/core/domain/premium/PremiumFeature;
+}
+
+public abstract interface class com/pairshot/core/domain/settings/AppInfo {
+	public abstract fun getVersionName ()Ljava/lang/String;
+}
+
+public abstract interface class com/pairshot/core/domain/settings/AppSettingsRepository {
+	public abstract fun getAlbumSortOrderFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getAppThemeNameFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getCurrent (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getHomeSortOrderFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getLastExportPreset (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getSettingsFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun saveLastExportPreset (Lcom/pairshot/core/model/ExportPreset;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateAlbumSortOrder (Lcom/pairshot/core/model/SortOrder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateAppThemeName (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraAspectRatio (Lcom/pairshot/core/model/AspectRatio;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraFlashMode (Lcom/pairshot/core/model/FlashMode;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraGridEnabled (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraHdr (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraLevelEnabled (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateCameraNightMode (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateFileNamePrefix (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateHomeSortOrder (Lcom/pairshot/core/model/SortOrder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateImageQuality (Lcom/pairshot/core/model/ImageQualityPreset;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateOverlayAlpha (FLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateOverlayEnabled (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/settings/ClearCacheUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/settings/StorageRepository;)V
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/settings/GetStorageInfoUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/settings/StorageRepository;)V
+	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/settings/OnboardingStateRepository {
+	public abstract fun getOnboardingPaywallShownFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getTutorialCompletedFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun isExportSettingsTutorialCompleted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isOnboardingPaywallShown (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isTutorialCompleted (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun markOnboardingPaywallShown (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/settings/StorageRepository {
+	public abstract fun clearCache (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getStorageInfo (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/settings/WatermarkRepository {
+	public abstract fun getConfig (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getWatermarkConfigFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun pruneOldLogoFiles (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun removeLogoFile (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveConfig (Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saveLogoFile (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/pairshot/core/domain/tutorial/AnchorBounds {
+	public fun <init> (FFFF)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()F
+	public final fun copy (FFFF)Lcom/pairshot/core/domain/tutorial/AnchorBounds;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/tutorial/AnchorBounds;FFFFILjava/lang/Object;)Lcom/pairshot/core/domain/tutorial/AnchorBounds;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeight ()F
+	public final fun getLeft ()F
+	public final fun getTop ()F
+	public final fun getWidth ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/tutorial/AnchorKey : java/lang/Enum {
+	public static final field AFTER_CAMERA_OVERLAY Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field AFTER_CAMERA_SELECTED_CARD Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field AFTER_CAMERA_SHUTTER Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field AFTER_CAMERA_STRIP Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field CAMERA_BACK_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field CAMERA_PREVIEW Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field CAMERA_SHUTTER_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field EXPORT_SECTION_COMBINE Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field EXPORT_SECTION_FORMAT Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field EXPORT_SECTION_INCLUDE Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field EXPORT_SECTION_WATERMARK Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_PAIR_CARD_FIRST Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_BAR_DELETE Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_BAR_EXPORT_SETTINGS Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_BAR_SAVE Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_BAR_SHARE Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SELECTION_EXIT_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SETTINGS_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field HOME_SHOOT_BUTTON Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static final field SETTINGS_SCREEN Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/domain/tutorial/AnchorKey;
+	public static fun values ()[Lcom/pairshot/core/domain/tutorial/AnchorKey;
+}
+
+public abstract interface class com/pairshot/core/domain/tutorial/TutorialActionDispatcher {
+	public abstract fun report (Ljava/lang/String;)V
+}
+
+public final class com/pairshot/core/domain/tutorial/TutorialActionIds {
+	public static final field AFTER_CAMERA_ALL_COMPLETED Ljava/lang/String;
+	public static final field AFTER_CAMERA_BACK_TO_HOME Ljava/lang/String;
+	public static final field AFTER_CAMERA_BEFORE_PREVIEW_OPENED Ljava/lang/String;
+	public static final field AFTER_CAMERA_ENTERED Ljava/lang/String;
+	public static final field AFTER_CAMERA_SHUTTER Ljava/lang/String;
+	public static final field CAMERA_BACK_TO_HOME Ljava/lang/String;
+	public static final field CAMERA_SHUTTER_LANDSCAPE_LEFT Ljava/lang/String;
+	public static final field CAMERA_SHUTTER_LANDSCAPE_RIGHT Ljava/lang/String;
+	public static final field CAMERA_SHUTTER_PORTRAIT Ljava/lang/String;
+	public static final field HOME_PAIR_CARD_TAPPED Ljava/lang/String;
+	public static final field HOME_SELECTION_EXITED Ljava/lang/String;
+	public static final field HOME_SELECTION_MODE_ENTERED Ljava/lang/String;
+	public static final field HOME_SETTINGS_OPENED Ljava/lang/String;
+	public static final field HOME_SHOOT_CLICKED Ljava/lang/String;
+	public static final field INSTANCE Lcom/pairshot/core/domain/tutorial/TutorialActionIds;
+}
+
+public abstract interface class com/pairshot/core/domain/tutorial/TutorialAnchorReporter {
+	public abstract fun report (Lcom/pairshot/core/domain/tutorial/AnchorKey;Lcom/pairshot/core/domain/tutorial/AnchorBounds;)V
+}
+
+public abstract interface class com/pairshot/core/domain/tutorial/TutorialModeProvider {
+	public abstract fun isActive ()Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public abstract interface class com/pairshot/core/domain/tutorial/TutorialPairTracker {
+	public abstract fun getTrackedPairIds ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun registerPair (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun registerTempFile (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/pairshot/core/domain/tutorial/TutorialReplayController {
+	public abstract fun restart ()V
+}
+
