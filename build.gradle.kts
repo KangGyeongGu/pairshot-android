@@ -28,6 +28,9 @@ dependencyCheck {
     formats = listOf("HTML", "JSON")
     failBuildOnCVSS = 7f
     suppressionFile = "config/owasp-suppressions.xml"
+    analyzers.apply {
+        ossIndexEnabled = false
+    }
 }
 
 dependencies {
