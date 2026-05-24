@@ -1,25 +1,13 @@
 package com.pairshot.feature.settings.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -31,68 +19,54 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.designsystem.PairShotTouchTarget
 import com.pairshot.core.model.AppSettings
+import com.pairshot.core.model.AppTextScale
 import com.pairshot.core.model.AppTheme
 import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.WatermarkConfig
-import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.navigation.SettingsHighlight
 import com.pairshot.core.ui.component.PairShotSnackbarController
 import com.pairshot.core.ui.component.PairShotSnackbarHost
 import com.pairshot.core.ui.component.SettingsCard
-import com.pairshot.core.ui.component.SettingsDivider
 import com.pairshot.core.ui.component.SettingsItem
 import com.pairshot.core.ui.component.SettingsSectionLabel
-import com.pairshot.core.ui.component.SettingsSliderItem
-import com.pairshot.core.ui.component.WarningBadge
 import com.pairshot.feature.settings.R
+import com.pairshot.feature.settings.component.HIGHLIGHT_PULSE_OFF_MS
+import com.pairshot.feature.settings.component.HIGHLIGHT_PULSE_ON_MS
+import com.pairshot.feature.settings.component.HighlightableSettingsCard
 import com.pairshot.feature.settings.dialog.ClearCacheDialog
 import com.pairshot.feature.settings.dialog.FileNamePrefixDialog
 import com.pairshot.feature.settings.dialog.ImageQualityDialog
 import com.pairshot.feature.settings.dialog.LanguageDialog
+import com.pairshot.feature.settings.dialog.TextScaleDialog
 import com.pairshot.feature.settings.dialog.ThemeDialog
-import com.pairshot.feature.settings.locale.AppLocale
 import com.pairshot.feature.settings.locale.apply
 import com.pairshot.feature.settings.locale.currentAppLocale
+import com.pairshot.feature.settings.section.SettingsCaptureSection
+import com.pairshot.feature.settings.section.SettingsGeneralSection
+import com.pairshot.feature.settings.section.SettingsStorageInfoSection
+import com.pairshot.feature.settings.section.SettingsWatermarkSection
 import com.pairshot.feature.settings.viewmodel.SettingsUiState
-import com.pairshot.feature.settings.viewmodel.formatBytes
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.coroutines.delay
-import kotlin.math.roundToInt
 import com.pairshot.core.ui.R as CoreR
 
-private const val SWITCH_SCALE = 0.67f
-
-private const val HIGHLIGHT_PULSE_ON_MS = 600L
-private const val HIGHLIGHT_PULSE_OFF_MS = 400L
-private const val HIGHLIGHT_COLOR_ALPHA = 0.3f
 private const val HIGHLIGHT_WATERMARK_INDEX = 3
 private const val HIGHLIGHT_COMBINE_INDEX = 6
 
@@ -103,6 +77,8 @@ fun SettingsScreen(
     watermarkConfig: WatermarkConfig,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
+    currentTextScale: AppTextScale,
+    onTextScaleChange: (AppTextScale) -> Unit,
     onClearCache: () -> Unit,
     onLicenseClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
@@ -121,12 +97,12 @@ fun SettingsScreen(
     highlight: SettingsHighlight? = null,
     proSubscriptionSection: @Composable () -> Unit = {},
 ) {
-    val haptic = LocalHapticFeedback.current
     var showClearCacheDialog by remember { mutableStateOf(false) }
     var showQualityDialog by remember { mutableStateOf(false) }
     var showPrefixDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showTextScaleDialog by remember { mutableStateOf(false) }
     var currentLocale by remember { mutableStateOf(currentAppLocale()) }
     val listState = rememberLazyListState()
     var alreadyHighlighted by remember { mutableStateOf(false) }
@@ -171,6 +147,14 @@ fun SettingsScreen(
         )
     }
 
+    if (showTextScaleDialog) {
+        TextScaleDialog(
+            current = currentTextScale,
+            onSelect = onTextScaleChange,
+            onDismiss = { showTextScaleDialog = false },
+        )
+    }
+
     val currentQuality = (uiState as? SettingsUiState.Success)?.imageQuality ?: ImageQualityPreset.DEFAULT
     val currentPrefix = (uiState as? SettingsUiState.Success)?.fileNamePrefix ?: AppSettings.DEFAULT_FILE_NAME_PREFIX
     val currentAlpha = (uiState as? SettingsUiState.Success)?.overlayAlpha ?: AppSettings.DEFAULT_OVERLAY_ALPHA
@@ -201,9 +185,9 @@ fun SettingsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.SETTINGS_SCREEN),
+            Modifier
+                .fillMaxSize()
+                .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.SETTINGS_SCREEN),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 CenterAlignedTopAppBar(
@@ -222,9 +206,9 @@ fun SettingsScreen(
                         }
                     },
                     colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                        ),
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                    ),
                 )
             },
         ) { innerPadding ->
@@ -232,9 +216,9 @@ fun SettingsScreen(
                 is SettingsUiState.Loading -> {
                     Box(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
                         contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
@@ -244,9 +228,9 @@ fun SettingsScreen(
                 is SettingsUiState.Error -> {
                     Box(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -273,19 +257,19 @@ fun SettingsScreen(
 
                     Column(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
                     ) {
                         PairShotBannerAd()
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             state = listState,
                             contentPadding =
-                                PaddingValues(
-                                    horizontal = PairShotScreen.horizontalPadding,
-                                    vertical = PairShotCard.innerPadding,
-                                ),
+                            PaddingValues(
+                                horizontal = PairShotScreen.horizontalPadding,
+                                vertical = PairShotCard.innerPadding,
+                            ),
                         ) {
                             item(key = "section_pro_subscription") {
                                 proSubscriptionSection()
@@ -297,82 +281,16 @@ fun SettingsScreen(
                             }
 
                             item(key = "card_capture") {
-                                SettingsCard {
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_image_quality),
-                                        trailing = qualityLabel,
-                                        onClick = { showQualityDialog = true },
-                                    )
-                                    SettingsDivider()
-                                    Column(modifier = Modifier.fillMaxWidth()) {
-                                        Row(
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .height(PairShotTouchTarget.large)
-                                                    .padding(horizontal = PairShotCard.innerPadding),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.settings_item_overlay_opacity),
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                                modifier = Modifier.weight(1f),
-                                            )
-                                            Switch(
-                                                checked = uiState.overlayEnabled,
-                                                onCheckedChange = {
-                                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                    onOverlayEnabledChange(it)
-                                                },
-                                                colors =
-                                                    SwitchDefaults.colors(
-                                                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    ),
-                                                modifier =
-                                                    Modifier
-                                                        .wrapContentHeight(unbounded = true)
-                                                        .scale(SWITCH_SCALE),
-                                            )
-                                        }
-                                        AnimatedVisibility(
-                                            visible = uiState.overlayEnabled,
-                                            enter = expandVertically(),
-                                            exit = shrinkVertically(),
-                                        ) {
-                                            SettingsSliderItem(
-                                                label = "",
-                                                value = currentAlpha,
-                                                valueRange = 0f..1.0f,
-                                                steps = 99,
-                                                valueLabel = { "${(it * 100).roundToInt()}%" },
-                                                onValueChange = onOverlayAlphaChange,
-                                                footer = {
-                                                    AnimatedVisibility(
-                                                        visible = currentAlpha > 0.75f,
-                                                        enter = expandVertically() + fadeIn(),
-                                                        exit = shrinkVertically() + fadeOut(),
-                                                    ) {
-                                                        Row(
-                                                            modifier = Modifier.fillMaxWidth().padding(bottom = PairShotSpacing.xs),
-                                                            horizontalArrangement = Arrangement.End,
-                                                            verticalAlignment = Alignment.CenterVertically,
-                                                        ) {
-                                                            WarningBadge(text = stringResource(R.string.settings_warning_opacity_high))
-                                                        }
-                                                    }
-                                                },
-                                            )
-                                        }
-                                    }
-                                    SettingsDivider()
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_file_name_prefix),
-                                        trailing = prefixDisplay,
-                                        onClick = { showPrefixDialog = true },
-                                    )
-                                }
+                                SettingsCaptureSection(
+                                    qualityLabel = qualityLabel,
+                                    onQualityClick = { showQualityDialog = true },
+                                    overlayEnabled = uiState.overlayEnabled,
+                                    overlayAlpha = currentAlpha,
+                                    onOverlayEnabledChange = onOverlayEnabledChange,
+                                    onOverlayAlphaChange = onOverlayAlphaChange,
+                                    prefixDisplay = prefixDisplay,
+                                    onPrefixClick = { showPrefixDialog = true },
+                                )
                             }
 
                             item(key = "gap_capture") {
@@ -385,56 +303,12 @@ fun SettingsScreen(
                             }
 
                             item(key = "card_watermark") {
-                                HighlightableSettingsCard(
+                                SettingsWatermarkSection(
+                                    watermarkConfig = watermarkConfig,
                                     pulse = highlightPulse && highlight == SettingsHighlight.WATERMARK,
-                                ) {
-                                    Row(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .height(PairShotTouchTarget.large)
-                                                .padding(horizontal = PairShotCard.innerPadding),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.settings_item_watermark_use),
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                        Switch(
-                                            checked = watermarkConfig.enabled,
-                                            onCheckedChange = { checked ->
-                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                onWatermarkConfigChange(watermarkConfig.copy(enabled = checked))
-                                            },
-                                            modifier =
-                                                Modifier
-                                                    .wrapContentHeight(unbounded = true)
-                                                    .scale(SWITCH_SCALE),
-                                        )
-                                    }
-                                    AnimatedVisibility(
-                                        visible = watermarkConfig.enabled,
-                                        enter = expandVertically(),
-                                        exit = shrinkVertically(),
-                                    ) {
-                                        Column {
-                                            SettingsDivider()
-                                            SettingsItem(
-                                                label = stringResource(R.string.settings_item_user_settings),
-                                                trailing =
-                                                    if (watermarkConfig.isContentMissing()) {
-                                                        stringResource(R.string.settings_warning_required)
-                                                    } else {
-                                                        null
-                                                    },
-                                                trailingIsError = watermarkConfig.isContentMissing(),
-                                                onClick = onWatermarkSettingsClick,
-                                            )
-                                        }
-                                    }
-                                }
+                                    onWatermarkConfigChange = onWatermarkConfigChange,
+                                    onWatermarkSettingsClick = onWatermarkSettingsClick,
+                                )
                             }
 
                             item(key = "gap_watermark") {
@@ -467,38 +341,16 @@ fun SettingsScreen(
                             }
 
                             item(key = "card_general") {
-                                SettingsCard {
-                                    val languageLabel =
-                                        when (currentLocale) {
-                                            AppLocale.SYSTEM -> stringResource(R.string.settings_language_system)
-                                            AppLocale.KOREAN -> stringResource(R.string.settings_language_korean)
-                                            AppLocale.ENGLISH -> stringResource(R.string.settings_language_english)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_language),
-                                        trailing = languageLabel,
-                                        onClick = { showLanguageDialog = true },
-                                    )
-                                    SettingsDivider()
-                                    val themeLabel =
-                                        when (currentTheme) {
-                                            AppTheme.SYSTEM -> stringResource(R.string.settings_theme_system)
-                                            AppTheme.LIGHT -> stringResource(R.string.settings_theme_light)
-                                            AppTheme.DARK -> stringResource(R.string.settings_theme_dark)
-                                        }
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_theme),
-                                        trailing = themeLabel,
-                                        onClick = { showThemeDialog = true },
-                                    )
-                                    if (showAdsConsent) {
-                                        SettingsDivider()
-                                        SettingsItem(
-                                            label = stringResource(R.string.settings_item_ads_consent),
-                                            onClick = onAdsConsentClick,
-                                        )
-                                    }
-                                }
+                                SettingsGeneralSection(
+                                    currentLocale = currentLocale,
+                                    currentTheme = currentTheme,
+                                    currentTextScale = currentTextScale,
+                                    showAdsConsent = showAdsConsent,
+                                    onLanguageClick = { showLanguageDialog = true },
+                                    onThemeClick = { showThemeDialog = true },
+                                    onTextScaleClick = { showTextScaleDialog = true },
+                                    onAdsConsentClick = onAdsConsentClick,
+                                )
                             }
 
                             item(key = "gap_general") {
@@ -513,7 +365,10 @@ fun SettingsScreen(
                             item(key = "card_help") {
                                 SettingsCard {
                                     SettingsItem(
-                                        label = stringResource(com.pairshot.feature.tutorial.R.string.tutorial_settings_replay_label),
+                                        label =
+                                        stringResource(
+                                            com.pairshot.feature.tutorial.R.string.tutorial_settings_replay_label,
+                                        ),
                                         onClick = onReplayTutorial,
                                     )
                                 }
@@ -529,33 +384,14 @@ fun SettingsScreen(
                             }
 
                             item(key = "card_storage_info") {
-                                SettingsCard {
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_photo_storage),
-                                        trailing = formatBytes(uiState.usedStorageBytes),
-                                    )
-                                    SettingsDivider()
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_cache),
-                                        trailing = formatBytes(uiState.cacheBytes),
-                                        onClick = { showClearCacheDialog = true },
-                                    )
-                                    SettingsDivider()
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_app_version),
-                                        trailing = uiState.appVersion,
-                                    )
-                                    SettingsDivider()
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_license),
-                                        onClick = onLicenseClick,
-                                    )
-                                    SettingsDivider()
-                                    SettingsItem(
-                                        label = stringResource(R.string.settings_item_privacy_policy),
-                                        onClick = onPrivacyPolicyClick,
-                                    )
-                                }
+                                SettingsStorageInfoSection(
+                                    usedStorageBytes = uiState.usedStorageBytes,
+                                    cacheBytes = uiState.cacheBytes,
+                                    appVersion = uiState.appVersion,
+                                    onClearCacheClick = { showClearCacheDialog = true },
+                                    onLicenseClick = onLicenseClick,
+                                    onPrivacyPolicyClick = onPrivacyPolicyClick,
+                                )
                             }
                         }
                     }
@@ -566,38 +402,10 @@ fun SettingsScreen(
         PairShotSnackbarHost(
             controller = snackbarController,
             modifier =
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(top = PairShotSnackbarTokens.topOffset),
+            Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = PairShotSnackbarTokens.topOffset),
         )
-    }
-}
-
-@Composable
-private fun HighlightableSettingsCard(
-    pulse: Boolean,
-    content: @Composable () -> Unit,
-) {
-    val targetColor =
-        if (pulse) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = HIGHLIGHT_COLOR_ALPHA)
-        } else {
-            MaterialTheme.colorScheme.surface
-        }
-    val backgroundColor: State<Color> =
-        animateColorAsState(
-            targetValue = targetColor,
-            animationSpec = tween(durationMillis = HIGHLIGHT_PULSE_ON_MS.toInt()),
-            label = "settings_highlight_bg",
-        )
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = backgroundColor.value,
-    ) {
-        Column {
-            content()
-        }
     }
 }
