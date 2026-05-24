@@ -3,18 +3,18 @@
     <string name="paywall_title">PairShot Pro</string>
     <string name="paywall_subtitle">전·후 사진 관리를 손쉽게.</string>
 
-    <string name="paywall_value_unlimited">페어 무제한 생성</string>
+    <string name="paywall_value_unlimited">페어 카드 무제한</string>
     <string name="paywall_value_no_ads">전체 광고 제거</string>
-    <string name="paywall_value_pro_features">합성·워터마크 모든 기능 액세스</string>
+    <string name="paywall_value_pro_features">전체 기능 액세스</string>
 
     <string name="paywall_plan_yearly_title">연간 구독</string>
     <string name="paywall_plan_yearly_price">%1$s/년</string>
-    <string name="paywall_plan_yearly_subtitle">월 %1$s 꼴 · 자동 갱신</string>
-    <string name="paywall_plan_yearly_badge">20% 할인</string>
+    <string name="paywall_plan_yearly_monthly_equivalent">월 %1$s</string>
+    <string name="paywall_plan_yearly_badge">%1$d%% 할인</string>
 
     <string name="paywall_plan_monthly_title">월간 구독</string>
     <string name="paywall_plan_monthly_price">%1$s/월</string>
-    <string name="paywall_plan_monthly_trial_note">2주 무료체험 후 자동 결제 · 언제든 해지</string>
+    <string name="paywall_plan_monthly_trial_note">2주 무료 체험 후 자동 결제</string>
 
     <string name="paywall_continue_free">무료 버전으로 계속 (페어 5개/일, 광고 표시)</string>
 
