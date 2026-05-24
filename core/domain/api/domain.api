@@ -401,6 +401,7 @@ public abstract interface class com/pairshot/core/domain/settings/AppInfo {
 
 public abstract interface class com/pairshot/core/domain/settings/AppSettingsRepository {
 	public abstract fun getAlbumSortOrderFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getAppTextScaleNameFlow ()Lkotlinx/coroutines/flow/Flow;
 	public abstract fun getAppThemeNameFlow ()Lkotlinx/coroutines/flow/Flow;
 	public abstract fun getCurrent (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getHomeSortOrderFlow ()Lkotlinx/coroutines/flow/Flow;
@@ -408,6 +409,7 @@ public abstract interface class com/pairshot/core/domain/settings/AppSettingsRep
 	public abstract fun getSettingsFlow ()Lkotlinx/coroutines/flow/Flow;
 	public abstract fun saveLastExportPreset (Lcom/pairshot/core/model/ExportPreset;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun updateAlbumSortOrder (Lcom/pairshot/core/model/SortOrder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateAppTextScaleName (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun updateAppThemeName (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun updateCameraAspectRatio (Lcom/pairshot/core/model/AspectRatio;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun updateCameraFlashMode (Lcom/pairshot/core/model/FlashMode;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -506,6 +508,7 @@ public abstract interface class com/pairshot/core/domain/tutorial/TutorialAction
 public final class com/pairshot/core/domain/tutorial/TutorialActionIds {
 	public static final field AFTER_CAMERA_ALL_COMPLETED Ljava/lang/String;
 	public static final field AFTER_CAMERA_BACK_TO_HOME Ljava/lang/String;
+	public static final field AFTER_CAMERA_BEFORE_PREVIEW_DISMISSED Ljava/lang/String;
 	public static final field AFTER_CAMERA_BEFORE_PREVIEW_OPENED Ljava/lang/String;
 	public static final field AFTER_CAMERA_ENTERED Ljava/lang/String;
 	public static final field AFTER_CAMERA_SHUTTER Ljava/lang/String;

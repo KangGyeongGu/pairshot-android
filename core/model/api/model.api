@@ -61,6 +61,23 @@ public final class com/pairshot/core/model/AppSettings {
 public final class com/pairshot/core/model/AppSettings$Companion {
 }
 
+public final class com/pairshot/core/model/AppTextScale : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/AppTextScale$Companion;
+	public static final field EXTRA_LARGE Lcom/pairshot/core/model/AppTextScale;
+	public static final field LARGE Lcom/pairshot/core/model/AppTextScale;
+	public static final field NORMAL Lcom/pairshot/core/model/AppTextScale;
+	public static final field SMALL Lcom/pairshot/core/model/AppTextScale;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getFactor ()F
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/AppTextScale;
+	public static fun values ()[Lcom/pairshot/core/model/AppTextScale;
+}
+
+public final class com/pairshot/core/model/AppTextScale$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/AppTextScale;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/AppTextScale;
+}
+
 public final class com/pairshot/core/model/AppTheme : java/lang/Enum {
 	public static final field Companion Lcom/pairshot/core/model/AppTheme$Companion;
 	public static final field DARK Lcom/pairshot/core/model/AppTheme;
