@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.AppTheme
 import com.pairshot.core.ui.component.PairShotBottomSheet
@@ -52,19 +51,19 @@ internal fun ThemeDialog(
                 }
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { selected = option }
-                        .padding(vertical = PairShotSpacing.sm),
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { selected = option }
+                    .padding(vertical = PairShotSpacing.sm),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
                     selected = selected == option,
                     onClick = { selected = option },
                     colors =
-                        RadioButtonDefaults.colors(
-                            selectedColor = MaterialTheme.colorScheme.primary,
-                        ),
+                    RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
                 Text(
                     text = stringResource(labelRes),

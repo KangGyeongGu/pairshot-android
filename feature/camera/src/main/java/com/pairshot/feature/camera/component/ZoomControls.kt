@@ -70,8 +70,8 @@ private const val ZOOM_MAJOR_TICK_INTERVAL = 10
 @Composable
 fun ZoomControls(
     zoomUiState: ZoomUiState,
-    onZoomRatioChanged: (Float) -> Unit,
-    onPresetTapped: (Float) -> Unit,
+    onZoomRatioChange: (Float) -> Unit,
+    onPresetTap: (Float) -> Unit,
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     onToggleLens: (() -> Unit)? = null,
@@ -80,7 +80,7 @@ fun ZoomControls(
     val density = LocalDensity.current
     val haptic = LocalHapticFeedback.current
     val latestRatio by rememberUpdatedState(zoomUiState.currentRatio)
-    val latestOnZoomChanged by rememberUpdatedState(onZoomRatioChanged)
+    val latestOnZoomChanged by rememberUpdatedState(onZoomRatioChange)
     val latestOnDragEnd by rememberUpdatedState(onDragEnd)
 
     val rangeSpanPx = with(density) { ZOOM_DIAL_RANGE_SPAN_DP.dp.toPx() }
@@ -92,45 +92,45 @@ fun ZoomControls(
 
     Box(
         modifier =
-            modifier
-                .pointerInput(zoomUiState.minRatio, zoomUiState.maxRatio) {
-                    detectHorizontalDragGestures(
-                        onDragStart = {
-                            isDragging = true
-                            dragAccumulator = 0f
-                            lastTickIndex = (latestRatio * ZOOM_TICKS_PER_UNIT).roundToInt()
-                        },
-                        onDragEnd = {
-                            isDragging = false
-                            latestOnDragEnd()
-                        },
-                        onDragCancel = {
-                            isDragging = false
-                            latestOnDragEnd()
-                        },
-                    ) { _, dragAmount ->
-                        dragAccumulator -= dragAmount
-                        val deltaZoom = dragAccumulator / pxPerZoom
-                        if (abs(deltaZoom) >= ZOOM_DRAG_MIN_DELTA) {
-                            val newRatio =
-                                (latestRatio + deltaZoom)
-                                    .coerceIn(zoomUiState.minRatio, zoomUiState.maxRatio)
-                            latestOnZoomChanged(newRatio)
-                            dragAccumulator = 0f
+        modifier
+            .pointerInput(zoomUiState.minRatio, zoomUiState.maxRatio) {
+                detectHorizontalDragGestures(
+                    onDragStart = {
+                        isDragging = true
+                        dragAccumulator = 0f
+                        lastTickIndex = (latestRatio * ZOOM_TICKS_PER_UNIT).roundToInt()
+                    },
+                    onDragEnd = {
+                        isDragging = false
+                        latestOnDragEnd()
+                    },
+                    onDragCancel = {
+                        isDragging = false
+                        latestOnDragEnd()
+                    },
+                ) { _, dragAmount ->
+                    dragAccumulator -= dragAmount
+                    val deltaZoom = dragAccumulator / pxPerZoom
+                    if (abs(deltaZoom) >= ZOOM_DRAG_MIN_DELTA) {
+                        val newRatio =
+                            (latestRatio + deltaZoom)
+                                .coerceIn(zoomUiState.minRatio, zoomUiState.maxRatio)
+                        latestOnZoomChanged(newRatio)
+                        dragAccumulator = 0f
 
-                            val newTickIndex = (newRatio * ZOOM_TICKS_PER_UNIT).roundToInt()
-                            if (newTickIndex != lastTickIndex) {
-                                val isMajorTick = newTickIndex % ZOOM_MAJOR_TICK_INTERVAL == 0
-                                if (isMajorTick) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                } else {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                }
-                                lastTickIndex = newTickIndex
+                        val newTickIndex = (newRatio * ZOOM_TICKS_PER_UNIT).roundToInt()
+                        if (newTickIndex != lastTickIndex) {
+                            val isMajorTick = newTickIndex % ZOOM_MAJOR_TICK_INTERVAL == 0
+                            if (isMajorTick) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            } else {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             }
+                            lastTickIndex = newTickIndex
                         }
                     }
-                },
+                }
+            },
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(
@@ -161,7 +161,7 @@ fun ZoomControls(
                 ) {
                     ZoomPresetCard(
                         zoomUiState = zoomUiState,
-                        onPresetTapped = onPresetTapped,
+                        onPresetTap = onPresetTap,
                     )
                 }
             }
@@ -174,17 +174,17 @@ fun ZoomControls(
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier =
-                    Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = PairShotSpacing.md),
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = PairShotSpacing.md),
             ) {
                 Box(
                     modifier =
-                        Modifier
-                            .size(LensButtonSize)
-                            .clip(CircleShape)
-                            .background(PairShotCameraTokens.Letterbox.copy(alpha = 0.35f))
-                            .clickable(onClick = toggleLens),
+                    Modifier
+                        .size(LensButtonSize)
+                        .clip(CircleShape)
+                        .background(PairShotCameraTokens.Letterbox.copy(alpha = 0.35f))
+                        .clickable(onClick = toggleLens),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -202,7 +202,7 @@ fun ZoomControls(
 @Composable
 private fun ZoomPresetCard(
     zoomUiState: ZoomUiState,
-    onPresetTapped: (Float) -> Unit,
+    onPresetTap: (Float) -> Unit,
 ) {
     val primary = MaterialTheme.colorScheme.primary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
@@ -215,11 +215,11 @@ private fun ZoomPresetCard(
 
     Row(
         modifier =
-            Modifier
-                .background(
-                    color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
-                    shape = shape,
-                ).padding(horizontal = PairShotSpacing.xs, vertical = PairShotSpacing.xs),
+        Modifier
+            .background(
+                color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
+                shape = shape,
+            ).padding(horizontal = PairShotSpacing.xs, vertical = PairShotSpacing.xs),
         horizontalArrangement = Arrangement.spacedBy(PairShotStroke.thin),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -231,11 +231,11 @@ private fun ZoomPresetCard(
 
             Box(
                 modifier =
-                    Modifier
-                        .height(PairShotIconSize.lg)
-                        .background(color = bgColor, shape = shape)
-                        .clickable { onPresetTapped(preset) }
-                        .padding(horizontal = PairShotSpacing.md),
+                Modifier
+                    .height(PairShotIconSize.lg)
+                    .background(color = bgColor, shape = shape)
+                    .clickable { onPresetTap(preset) }
+                    .padding(horizontal = PairShotSpacing.md),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -264,11 +264,11 @@ private fun ZoomDialWithLabel(
     ) {
         Box(
             modifier =
-                Modifier
-                    .background(
-                        color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
-                        shape = MaterialTheme.shapes.small,
-                    ).padding(horizontal = PairShotSpacing.md, vertical = PairShotSpacing.xs),
+            Modifier
+                .background(
+                    color = PairShotCameraTokens.Letterbox.copy(alpha = 0.35f),
+                    shape = MaterialTheme.shapes.small,
+                ).padding(horizontal = PairShotSpacing.md, vertical = PairShotSpacing.xs),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -281,9 +281,9 @@ private fun ZoomDialWithLabel(
 
         Canvas(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(PairShotScreen.horizontalPadding),
+            Modifier
+                .fillMaxWidth()
+                .height(PairShotScreen.horizontalPadding),
         ) {
             val centerX = size.width / 2f
             val canvasH = size.height
@@ -306,10 +306,28 @@ private fun ZoomDialWithLabel(
 
                 val isMajor = i % ZOOM_MAJOR_TICK_INTERVAL == 0
                 val tickHeightPx =
-                    if (isMajor) with(density) { PairShotSpacing.md.toPx() } else with(density) { PairShotRadius.sm.toPx() }
+                    if (isMajor) {
+                        with(
+                            density
+                        ) { PairShotSpacing.md.toPx() }
+                    } else {
+                        with(density) { PairShotRadius.sm.toPx() }
+                    }
                 val tickWidthPx =
-                    if (isMajor) with(density) { PairShotStroke.thin.toPx() } else with(density) { PairShotStroke.hairline.toPx() }
-                val tickColor = if (isMajor) PairShotCameraTokens.Foreground else PairShotCameraTokens.Foreground.copy(alpha = 0.5f)
+                    if (isMajor) {
+                        with(
+                            density
+                        ) { PairShotStroke.thin.toPx() }
+                    } else {
+                        with(density) { PairShotStroke.hairline.toPx() }
+                    }
+                val tickColor = if (isMajor) {
+                    PairShotCameraTokens.Foreground
+                } else {
+                    PairShotCameraTokens.Foreground.copy(
+                        alpha = 0.5f
+                    )
+                }
                 val topY = canvasH - tickHeightPx
 
                 drawLine(

@@ -26,15 +26,14 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,6 +66,7 @@ import com.pairshot.feature.camera.viewmodel.AfterCameraViewModel
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import com.pairshot.core.ui.R as CoreR
 
@@ -75,8 +75,8 @@ private val CameraShutterHeight = CameraSpec.shutterSectionHeight
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AfterCameraScreen(
-    viewModel: AfterCameraViewModel,
     onNavigateBack: () -> Unit,
+    viewModel: AfterCameraViewModel = hiltViewModel(),
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -84,6 +84,7 @@ internal fun AfterCameraScreen(
     val haptic = LocalHapticFeedback.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
+    val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
 
     val cameraSession = sessionViewModel.cameraSession
     val sensorSession = sessionViewModel.sensorSession
@@ -248,7 +249,7 @@ internal fun AfterCameraScreen(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     tutorialActions.report(TutorialActionIds.AFTER_CAMERA_SHUTTER)
                     if (isRetakeMode) {
-                        onNavigateBack()
+                        currentOnNavigateBack()
                     }
                 }
 
@@ -294,9 +295,9 @@ internal fun AfterCameraScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
                 CameraPreviewPane(
                     surfaceRequest = surfaceRequest,
@@ -312,12 +313,12 @@ internal fun AfterCameraScreen(
                     exposureStepDenominator = capabilities.exposureStepDenominator,
                     selectedAspectRatio = settingsState.aspectRatio,
                     modifier = Modifier.fillMaxWidth().weight(1f),
-                    onZoomRatioChanged = { newRatio ->
+                    onZoomRatioChange = { newRatio ->
                         viewModel.updateZoomRatio(newRatio)
                         cameraSession.setZoom(newRatio)
                     },
-                    onPresetTapped = { preset ->
-                        viewModel.onPresetTapped(preset)
+                    onPresetTap = { preset ->
+                        viewModel.onPresetTap(preset)
                         cameraSession.setZoom(viewModel.zoomUiState.value.currentRatio)
                     },
                     onDragEnd = { viewModel.applyCustomRatio() },
@@ -353,11 +354,11 @@ internal fun AfterCameraScreen(
                 )
 
                 BeforePreviewStrip(
-                    beforePreviewUris = beforePreviewUris,
+                    beforePreviewUris = beforePreviewUris.toImmutableList(),
                     modifier =
-                        Modifier
-                            .height(stripSectionHeight)
-                            .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.AFTER_CAMERA_STRIP),
+                    Modifier
+                        .height(stripSectionHeight)
+                        .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.AFTER_CAMERA_STRIP),
                     selectedIndex = if (totalCount > 0) currentIndex else null,
                     onSelectIndex = viewModel::selectIndex,
                     onLongPressIndex = { idx ->
@@ -370,11 +371,11 @@ internal fun AfterCameraScreen(
                     emptyMessage = stringResource(R.string.camera_strip_empty_after),
                     stripHeight = stripSectionHeight,
                     progress =
-                        if (isRetakeMode) {
-                            null
-                        } else {
-                            StripProgress(completed = completedCount, total = totalPairCount)
-                        },
+                    if (isRetakeMode) {
+                        null
+                    } else {
+                        StripProgress(completed = completedCount, total = totalPairCount)
+                    },
                 )
 
                 CameraBottomBar(
@@ -403,7 +404,7 @@ internal fun AfterCameraScreen(
                     },
                     onThumbnailClick = {
                         tutorialActions.report(TutorialActionIds.AFTER_CAMERA_BACK_TO_HOME)
-                        onNavigateBack()
+                        currentOnNavigateBack()
                     },
                 )
 
@@ -412,10 +413,10 @@ internal fun AfterCameraScreen(
 
             PairShotBannerAd(
                 modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
             )
 
             CameraSettingsSheet(
@@ -454,10 +455,10 @@ internal fun AfterCameraScreen(
             PairShotSnackbarHost(
                 controller = snackbarController,
                 modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
-                        .padding(top = PairShotSnackbarTokens.topOffset),
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
+                    .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
 
@@ -465,7 +466,10 @@ internal fun AfterCameraScreen(
             BeforePhotoFullPreview(
                 uri = uri,
                 bottomAnchor = shutterSectionHeight + bottomSpacerHeight,
-                onDismiss = { beforePreviewUriForFullView = null },
+                onDismiss = {
+                    beforePreviewUriForFullView = null
+                    tutorialActions.report(TutorialActionIds.AFTER_CAMERA_BEFORE_PREVIEW_DISMISSED)
+                },
             )
         }
     }

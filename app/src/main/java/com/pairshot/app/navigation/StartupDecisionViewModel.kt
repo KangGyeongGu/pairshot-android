@@ -22,33 +22,33 @@ data class StartupPlan(
 
 @HiltViewModel
 class StartupDecisionViewModel
-    @Inject
-    constructor(
-        private val appFlowCoordinator: AppFlowCoordinator,
-        private val onboardingStateRepository: OnboardingStateRepository,
-    ) : ViewModel() {
-        private val _plan = MutableStateFlow<StartupPlan?>(null)
-        val plan: StateFlow<StartupPlan?> = _plan.asStateFlow()
+@Inject
+constructor(
+    private val appFlowCoordinator: AppFlowCoordinator,
+    private val onboardingStateRepository: OnboardingStateRepository,
+) : ViewModel() {
+    private val _plan = MutableStateFlow<StartupPlan?>(null)
+    val plan: StateFlow<StartupPlan?> = _plan.asStateFlow()
 
-        init {
-            viewModelScope.launch {
-                _plan.value = resolvePlan()
+    init {
+        viewModelScope.launch {
+            _plan.value = resolvePlan()
+        }
+    }
+
+    private suspend fun resolvePlan(): StartupPlan =
+        when (appFlowCoordinator.decideStartup()) {
+            StartupDecision.FirstLaunchTutorial -> {
+                StartupPlan(initialRoute = Home, startMainTutorial = true)
+            }
+
+            StartupDecision.OnboardingPaywall -> {
+                StartupPlan(initialRoute = Paywall(dismissible = false), startMainTutorial = false)
+            }
+
+            StartupDecision.Camera -> {
+                onboardingStateRepository.markOnboardingPaywallShown()
+                StartupPlan(initialRoute = Camera(), startMainTutorial = false)
             }
         }
-
-        private suspend fun resolvePlan(): StartupPlan =
-            when (appFlowCoordinator.decideStartup()) {
-                StartupDecision.FirstLaunchTutorial -> {
-                    StartupPlan(initialRoute = Home, startMainTutorial = true)
-                }
-
-                StartupDecision.OnboardingPaywall -> {
-                    StartupPlan(initialRoute = Paywall(dismissible = false), startMainTutorial = false)
-                }
-
-                StartupDecision.Camera -> {
-                    onboardingStateRepository.markOnboardingPaywallShown()
-                    StartupPlan(initialRoute = Camera(), startMainTutorial = false)
-                }
-            }
-    }
+}

@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotStroke
 
@@ -22,9 +20,19 @@ fun GridOverlay(modifier: Modifier = Modifier) {
         val thirdH = size.height / GRID_DIVISIONS
 
         drawLine(color, Offset(thirdW, 0f), Offset(thirdW, size.height), strokeWidth)
-        drawLine(color, Offset(thirdW * SECOND_LINE_MULTIPLIER, 0f), Offset(thirdW * SECOND_LINE_MULTIPLIER, size.height), strokeWidth)
+        drawLine(
+            color,
+            Offset(thirdW * SECOND_LINE_MULTIPLIER, 0f),
+            Offset(thirdW * SECOND_LINE_MULTIPLIER, size.height),
+            strokeWidth
+        )
 
         drawLine(color, Offset(0f, thirdH), Offset(size.width, thirdH), strokeWidth)
-        drawLine(color, Offset(0f, thirdH * SECOND_LINE_MULTIPLIER), Offset(size.width, thirdH * SECOND_LINE_MULTIPLIER), strokeWidth)
+        drawLine(
+            color,
+            Offset(0f, thirdH * SECOND_LINE_MULTIPLIER),
+            Offset(size.width, thirdH * SECOND_LINE_MULTIPLIER),
+            strokeWidth
+        )
     }
 }

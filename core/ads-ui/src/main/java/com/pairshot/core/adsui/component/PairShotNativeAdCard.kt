@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
@@ -37,9 +36,9 @@ fun PairShotNativeAdCard(
 ) {
     Surface(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .aspectRatio(NATIVE_AD_ASPECT_RATIO),
+        modifier
+            .fillMaxWidth()
+            .aspectRatio(NATIVE_AD_ASPECT_RATIO),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
     ) {
@@ -71,9 +70,9 @@ fun PairShotNativeAdCard(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
-                    Modifier
-                        .align(Alignment.TopStart)
-                        .padding(PairShotSpacing.xs),
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(PairShotSpacing.xs),
             )
         }
     }

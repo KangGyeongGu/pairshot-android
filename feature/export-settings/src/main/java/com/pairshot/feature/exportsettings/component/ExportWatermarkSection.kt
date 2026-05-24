@@ -2,7 +2,7 @@ package com.pairshot.feature.exportsettings.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
@@ -55,10 +55,10 @@ internal fun ExportSwitchWithGearItem(
     val haptic = LocalHapticFeedback.current
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(PairShotTouchTarget.large)
-                .padding(start = PairShotCard.innerPadding),
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = PairShotTouchTarget.large)
+            .padding(start = PairShotCard.innerPadding, top = PairShotSpacing.sm, bottom = PairShotSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -74,14 +74,14 @@ internal fun ExportSwitchWithGearItem(
                 onCheckedChange(it)
             },
             colors =
-                SwitchDefaults.colors(
-                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
+            SwitchDefaults.colors(
+                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
             modifier =
-                Modifier
-                    .wrapContentHeight(unbounded = true)
-                    .scale(SWITCH_SCALE),
+            Modifier
+                .wrapContentHeight(unbounded = true)
+                .scale(SWITCH_SCALE),
         )
         IconButton(onClick = onGearClick) {
             Icon(

@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +28,7 @@ fun ExportFormatSection(
     format: ExportFormat,
     isProSubscriber: Boolean,
     onFormatChange: (ExportFormat) -> Unit,
-    onProLocked: () -> Unit,
+    onProLock: () -> Unit,
 ) {
     SettingsCard {
         ExportFormatRadioItem(
@@ -43,7 +43,7 @@ fun ExportFormatSection(
             selected = format == ExportFormat.ZIP,
             locked = !isProSubscriber,
             onClick = {
-                if (isProSubscriber) onFormatChange(ExportFormat.ZIP) else onProLocked()
+                if (isProSubscriber) onFormatChange(ExportFormat.ZIP) else onProLock()
             },
         )
     }
@@ -64,11 +64,11 @@ private fun ExportFormatRadioItem(
         }
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .height(PairShotTouchTarget.large)
-                .padding(horizontal = PairShotCard.innerPadding),
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .heightIn(min = PairShotTouchTarget.large)
+            .padding(horizontal = PairShotCard.innerPadding, vertical = PairShotSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

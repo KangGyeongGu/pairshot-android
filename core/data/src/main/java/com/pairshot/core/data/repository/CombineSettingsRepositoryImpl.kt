@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CombineSettingsRepositoryImpl
-    @Inject
-    constructor(
-        private val combinePreferences: CombinePreferences,
-    ) : CombineSettingsRepository {
-        override val configFlow: Flow<CombineConfig> = combinePreferences.configFlow
+@Inject
+constructor(
+    private val combinePreferences: CombinePreferences,
+) : CombineSettingsRepository {
+    override val configFlow: Flow<CombineConfig> = combinePreferences.configFlow
 
-        override suspend fun saveConfig(config: CombineConfig) {
-            combinePreferences.saveConfig(config)
-        }
-
-        override suspend fun getConfig(): CombineConfig = combinePreferences.configFlow.first()
+    override suspend fun saveConfig(config: CombineConfig) {
+        combinePreferences.saveConfig(config)
     }
+
+    override suspend fun getConfig(): CombineConfig = combinePreferences.configFlow.first()
+}

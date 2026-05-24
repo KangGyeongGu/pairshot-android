@@ -22,12 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
 import com.pairshot.core.designsystem.PairShotProgress
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
 
 @Composable
@@ -49,16 +47,16 @@ fun TopProgressPill(
         color = SnackbarBackground,
         shadowElevation = PairShotSnackbarTokens.elevation,
         modifier =
-            modifier
-                .widthIn(max = PairShotProgress.pillMaxWidth)
-                .heightIn(min = PairShotSnackbarTokens.minHeight),
+        modifier
+            .widthIn(max = PairShotProgress.pillMaxWidth)
+            .heightIn(min = PairShotSnackbarTokens.minHeight),
     ) {
         Column(
             modifier =
-                Modifier.padding(
-                    horizontal = PairShotSnackbarTokens.horizontalPadding,
-                    vertical = PairShotSnackbarTokens.verticalPadding,
-                ),
+            Modifier.padding(
+                horizontal = PairShotSnackbarTokens.horizontalPadding,
+                vertical = PairShotSnackbarTokens.verticalPadding,
+            ),
             verticalArrangement = Arrangement.spacedBy(PairShotRadius.sm),
         ) {
             Row(
@@ -82,10 +80,10 @@ fun TopProgressPill(
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(PairShotStroke.thick)
-                        .clip(RoundedCornerShape(PairShotRadius.pill)),
+                Modifier
+                    .fillMaxWidth()
+                    .height(PairShotStroke.thick)
+                    .clip(RoundedCornerShape(PairShotRadius.pill)),
                 color = extendedColors.success,
                 trackColor = Color.White.copy(alpha = 0.2f),
             )

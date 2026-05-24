@@ -30,216 +30,154 @@ import java.io.IOException
 import javax.inject.Inject
 
 class PhotoPairRepositoryImpl
-    @Inject
-    constructor(
-        private val photoPairDao: PhotoPairDao,
-        private val pairAlbumCrossRefDao: PairAlbumCrossRefDao,
-        private val mediaStoreManager: MediaStoreManager,
-        private val mediaSourceVerifier: MediaSourceVerifier,
-        private val fileNameGenerator: FileNameGenerator,
-        private val appSettingsRepository: AppSettingsRepository,
-        private val tutorialMode: TutorialModeProvider,
-        private val tutorialPairTracker: TutorialPairTracker,
-    ) : PhotoPairRepository {
-        override fun observeAll(): Flow<List<PhotoPair>> =
-            photoPairDao.observeAllWithCounts().map { entities ->
-                entities.map { it.toDomain() }
-            }
+@Inject
+constructor(
+    private val photoPairDao: PhotoPairDao,
+    private val pairAlbumCrossRefDao: PairAlbumCrossRefDao,
+    private val mediaStoreManager: MediaStoreManager,
+    private val mediaSourceVerifier: MediaSourceVerifier,
+    private val fileNameGenerator: FileNameGenerator,
+    private val appSettingsRepository: AppSettingsRepository,
+    private val tutorialMode: TutorialModeProvider,
+    private val tutorialPairTracker: TutorialPairTracker,
+) : PhotoPairRepository {
+    override fun observeAll(): Flow<List<PhotoPair>> =
+        photoPairDao.observeAllWithCounts().map { entities ->
+            entities.map { it.toDomain() }
+        }
 
-        override fun observeUnpaired(): Flow<List<PhotoPair>> =
-            photoPairDao.observeUnpaired().map { entities ->
-                entities.map { it.toDomain() }
-            }
+    override fun observeUnpaired(): Flow<List<PhotoPair>> =
+        photoPairDao.observeUnpaired().map { entities ->
+            entities.map { it.toDomain() }
+        }
 
-        override fun observeUnpairedByAlbum(albumId: Long): Flow<List<PhotoPair>> =
-            pairAlbumCrossRefDao.getUnpairedByAlbum(albumId).map { entities ->
-                entities.map { it.toDomain() }
-            }
+    override fun observeUnpairedByAlbum(albumId: Long): Flow<List<PhotoPair>> =
+        pairAlbumCrossRefDao.getUnpairedByAlbum(albumId).map { entities ->
+            entities.map { it.toDomain() }
+        }
 
-        override suspend fun getById(id: Long): PhotoPair? =
-            withContext(Dispatchers.IO) {
-                photoPairDao.getById(id)?.toDomain()
-            }
+    override suspend fun getById(id: Long): PhotoPair? =
+        withContext(Dispatchers.IO) {
+            photoPairDao.getById(id)?.toDomain()
+        }
 
-        override fun observeById(id: Long): Flow<PhotoPair?> = photoPairDao.observeById(id).map { entity -> entity?.toDomain() }
+    override fun observeById(id: Long): Flow<PhotoPair?> = photoPairDao.observeById(
+        id
+    ).map { entity -> entity?.toDomain() }
 
-        override suspend fun getByIds(ids: List<Long>): List<PhotoPair> =
-            withContext(Dispatchers.IO) {
-                if (ids.isEmpty()) emptyList() else photoPairDao.getByIds(ids).map { it.toDomain() }
-            }
+    override suspend fun getByIds(ids: List<Long>): List<PhotoPair> =
+        withContext(Dispatchers.IO) {
+            if (ids.isEmpty()) emptyList() else photoPairDao.getByIds(ids).map { it.toDomain() }
+        }
 
-        override suspend fun pruneMissingSources(pairId: Long): PrunePairResult =
-            withContext(Dispatchers.IO) {
-                val entity = photoPairDao.getById(pairId) ?: return@withContext PrunePairResult.NotFound
+    override suspend fun pruneMissingSources(pairId: Long): PrunePairResult =
+        withContext(Dispatchers.IO) {
+            val entity = photoPairDao.getById(pairId) ?: return@withContext PrunePairResult.NotFound
+            val beforeAlive = mediaSourceVerifier.exists(entity.beforePhotoUri)
+            val afterAlive = entity.afterPhotoUri?.let { mediaSourceVerifier.exists(it) } == true
+            applyPrune(entity, beforeAlive, afterAlive)
+        }
+
+    override suspend fun pruneAllMissingSources(): List<PrunePairResult> =
+        withContext(Dispatchers.IO) {
+            photoPairDao.observeAllWithCounts().first().map { withCounts ->
+                val entity = withCounts.pair
                 val beforeAlive = mediaSourceVerifier.exists(entity.beforePhotoUri)
                 val afterAlive = entity.afterPhotoUri?.let { mediaSourceVerifier.exists(it) } == true
                 applyPrune(entity, beforeAlive, afterAlive)
             }
-
-        override suspend fun pruneAllMissingSources(): List<PrunePairResult> =
-            withContext(Dispatchers.IO) {
-                photoPairDao.observeAllWithCounts().first().map { withCounts ->
-                    val entity = withCounts.pair
-                    val beforeAlive = mediaSourceVerifier.exists(entity.beforePhotoUri)
-                    val afterAlive = entity.afterPhotoUri?.let { mediaSourceVerifier.exists(it) } == true
-                    applyPrune(entity, beforeAlive, afterAlive)
-                }
-            }
-
-        private suspend fun applyPrune(
-            entity: PhotoPairEntity,
-            beforeAlive: Boolean,
-            afterAlive: Boolean,
-        ): PrunePairResult {
-            val hadBefore = !entity.beforePhotoUri.isNullOrBlank()
-            val hadAfter = !entity.afterPhotoUri.isNullOrBlank()
-            val beforeMissing = hadBefore && !beforeAlive
-            val afterMissing = hadAfter && !afterAlive
-            if (!beforeMissing && !afterMissing) return PrunePairResult.Healthy
-
-            val beforeRemains = hadBefore && !beforeMissing
-            val afterRemains = hadAfter && !afterMissing
-            if (!beforeRemains && !afterRemains) {
-                photoPairDao.delete(entity)
-                return PrunePairResult.DeletedEntirely
-            }
-
-            photoPairDao.update(buildPrunedEntity(entity, beforeRemains, afterRemains))
-            return resolvePruneResult(beforeMissing, afterMissing)
         }
 
-        private fun buildPrunedEntity(
-            entity: PhotoPairEntity,
-            beforeRemains: Boolean,
-            afterRemains: Boolean,
-        ): PhotoPairEntity =
-            entity.copy(
-                beforePhotoUri = if (beforeRemains) entity.beforePhotoUri else null,
-                afterPhotoUri = if (afterRemains) entity.afterPhotoUri else null,
-                afterTimestamp = if (afterRemains) entity.afterTimestamp else null,
-                status = resolveStatus(beforeRemains, afterRemains).name,
-            )
+    private suspend fun applyPrune(
+        entity: PhotoPairEntity,
+        beforeAlive: Boolean,
+        afterAlive: Boolean,
+    ): PrunePairResult {
+        val hadBefore = !entity.beforePhotoUri.isNullOrBlank()
+        val hadAfter = !entity.afterPhotoUri.isNullOrBlank()
+        val beforeMissing = hadBefore && !beforeAlive
+        val afterMissing = hadAfter && !afterAlive
+        if (!beforeMissing && !afterMissing) return PrunePairResult.Healthy
 
-        private fun resolveStatus(
-            beforeRemains: Boolean,
-            afterRemains: Boolean,
-        ): PairStatus =
-            when {
-                beforeRemains && afterRemains -> PairStatus.PAIRED
-                beforeRemains -> PairStatus.BEFORE_ONLY
-                else -> PairStatus.AFTER_ONLY
-            }
-
-        private fun resolvePruneResult(
-            beforeMissing: Boolean,
-            afterMissing: Boolean,
-        ): PrunePairResult =
-            when {
-                beforeMissing && afterMissing -> PrunePairResult.DeletedEntirely
-                beforeMissing -> PrunePairResult.BeforeDropped
-                else -> PrunePairResult.AfterDropped
-            }
-
-        override suspend fun delete(pair: PhotoPair) {
-            withContext(Dispatchers.IO) {
-                pair.beforePhotoUri?.let { uri ->
-                    runCatching { deleteGalleryUriLogOnFailure(uri, "before delete failed during pair removal") }
-                        .onFailure { Timber.w(it, "before gallery delete threw: %s", uri) }
-                }
-                pair.afterPhotoUri?.let { uri ->
-                    runCatching { deleteGalleryUriLogOnFailure(uri, "after delete failed during pair removal") }
-                        .onFailure { Timber.w(it, "after gallery delete threw: %s", uri) }
-                }
-                photoPairDao.delete(pair.toEntity())
-            }
+        val beforeRemains = hadBefore && !beforeMissing
+        val afterRemains = hadAfter && !afterMissing
+        if (!beforeRemains && !afterRemains) {
+            photoPairDao.delete(entity)
+            return PrunePairResult.DeletedEntirely
         }
 
-        override fun countAll(): Flow<Int> = photoPairDao.countAll()
+        photoPairDao.update(buildPrunedEntity(entity, beforeRemains, afterRemains))
+        return resolvePruneResult(beforeMissing, afterMissing)
+    }
 
-        override fun countCreatedSince(sinceEpochMs: Long): Flow<Int> = photoPairDao.countCreatedSince(sinceEpochMs)
+    private fun buildPrunedEntity(
+        entity: PhotoPairEntity,
+        beforeRemains: Boolean,
+        afterRemains: Boolean,
+    ): PhotoPairEntity =
+        entity.copy(
+            beforePhotoUri = if (beforeRemains) entity.beforePhotoUri else null,
+            afterPhotoUri = if (afterRemains) entity.afterPhotoUri else null,
+            afterTimestamp = if (afterRemains) entity.afterTimestamp else null,
+            status = resolveStatus(beforeRemains, afterRemains).name,
+        )
 
-        override suspend fun saveBeforePhoto(
-            tempFileUri: String,
-            zoomLevel: Float?,
-            albumId: Long?,
-            aspectRatio: AspectRatio?,
-        ): Long =
-            withContext(Dispatchers.IO) {
-                val tutorialActive = tutorialMode.isActive.value
-                val savedUriString: String
-                try {
-                    savedUriString =
-                        if (tutorialActive) {
-                            tutorialPairTracker.registerTempFile(tempFileUri)
-                            tempFileUri
-                        } else {
-                            val sequenceNumber = (photoPairDao.getMaxId() ?: 0L).plus(1L).toInt()
-                            val prefix = appSettingsRepository.getCurrent().fileNamePrefix
-                            val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
-                            mediaStoreManager
-                                .saveToGallery(
-                                    tempFileUri = Uri.parse(tempFileUri),
-                                    subfolder = "",
-                                    displayName = fileName,
-                                ).toString()
-                        }
+    private fun resolveStatus(
+        beforeRemains: Boolean,
+        afterRemains: Boolean,
+    ): PairStatus =
+        when {
+            beforeRemains && afterRemains -> PairStatus.PAIRED
+            beforeRemains -> PairStatus.BEFORE_ONLY
+            else -> PairStatus.AFTER_ONLY
+        }
 
-                    val entity =
-                        PhotoPairEntity(
-                            beforePhotoUri = savedUriString,
-                            beforeTimestamp = System.currentTimeMillis(),
-                            status = PairStatus.BEFORE_ONLY.name,
-                            zoomLevel = zoomLevel,
-                            aspectRatio = aspectRatio?.name,
-                        )
-                    try {
-                        val pairId = photoPairDao.insert(entity)
-                        if (albumId != null) {
-                            pairAlbumCrossRefDao.insert(
-                                PairAlbumCrossRefEntity(
-                                    pairId = pairId,
-                                    albumId = albumId,
-                                ),
-                            )
-                        }
-                        if (tutorialActive) tutorialPairTracker.registerPair(pairId)
-                        pairId
-                    } catch (e: SQLiteException) {
-                        if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
-                        throw e
-                    } catch (e: IllegalStateException) {
-                        if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
-                        throw e
-                    }
-                } finally {
-                    if (!tutorialActive) deleteTempFile(tempFileUri)
-                }
+    private fun resolvePruneResult(
+        beforeMissing: Boolean,
+        afterMissing: Boolean,
+    ): PrunePairResult =
+        when {
+            beforeMissing && afterMissing -> PrunePairResult.DeletedEntirely
+            beforeMissing -> PrunePairResult.BeforeDropped
+            else -> PrunePairResult.AfterDropped
+        }
+
+    override suspend fun delete(pair: PhotoPair) {
+        withContext(Dispatchers.IO) {
+            pair.beforePhotoUri?.let { uri ->
+                runCatching { deleteGalleryUriLogOnFailure(uri, "before delete failed during pair removal") }
+                    .onFailure { Timber.w(it, "before gallery delete threw: %s", uri) }
             }
+            pair.afterPhotoUri?.let { uri ->
+                runCatching { deleteGalleryUriLogOnFailure(uri, "after delete failed during pair removal") }
+                    .onFailure { Timber.w(it, "after gallery delete threw: %s", uri) }
+            }
+            photoPairDao.delete(pair.toEntity())
+        }
+    }
 
-        override suspend fun saveAfterPhoto(
-            pairId: Long,
-            tempFileUri: String,
-        ) = withContext(Dispatchers.IO) {
+    override fun countAll(): Flow<Int> = photoPairDao.countAll()
+
+    override fun countCreatedSince(sinceEpochMs: Long): Flow<Int> = photoPairDao.countCreatedSince(sinceEpochMs)
+
+    override suspend fun saveBeforePhoto(
+        tempFileUri: String,
+        zoomLevel: Float?,
+        albumId: Long?,
+        aspectRatio: AspectRatio?,
+    ): Long =
+        withContext(Dispatchers.IO) {
             val tutorialActive = tutorialMode.isActive.value
+            val savedUriString: String
             try {
-                val entity =
-                    photoPairDao.getById(pairId)
-                        ?: throw IllegalArgumentException("PhotoPair not found: $pairId")
-
-                if (!tutorialActive) {
-                    entity.afterPhotoUri?.let {
-                        deleteGalleryUriLogOnFailure(it, "previous After photo delete failed")
-                    }
-                }
-
-                val savedUriString: String =
+                savedUriString =
                     if (tutorialActive) {
                         tutorialPairTracker.registerTempFile(tempFileUri)
                         tempFileUri
                     } else {
-                        val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
+                        val sequenceNumber = (photoPairDao.getMaxId() ?: 0L).plus(1L).toInt()
                         val prefix = appSettingsRepository.getCurrent().fileNamePrefix
-                        val fileName = fileNameGenerator.generateAfterFileName(sequenceNumber, prefix)
+                        val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
                         mediaStoreManager
                             .saveToGallery(
                                 tempFileUri = Uri.parse(tempFileUri),
@@ -248,20 +186,31 @@ class PhotoPairRepositoryImpl
                             ).toString()
                     }
 
-                try {
-                    val now = System.currentTimeMillis()
-                    photoPairDao.update(
-                        entity.copy(
-                            afterPhotoUri = savedUriString,
-                            afterTimestamp = now,
-                            status = PairStatus.PAIRED.name,
-                        ),
+                val entity =
+                    PhotoPairEntity(
+                        beforePhotoUri = savedUriString,
+                        beforeTimestamp = System.currentTimeMillis(),
+                        status = PairStatus.BEFORE_ONLY.name,
+                        zoomLevel = zoomLevel,
+                        aspectRatio = aspectRatio?.name,
                     )
+                try {
+                    val pairId = photoPairDao.insert(entity)
+                    if (albumId != null) {
+                        pairAlbumCrossRefDao.insert(
+                            PairAlbumCrossRefEntity(
+                                pairId = pairId,
+                                albumId = albumId,
+                            ),
+                        )
+                    }
+                    if (tutorialActive) tutorialPairTracker.registerPair(pairId)
+                    pairId
                 } catch (e: SQLiteException) {
-                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
+                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
                     throw e
                 } catch (e: IllegalStateException) {
-                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
+                    if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "BEFORE rollback failed")
                     throw e
                 }
             } finally {
@@ -269,96 +218,149 @@ class PhotoPairRepositoryImpl
             }
         }
 
-        override suspend fun replaceBeforePhoto(
-            pairId: Long,
-            tempFileUri: String,
-        ) = withContext(Dispatchers.IO) {
-            try {
-                val entity =
-                    photoPairDao.getById(pairId)
-                        ?: throw IllegalArgumentException("PhotoPair not found: $pairId")
+    override suspend fun saveAfterPhoto(
+        pairId: Long,
+        tempFileUri: String,
+    ) = withContext(Dispatchers.IO) {
+        val tutorialActive = tutorialMode.isActive.value
+        try {
+            val entity =
+                photoPairDao.getById(pairId)
+                    ?: throw IllegalArgumentException("PhotoPair not found: $pairId")
 
-                entity.beforePhotoUri?.let {
-                    deleteGalleryUriLogOnFailure(it, "previous Before photo delete failed")
-                }
-
-                val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
-                val prefix = appSettingsRepository.getCurrent().fileNamePrefix
-                val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
-
-                val savedUri =
-                    mediaStoreManager.saveToGallery(
-                        tempFileUri = Uri.parse(tempFileUri),
-                        subfolder = "",
-                        displayName = fileName,
-                    )
-
-                try {
-                    val now = System.currentTimeMillis()
-                    val newStatus =
-                        if (entity.afterPhotoUri.isNullOrBlank()) {
-                            PairStatus.BEFORE_ONLY
-                        } else {
-                            PairStatus.PAIRED
-                        }
-                    photoPairDao.update(
-                        entity.copy(
-                            beforePhotoUri = savedUri.toString(),
-                            beforeTimestamp = now,
-                            status = newStatus.name,
-                        ),
-                    )
-                } catch (e: SQLiteException) {
-                    deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE replace rollback failed")
-                    throw e
-                } catch (e: IllegalStateException) {
-                    deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE replace rollback failed")
-                    throw e
-                }
-            } finally {
-                deleteTempFile(tempFileUri)
-            }
-        }
-
-        private fun deleteGalleryUriLogOnFailure(
-            uriString: String,
-            failureLogMessage: String,
-        ) {
-            val result = mediaStoreManager.deleteFromGallery(Uri.parse(uriString))
-            when (result) {
-                is DeleteResult.Success, DeleteResult.NotFound -> {
-                    Unit
-                }
-
-                is DeleteResult.Failed -> {
-                    Timber.w(result.exception, "$failureLogMessage: $uriString")
-                }
-
-                is DeleteResult.RecoverablePermission -> {
-                    Timber.w(result.exception, "$failureLogMessage (permission required): $uriString")
+            if (!tutorialActive) {
+                entity.afterPhotoUri?.let {
+                    deleteGalleryUriLogOnFailure(it, "previous After photo delete failed")
                 }
             }
-        }
 
-        private fun extractSequenceNumber(beforePhotoUri: String): Int {
-            val match = Regex("BEFORE_(\\d+)_").find(beforePhotoUri)
-            return match?.groupValues?.get(1)?.toIntOrNull() ?: 1
-        }
+            val savedUriString: String =
+                if (tutorialActive) {
+                    tutorialPairTracker.registerTempFile(tempFileUri)
+                    tempFileUri
+                } else {
+                    val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
+                    val prefix = appSettingsRepository.getCurrent().fileNamePrefix
+                    val fileName = fileNameGenerator.generateAfterFileName(sequenceNumber, prefix)
+                    mediaStoreManager
+                        .saveToGallery(
+                            tempFileUri = Uri.parse(tempFileUri),
+                            subfolder = "",
+                            displayName = fileName,
+                        ).toString()
+                }
 
-        private fun deleteTempFile(tempFileUri: String) {
             try {
-                val uri = Uri.parse(tempFileUri)
-                val path =
-                    when (uri.scheme) {
-                        "file" -> uri.path
-                        null -> tempFileUri
-                        else -> null
+                val now = System.currentTimeMillis()
+                photoPairDao.update(
+                    entity.copy(
+                        afterPhotoUri = savedUriString,
+                        afterTimestamp = now,
+                        status = PairStatus.PAIRED.name,
+                    ),
+                )
+            } catch (e: SQLiteException) {
+                if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
+                throw e
+            } catch (e: IllegalStateException) {
+                if (!tutorialActive) deleteGalleryUriLogOnFailure(savedUriString, "AFTER rollback failed")
+                throw e
+            }
+        } finally {
+            if (!tutorialActive) deleteTempFile(tempFileUri)
+        }
+    }
+
+    override suspend fun replaceBeforePhoto(
+        pairId: Long,
+        tempFileUri: String,
+    ) = withContext(Dispatchers.IO) {
+        try {
+            val entity =
+                photoPairDao.getById(pairId)
+                    ?: throw IllegalArgumentException("PhotoPair not found: $pairId")
+
+            entity.beforePhotoUri?.let {
+                deleteGalleryUriLogOnFailure(it, "previous Before photo delete failed")
+            }
+
+            val sequenceNumber = extractSequenceNumber(entity.beforePhotoUri.orEmpty())
+            val prefix = appSettingsRepository.getCurrent().fileNamePrefix
+            val fileName = fileNameGenerator.generateBeforeFileName(sequenceNumber, prefix)
+
+            val savedUri =
+                mediaStoreManager.saveToGallery(
+                    tempFileUri = Uri.parse(tempFileUri),
+                    subfolder = "",
+                    displayName = fileName,
+                )
+
+            try {
+                val now = System.currentTimeMillis()
+                val newStatus =
+                    if (entity.afterPhotoUri.isNullOrBlank()) {
+                        PairStatus.BEFORE_ONLY
+                    } else {
+                        PairStatus.PAIRED
                     }
-                if (path != null) java.io.File(path).delete()
-            } catch (e: SecurityException) {
-                Timber.d(e, "temp file delete failed: $tempFileUri")
-            } catch (e: IOException) {
-                Timber.d(e, "temp file delete failed: $tempFileUri")
+                photoPairDao.update(
+                    entity.copy(
+                        beforePhotoUri = savedUri.toString(),
+                        beforeTimestamp = now,
+                        status = newStatus.name,
+                    ),
+                )
+            } catch (e: SQLiteException) {
+                deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE replace rollback failed")
+                throw e
+            } catch (e: IllegalStateException) {
+                deleteGalleryUriLogOnFailure(savedUri.toString(), "BEFORE replace rollback failed")
+                throw e
+            }
+        } finally {
+            deleteTempFile(tempFileUri)
+        }
+    }
+
+    private fun deleteGalleryUriLogOnFailure(
+        uriString: String,
+        failureLogMessage: String,
+    ) {
+        val result = mediaStoreManager.deleteFromGallery(Uri.parse(uriString))
+        when (result) {
+            is DeleteResult.Success, DeleteResult.NotFound -> {
+                Unit
+            }
+
+            is DeleteResult.Failed -> {
+                Timber.w(result.exception, "$failureLogMessage: $uriString")
+            }
+
+            is DeleteResult.RecoverablePermission -> {
+                Timber.w(result.exception, "$failureLogMessage (permission required): $uriString")
             }
         }
     }
+
+    private fun extractSequenceNumber(beforePhotoUri: String): Int {
+        val match = Regex("BEFORE_(\\d+)_").find(beforePhotoUri)
+        return match?.groupValues?.get(1)?.toIntOrNull() ?: 1
+    }
+
+    private fun deleteTempFile(tempFileUri: String) {
+        try {
+            val uri = Uri.parse(tempFileUri)
+            val path =
+                when (uri.scheme) {
+                    "file" -> uri.path
+                    null -> tempFileUri
+                    else -> null
+                }
+            if (path != null) java.io.File(path).delete()
+        } catch (e: SecurityException) {
+            Timber.d(e, "temp file delete failed: $tempFileUri")
+        } catch (e: IOException) {
+            Timber.d(e, "temp file delete failed: $tempFileUri")
+        }
+    }
+}

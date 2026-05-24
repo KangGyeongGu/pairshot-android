@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +17,8 @@ import com.pairshot.feature.home.screen.HomeScreen
 import com.pairshot.feature.home.viewmodel.HomeEvent
 import com.pairshot.feature.home.viewmodel.HomeViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,7 +31,7 @@ fun HomeRoute(
     onNavigateToPaywall: (PaywallTrigger) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToExportSettings: (Set<Long>) -> Unit,
-    onShareSelected: (Set<Long>) -> Unit,
+    onShareSelection: (Set<Long>) -> Unit,
     onSaveToDevice: (Set<Long>) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -56,6 +59,14 @@ fun HomeRoute(
 
     var showCreateAlbumDialog by remember { mutableStateOf(false) }
 
+    val currentOnNavigateToPairPreview by rememberUpdatedState(onNavigateToPairPreview)
+    val currentOnNavigateToAfterCamera by rememberUpdatedState(onNavigateToAfterCamera)
+    val currentOnNavigateToBeforeRetake by rememberUpdatedState(onNavigateToBeforeRetake)
+    val currentOnNavigateToAlbumDetail by rememberUpdatedState(onNavigateToAlbumDetail)
+    val currentOnNavigateToExportSettings by rememberUpdatedState(onNavigateToExportSettings)
+    val currentOnShareSelection by rememberUpdatedState(onShareSelection)
+    val currentOnSaveToDevice by rememberUpdatedState(onSaveToDevice)
+
     LaunchedEffect(pairs) {
         viewModel.cleanupStaleSelections()
     }
@@ -65,32 +76,32 @@ fun HomeRoute(
             when (event) {
                 is HomeEvent.NavigateToPairPreview -> {
                     tutorialActions.report(TutorialActionIds.HOME_PAIR_CARD_TAPPED)
-                    onNavigateToPairPreview(event.pairId)
+                    currentOnNavigateToPairPreview(event.pairId)
                 }
 
                 is HomeEvent.NavigateToAfterCamera -> {
                     tutorialActions.report(TutorialActionIds.HOME_PAIR_CARD_TAPPED)
-                    onNavigateToAfterCamera(event.pairId)
+                    currentOnNavigateToAfterCamera(event.pairId)
                 }
 
                 is HomeEvent.NavigateToBeforeRetake -> {
-                    onNavigateToBeforeRetake(event.pairId)
+                    currentOnNavigateToBeforeRetake(event.pairId)
                 }
 
                 is HomeEvent.NavigateToAlbumDetail -> {
-                    onNavigateToAlbumDetail(event.albumId)
+                    currentOnNavigateToAlbumDetail(event.albumId)
                 }
 
                 is HomeEvent.NavigateToExportSettings -> {
-                    onNavigateToExportSettings(event.pairIds)
+                    currentOnNavigateToExportSettings(event.pairIds)
                 }
 
                 is HomeEvent.ShareSelected -> {
-                    onShareSelected(event.pairIds)
+                    currentOnShareSelection(event.pairIds)
                 }
 
                 is HomeEvent.SaveToDevice -> {
-                    onSaveToDevice(event.pairIds)
+                    currentOnSaveToDevice(event.pairIds)
                 }
 
                 is HomeEvent.DeleteCompleted -> {
@@ -106,16 +117,16 @@ fun HomeRoute(
 
     HomeScreen(
         mode = mode,
-        pairs = pairs,
-        albums = albums,
+        pairs = pairs.toImmutableList(),
+        albums = albums.toImmutableList(),
         selectionMode = selectionMode,
-        selectedIds = selectedIds,
+        selectedIds = selectedIds.toImmutableSet(),
         albumSelectionMode = albumSelectionMode,
-        selectedAlbumIds = selectedAlbumIds,
+        selectedAlbumIds = selectedAlbumIds.toImmutableSet(),
         currentLocation = currentLocation,
         showCreateAlbumDialog = showCreateAlbumDialog,
         sortOrder = sortOrder,
-        onModeSelected = viewModel::setMode,
+        onModeChange = viewModel::setMode,
         onToggleSortOrder = viewModel::toggleSortOrder,
         onPairClick = viewModel::onPairCardClick,
         onPairLongClick = { id ->
@@ -137,9 +148,9 @@ fun HomeRoute(
             tutorialActions.report(TutorialActionIds.HOME_SELECTION_EXITED)
         },
         onToggleSelectAll = viewModel::toggleSelectAll,
-        onShare = viewModel::onShareSelected,
+        onShare = viewModel::onShareSelection,
         onSaveToDevice = viewModel::onSaveToDevice,
-        onDeleteSelected = viewModel::deleteSelected,
+        onDeleteSelection = viewModel::deleteSelected,
         onDeleteCombinedOnly = viewModel::deleteCombinedOnly,
         onExportSettings = viewModel::onExportSettings,
         onCreateAlbumClick = { showCreateAlbumDialog = true },

@@ -71,7 +71,7 @@ fun ExportSettingsRoute(
         onNavigateBack = onNavigateBack,
         onNavigateToWatermarkSettings = onNavigateToWatermarkSettings,
         onNavigateToCombineSettings = onNavigateToCombineSettings,
-        onProLocked = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
+        onProLock = { onNavigateToPaywall(PaywallTrigger.FEATURE_LOCKED) },
         onShare = { onShare(pairIdSet) },
         onSaveToDevice = { onSaveToDevice(pairIdSet) },
         onReplayTutorial = { tutorialCoordinator.start(TutorialSection.EXPORT_SETTINGS_INTRO) },

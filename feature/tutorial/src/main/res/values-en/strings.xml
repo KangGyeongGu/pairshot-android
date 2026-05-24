@@ -2,19 +2,23 @@
 <resources>
     <string name="tutorial_msg_home_shoot">Let\'s start a BEFORE shot.</string>
     <string name="tutorial_msg_camera_portrait">Hold the device upright and take one shot.</string>
+    <string name="tutorial_msg_camera_portrait_keyword">upright</string>
     <string name="tutorial_msg_camera_landscape_left">Rotate the device to the left and take one shot in landscape.</string>
+    <string name="tutorial_msg_camera_landscape_left_keyword">to the left</string>
     <string name="tutorial_msg_camera_landscape_right">Rotate the device to the right and take one shot in landscape.</string>
+    <string name="tutorial_msg_camera_landscape_right_keyword">to the right</string>
     <string name="tutorial_msg_camera_back">Go back to home.</string>
     <string name="tutorial_msg_home_pair_card">Tap the photo you just took.</string>
     <string name="tutorial_msg_after_strip">You can review the BEFORE shot here.</string>
     <string name="tutorial_msg_after_selected_card">Long-press the current BEFORE card to view the original in full size. Try it once.</string>
+    <string name="tutorial_msg_after_preview_dismiss">Tap the empty area outside the photo to close the full-size view.</string>
     <string name="tutorial_msg_after_overlay">Follow the overlay and rotation hint of the BEFORE shot to finish AFTER capture.</string>
     <string name="tutorial_msg_after_shutter">Take the AFTER shot.</string>
     <string name="tutorial_msg_after_back">Go back to home.</string>
     <string name="tutorial_msg_home_selection_mode">Long-press a photo to enter selection mode.</string>
-    <string name="tutorial_msg_selection_share">Share to SNS or messengers.</string>
-    <string name="tutorial_msg_selection_save">Save to gallery or chosen location.</string>
-    <string name="tutorial_msg_selection_delete">Delete selected photos.</string>
+    <string name="tutorial_msg_selection_share">You can share to SNS or messengers.</string>
+    <string name="tutorial_msg_selection_save">You can export to your gallery or a chosen location.</string>
+    <string name="tutorial_msg_selection_delete">You can delete the selected photos.</string>
     <string name="tutorial_msg_selection_export_settings">You can configure various export options.</string>
     <string name="tutorial_msg_selection_exit">Close selection mode.</string>
     <string name="tutorial_msg_settings_navigate">Check various options in settings.</string>

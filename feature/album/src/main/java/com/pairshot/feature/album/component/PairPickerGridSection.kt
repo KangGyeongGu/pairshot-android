@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
@@ -38,14 +37,16 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.album.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 
 private const val PAIR_CARD_ASPECT_RATIO = PairCardSpec.ASPECT_RATIO
 
 @Composable
 fun PairPickerGridSection(
-    pairs: List<PhotoPair>,
-    selectedIds: Set<Long>,
-    alreadyInAlbumIds: Set<Long>,
+    pairs: ImmutableList<PhotoPair>,
+    selectedIds: ImmutableSet<Long>,
+    alreadyInAlbumIds: ImmutableSet<Long>,
     onToggle: (Long) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -100,15 +101,15 @@ private fun PairPickerCard(
 
     Surface(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .aspectRatio(PAIR_CARD_ASPECT_RATIO)
-                .clip(shape)
-                .then(border)
-                .clickable(
-                    enabled = !isAlreadyInAlbum,
-                    onClick = onToggle,
-                ),
+        modifier
+            .fillMaxWidth()
+            .aspectRatio(PAIR_CARD_ASPECT_RATIO)
+            .clip(shape)
+            .then(border)
+            .clickable(
+                enabled = !isAlreadyInAlbum,
+                onClick = onToggle,
+            ),
         shape = shape,
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
@@ -132,10 +133,10 @@ private fun PairPickerCard(
                 } else {
                     Box(
                         modifier =
-                            Modifier
-                                .weight(1f)
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                        Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -150,9 +151,9 @@ private fun PairPickerCard(
             if (isAlreadyInAlbum) {
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f)),
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -164,19 +165,19 @@ private fun PairPickerCard(
             } else if (isSelected) {
                 Box(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                 )
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier =
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(PairShotRadius.sm)
-                            .size(PairShotSpacing.xl),
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(PairShotRadius.sm)
+                        .size(PairShotSpacing.xl),
                 )
             }
         }

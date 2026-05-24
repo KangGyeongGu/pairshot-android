@@ -14,6 +14,7 @@ enum class TutorialStepId {
     AFTER_CAMERA_OVERLAY_HINT,
     AFTER_CAMERA_STRIP_INFO,
     AFTER_CAMERA_SELECTED_CARD_GUIDE,
+    AFTER_CAMERA_BEFORE_PREVIEW_DISMISS_GUIDE,
     AFTER_CAMERA_SHUTTER_GUIDE,
     AFTER_CAMERA_AWAIT_COMPLETION,
     AFTER_CAMERA_BACK_GUIDE,
@@ -56,6 +57,7 @@ data class TutorialStepDef(
     val actionAnchor: AnchorKey? = null,
     val strokeAnchor: Boolean = true,
     val centerMessage: Boolean = false,
+    val messageKeywordResId: Int? = null,
 ) {
     val isVisible: Boolean get() = messageResId != null
 

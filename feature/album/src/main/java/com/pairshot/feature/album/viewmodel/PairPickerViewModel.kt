@@ -45,83 +45,83 @@ private data class PickerSelectionState(
 
 @HiltViewModel
 class PairPickerViewModel
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        private val photoPairRepository: PhotoPairRepository,
-        private val albumRepository: AlbumRepository,
-    ) : ViewModel() {
-        private val route = savedStateHandle.toRoute<PairPicker>()
-        val albumId: Long = route.albumId
+@Inject
+constructor(
+    savedStateHandle: SavedStateHandle,
+    private val photoPairRepository: PhotoPairRepository,
+    private val albumRepository: AlbumRepository,
+) : ViewModel() {
+    private val route = savedStateHandle.toRoute<PairPicker>()
+    val albumId: Long = route.albumId
 
-        private val allPairsFlow = MutableStateFlow<List<PhotoPair>?>(null)
-        private val albumPairIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
-        private val selectionFlow = MutableStateFlow(PickerSelectionState())
+    private val allPairsFlow = MutableStateFlow<List<PhotoPair>?>(null)
+    private val albumPairIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
+    private val selectionFlow = MutableStateFlow(PickerSelectionState())
 
-        val uiState: StateFlow<PairPickerUiState> =
-            combine(allPairsFlow, albumPairIdsFlow, selectionFlow) { pairs, albumIds, selection ->
-                if (pairs == null) {
-                    PairPickerUiState.Loading
-                } else {
-                    PairPickerUiState.Ready(
-                        pairs = pairs,
-                        alreadyInAlbumIds = albumIds,
-                        selectedIds = selection.selectedIds,
-                        isConfirming = selection.isConfirming,
-                    )
-                }
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                initialValue = PairPickerUiState.Loading,
-            )
-
-        private val _events = MutableSharedFlow<PairPickerEvent>()
-        val events: SharedFlow<PairPickerEvent> = _events.asSharedFlow()
-
-        init {
-            observeAllPairs()
-            observeAlbumPairs()
-        }
-
-        private fun observeAllPairs() {
-            viewModelScope.launch {
-                photoPairRepository.observeAll().collect { pairs ->
-                    allPairsFlow.value = pairs
-                }
+    val uiState: StateFlow<PairPickerUiState> =
+        combine(allPairsFlow, albumPairIdsFlow, selectionFlow) { pairs, albumIds, selection ->
+            if (pairs == null) {
+                PairPickerUiState.Loading
+            } else {
+                PairPickerUiState.Ready(
+                    pairs = pairs,
+                    alreadyInAlbumIds = albumIds,
+                    selectedIds = selection.selectedIds,
+                    isConfirming = selection.isConfirming,
+                )
             }
-        }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            initialValue = PairPickerUiState.Loading,
+        )
 
-        private fun observeAlbumPairs() {
-            viewModelScope.launch {
-                albumRepository.observePairs(albumId).collect { albumPairs ->
-                    albumPairIdsFlow.value = albumPairs.map { it.id }.toSet()
-                }
-            }
-        }
+    private val _events = MutableSharedFlow<PairPickerEvent>()
+    val events: SharedFlow<PairPickerEvent> = _events.asSharedFlow()
 
-        fun toggleSelection(pairId: Long) {
-            selectionFlow.update { state ->
-                val updated =
-                    if (pairId in state.selectedIds) {
-                        state.selectedIds - pairId
-                    } else {
-                        state.selectedIds + pairId
-                    }
-                state.copy(selectedIds = updated)
-            }
-        }
+    init {
+        observeAllPairs()
+        observeAlbumPairs()
+    }
 
-        fun confirmSelection() {
-            val selectedIds = selectionFlow.value.selectedIds.toList()
-            if (selectedIds.isEmpty()) {
-                viewModelScope.launch { _events.emit(PairPickerEvent.NavigateBack) }
-                return
-            }
-            selectionFlow.update { it.copy(isConfirming = true) }
-            viewModelScope.launch {
-                albumRepository.addPairs(albumId, selectedIds)
-                _events.emit(PairPickerEvent.NavigateBack)
+    private fun observeAllPairs() {
+        viewModelScope.launch {
+            photoPairRepository.observeAll().collect { pairs ->
+                allPairsFlow.value = pairs
             }
         }
     }
+
+    private fun observeAlbumPairs() {
+        viewModelScope.launch {
+            albumRepository.observePairs(albumId).collect { albumPairs ->
+                albumPairIdsFlow.value = albumPairs.map { it.id }.toSet()
+            }
+        }
+    }
+
+    fun toggleSelection(pairId: Long) {
+        selectionFlow.update { state ->
+            val updated =
+                if (pairId in state.selectedIds) {
+                    state.selectedIds - pairId
+                } else {
+                    state.selectedIds + pairId
+                }
+            state.copy(selectedIds = updated)
+        }
+    }
+
+    fun confirmSelection() {
+        val selectedIds = selectionFlow.value.selectedIds.toList()
+        if (selectedIds.isEmpty()) {
+            viewModelScope.launch { _events.emit(PairPickerEvent.NavigateBack) }
+            return
+        }
+        selectionFlow.update { it.copy(isConfirming = true) }
+        viewModelScope.launch {
+            albumRepository.addPairs(albumId, selectedIds)
+            _events.emit(PairPickerEvent.NavigateBack)
+        }
+    }
+}

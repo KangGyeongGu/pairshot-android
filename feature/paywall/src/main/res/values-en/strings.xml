@@ -39,7 +39,6 @@
 
     <string name="paywall_logo_content_description">PairShot logo</string>
 
-    <!-- Pro hint snackbar (shown when paywall is triggered) -->
     <string name="pro_hint_daily_limit">You\'ve reached today\'s free limit</string>
     <string name="pro_hint_feature_locked">Subscribe to Pro to unlock this feature</string>
 

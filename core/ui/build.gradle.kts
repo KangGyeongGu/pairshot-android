@@ -23,4 +23,5 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.glide)
+    api(libs.kotlinx.collections.immutable)
 }

@@ -16,30 +16,30 @@ sealed interface ExportAction {
 }
 
 class ShareSelectionUseCase
-    @Inject
-    constructor(
-        private val exportRepository: ExportRepository,
-    ) {
-        suspend operator fun invoke(
-            pairIds: List<Long>,
-            preset: ExportPreset,
-            watermarkConfig: WatermarkConfig?,
-            combineConfig: CombineConfig,
-            onProgress: (current: Int, total: Int) -> Unit = { _, _ -> },
-        ): ExportAction {
-            require(pairIds.isNotEmpty()) { "no pairs to share" }
-            require(preset.includeBefore || preset.includeAfter || preset.includeCombined) {
-                "at least one include option is required"
-            }
-
-            val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
-
-            return exportRepository.buildShareablePayload(
-                pairIds = pairIds,
-                preset = preset,
-                combineConfig = effectiveCombine,
-                watermarkConfig = watermarkConfig,
-                onProgress = onProgress,
-            )
+@Inject
+constructor(
+    private val shareExportRepository: ShareExportRepository,
+) {
+    suspend operator fun invoke(
+        pairIds: List<Long>,
+        preset: ExportPreset,
+        watermarkConfig: WatermarkConfig?,
+        combineConfig: CombineConfig,
+        onProgress: (current: Int, total: Int) -> Unit = { _, _ -> },
+    ): ExportAction {
+        require(pairIds.isNotEmpty()) { "no pairs to share" }
+        require(preset.includeBefore || preset.includeAfter || preset.includeCombined) {
+            "at least one include option is required"
         }
+
+        val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
+
+        return shareExportRepository.buildShareablePayload(
+            pairIds = pairIds,
+            preset = preset,
+            combineConfig = effectiveCombine,
+            watermarkConfig = watermarkConfig,
+            onProgress = onProgress,
+        )
     }
+}

@@ -24,108 +24,108 @@ import javax.inject.Singleton
 
 @Singleton
 class PromotionRepositoryImpl
-    @Inject
-    constructor(
-        private val api: PromotionApi,
-        private val preferences: PromotionPreferencesSource,
-        private val deviceHashProvider: DeviceHashProvider,
-    ) : PromotionRepository {
-        override fun observe(): Flow<PromotionState> = preferences.state
+@Inject
+constructor(
+    private val api: PromotionApi,
+    private val preferences: PromotionPreferencesSource,
+    private val deviceHashProvider: DeviceHashProvider,
+) : PromotionRepository {
+    override fun observe(): Flow<PromotionState> = preferences.state
 
-        override suspend fun refresh() {
-            val deviceHash = deviceHashProvider.deviceHash()
-            when (val result = api.fetchMembership(deviceHash)) {
-                is MembershipApiResult.Success -> {
-                    preferences.save(result.membership.toDomain())
-                }
-
-                MembershipApiResult.NetworkError,
-                MembershipApiResult.ServerError,
-                -> {
-                    Unit
-                }
+    override suspend fun refresh() {
+        val deviceHash = deviceHashProvider.deviceHash()
+        when (val result = api.fetchMembership(deviceHash)) {
+            is MembershipApiResult.Success -> {
+                preferences.save(result.membership.toDomain())
             }
-        }
 
-        override suspend fun activate(code: String): ActivationResult {
-            val trimmed = code.trim()
-            if (trimmed.isEmpty()) return ActivationResult.Failure.InvalidFormat
-
-            preferences.savePending(trimmed, System.currentTimeMillis())
-
-            val deviceHash = deviceHashProvider.deviceHash()
-            val apiResult = api.activate(ActivateRequestDto(code = trimmed, device = deviceHash))
-
-            return when (apiResult) {
-                is ActivationApiResult.Success -> {
-                    preferences.clearPending()
-                    preferences.save(apiResult.response.membership.toDomain())
-                    val promotion = apiResult.response.promotion.toDomainOrNull()
-                    if (promotion == null) {
-                        Timber.tag(TAG).w(
-                            "activate response promotion malformed — entitlement=%s status=%s",
-                            apiResult.response.promotion.entitlement,
-                            apiResult.response.promotion.status,
-                        )
-                        ActivationResult.Failure.UnknownError
-                    } else {
-                        ActivationResult.Success(promotion)
-                    }
-                }
-
-                ActivationApiResult.InvalidCodeFormat -> {
-                    preferences.clearPending()
-                    ActivationResult.Failure.InvalidFormat
-                }
-
-                ActivationApiResult.InvalidSignature -> {
-                    preferences.clearPending()
-                    ActivationResult.Failure.InvalidSignature
-                }
-
-                ActivationApiResult.NotFound -> {
-                    preferences.clearPending()
-                    ActivationResult.Failure.NotFound
-                }
-
-                ActivationApiResult.AlreadyUsedOnAnotherDevice -> {
-                    preferences.clearPending()
-                    ActivationResult.Failure.AlreadyUsedOnAnotherDevice
-                }
-
-                ActivationApiResult.Revoked -> {
-                    preferences.clearPending()
-                    ActivationResult.Failure.Revoked
-                }
-
-                ActivationApiResult.NetworkError -> {
-                    ActivationResult.Failure.NetworkError
-                }
-
-                ActivationApiResult.ServerError -> {
-                    ActivationResult.Failure.UnknownError
-                }
+            MembershipApiResult.NetworkError,
+            MembershipApiResult.ServerError,
+            -> {
+                Unit
             }
-        }
-
-        override suspend fun retryPendingIfAny() {
-            val pending = preferences.pending.first() ?: return
-            if (System.currentTimeMillis() - pending.sinceEpochMillis > PENDING_EXPIRY_MS) {
-                preferences.clearPending()
-                return
-            }
-            activate(pending.code)
-        }
-
-        override suspend fun clear() {
-            preferences.clear()
-        }
-
-        private companion object {
-            const val PENDING_EXPIRY_MS: Long = 7L * 24L * 60L * 60L * 1000L
-            const val TAG = "PromotionRepo"
         }
     }
+
+    override suspend fun activate(code: String): ActivationResult {
+        val trimmed = code.trim()
+        if (trimmed.isEmpty()) return ActivationResult.Failure.InvalidFormat
+
+        preferences.savePending(trimmed, System.currentTimeMillis())
+
+        val deviceHash = deviceHashProvider.deviceHash()
+        val apiResult = api.activate(ActivateRequestDto(code = trimmed, device = deviceHash))
+
+        return when (apiResult) {
+            is ActivationApiResult.Success -> {
+                preferences.clearPending()
+                preferences.save(apiResult.response.membership.toDomain())
+                val promotion = apiResult.response.promotion.toDomainOrNull()
+                if (promotion == null) {
+                    Timber.tag(TAG).w(
+                        "activate response promotion malformed — entitlement=%s status=%s",
+                        apiResult.response.promotion.entitlement,
+                        apiResult.response.promotion.status,
+                    )
+                    ActivationResult.Failure.UnknownError
+                } else {
+                    ActivationResult.Success(promotion)
+                }
+            }
+
+            ActivationApiResult.InvalidCodeFormat -> {
+                preferences.clearPending()
+                ActivationResult.Failure.InvalidFormat
+            }
+
+            ActivationApiResult.InvalidSignature -> {
+                preferences.clearPending()
+                ActivationResult.Failure.InvalidSignature
+            }
+
+            ActivationApiResult.NotFound -> {
+                preferences.clearPending()
+                ActivationResult.Failure.NotFound
+            }
+
+            ActivationApiResult.AlreadyUsedOnAnotherDevice -> {
+                preferences.clearPending()
+                ActivationResult.Failure.AlreadyUsedOnAnotherDevice
+            }
+
+            ActivationApiResult.Revoked -> {
+                preferences.clearPending()
+                ActivationResult.Failure.Revoked
+            }
+
+            ActivationApiResult.NetworkError -> {
+                ActivationResult.Failure.NetworkError
+            }
+
+            ActivationApiResult.ServerError -> {
+                ActivationResult.Failure.UnknownError
+            }
+        }
+    }
+
+    override suspend fun retryPendingIfAny() {
+        val pending = preferences.pending.first() ?: return
+        if (System.currentTimeMillis() - pending.sinceEpochMillis > PENDING_EXPIRY_MS) {
+            preferences.clearPending()
+            return
+        }
+        activate(pending.code)
+    }
+
+    override suspend fun clear() {
+        preferences.clear()
+    }
+
+    private companion object {
+        const val PENDING_EXPIRY_MS: Long = 7L * 24L * 60L * 60L * 1000L
+        const val TAG = "PromotionRepo"
+    }
+}
 
 internal fun MembershipDto.toDomain(): PromotionState =
     PromotionState(

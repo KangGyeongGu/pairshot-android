@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -30,13 +31,14 @@ import com.pairshot.feature.camera.viewmodel.CameraEvent
 import com.pairshot.feature.camera.viewmodel.CameraSessionViewModel
 import com.pairshot.feature.camera.viewmodel.CameraViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun CameraScreen(
-    viewModel: CameraViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToPaywall: (PaywallTrigger) -> Unit,
+    viewModel: CameraViewModel = hiltViewModel(),
     sessionViewModel: CameraSessionViewModel = hiltViewModel(),
 ) {
     ImmersiveCameraEffect()
@@ -59,6 +61,8 @@ internal fun CameraScreen(
 
     val snackbarController = remember { PairShotSnackbarController() }
     val thumbnailListState = rememberLazyListState()
+    val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
+    val currentOnNavigateToPaywall by rememberUpdatedState(onNavigateToPaywall)
 
     val context = LocalContext.current
     val tutorialActions =
@@ -111,7 +115,7 @@ internal fun CameraScreen(
                 is CameraEvent.PhotoSaved -> {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     if (isReplaceBeforeMode) {
-                        onNavigateBack()
+                        currentOnNavigateBack()
                     }
                 }
 
@@ -144,12 +148,12 @@ internal fun CameraScreen(
 
     val callbacks =
         CameraScreenCallbacks(
-            onZoomRatioChanged = { newRatio ->
+            onZoomRatioChange = { newRatio ->
                 viewModel.updateZoomRatio(newRatio)
                 cameraSession.setZoom(newRatio)
             },
-            onPresetTapped = { preset ->
-                viewModel.onPresetTapped(preset)
+            onPresetTap = { preset ->
+                viewModel.onPresetTap(preset)
                 cameraSession.setZoom(viewModel.zoomUiState.value.currentRatio)
             },
             onDragEnd = { viewModel.applyCustomRatio() },
@@ -175,7 +179,7 @@ internal fun CameraScreen(
                 scope.launch {
                     when (viewModel.canCreatePair()) {
                         is CanCreatePairUseCase.Result.LimitReached -> {
-                            onNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                            currentOnNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
                             return@launch
                         }
 
@@ -209,7 +213,7 @@ internal fun CameraScreen(
             },
             onThumbnailClick = {
                 tutorialActions.report(TutorialActionIds.CAMERA_BACK_TO_HOME)
-                onNavigateBack()
+                currentOnNavigateBack()
             },
             onToggleGrid = viewModel::toggleGrid,
             onCycleFlash = {
@@ -242,7 +246,7 @@ internal fun CameraScreen(
         capabilities = capabilities,
         roll = roll,
         blackoutAlpha = blackoutAlpha,
-        beforePreviewUris = beforePreviewUris,
+        beforePreviewUris = beforePreviewUris.toImmutableList(),
         callbacks = callbacks,
         snackbarController = snackbarController,
         thumbnailListState = thumbnailListState,

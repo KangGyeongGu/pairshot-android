@@ -23,74 +23,74 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExportSettingsViewModel
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        private val appSettingsRepository: AppSettingsRepository,
-        private val watermarkRepository: WatermarkRepository,
-        membershipProvider: MembershipProvider,
-    ) : ViewModel() {
-        val pairIds: String = savedStateHandle.toRoute<ExportSettings>().pairIds
+@Inject
+constructor(
+    savedStateHandle: SavedStateHandle,
+    private val appSettingsRepository: AppSettingsRepository,
+    private val watermarkRepository: WatermarkRepository,
+    membershipProvider: MembershipProvider,
+) : ViewModel() {
+    val pairIds: String = savedStateHandle.toRoute<ExportSettings>().pairIds
 
-        private val _preset = MutableStateFlow(ExportPreset())
-        val preset: StateFlow<ExportPreset> = _preset.asStateFlow()
+    private val _preset = MutableStateFlow(ExportPreset())
+    val preset: StateFlow<ExportPreset> = _preset.asStateFlow()
 
-        val isProSubscriber: StateFlow<Boolean> =
-            membershipProvider
-                .observe()
-                .map { it.isPro }
-                .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val isProSubscriber: StateFlow<Boolean> =
+        membershipProvider
+            .observe()
+            .map { it.isPro }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-        val watermarkConfig: StateFlow<WatermarkConfig> =
-            watermarkRepository.watermarkConfigFlow.stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                WatermarkConfig(),
-            )
+    val watermarkConfig: StateFlow<WatermarkConfig> =
+        watermarkRepository.watermarkConfigFlow.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            WatermarkConfig(),
+        )
 
-        val applyWatermark: StateFlow<Boolean> =
-            watermarkConfig
-                .map { it.enabled }
-                .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val applyWatermark: StateFlow<Boolean> =
+        watermarkConfig
+            .map { it.enabled }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-        init {
-            viewModelScope.launch {
-                _preset.value = appSettingsRepository.getLastExportPreset()
-            }
-        }
-
-        fun setIncludeBefore(value: Boolean) {
-            updatePreset { it.copy(includeBefore = value) }
-        }
-
-        fun setIncludeAfter(value: Boolean) {
-            updatePreset { it.copy(includeAfter = value) }
-        }
-
-        fun setIncludeCombined(value: Boolean) {
-            updatePreset { it.copy(includeCombined = value) }
-        }
-
-        fun setFormat(newFormat: ExportFormat) {
-            updatePreset { it.copy(format = newFormat) }
-        }
-
-        fun setApplyWatermark(value: Boolean) {
-            viewModelScope.launch {
-                val current = watermarkRepository.getConfig()
-                watermarkRepository.saveConfig(current.copy(enabled = value))
-            }
-        }
-
-        fun setApplyCombineConfig(value: Boolean) {
-            updatePreset { it.copy(applyCombineConfig = value) }
-        }
-
-        private fun updatePreset(transform: (ExportPreset) -> ExportPreset) {
-            val updated = transform(_preset.value)
-            _preset.value = updated
-            viewModelScope.launch {
-                appSettingsRepository.saveLastExportPreset(updated)
-            }
+    init {
+        viewModelScope.launch {
+            _preset.value = appSettingsRepository.getLastExportPreset()
         }
     }
+
+    fun setIncludeBefore(value: Boolean) {
+        updatePreset { it.copy(includeBefore = value) }
+    }
+
+    fun setIncludeAfter(value: Boolean) {
+        updatePreset { it.copy(includeAfter = value) }
+    }
+
+    fun setIncludeCombined(value: Boolean) {
+        updatePreset { it.copy(includeCombined = value) }
+    }
+
+    fun setFormat(newFormat: ExportFormat) {
+        updatePreset { it.copy(format = newFormat) }
+    }
+
+    fun setApplyWatermark(value: Boolean) {
+        viewModelScope.launch {
+            val current = watermarkRepository.getConfig()
+            watermarkRepository.saveConfig(current.copy(enabled = value))
+        }
+    }
+
+    fun setApplyCombineConfig(value: Boolean) {
+        updatePreset { it.copy(applyCombineConfig = value) }
+    }
+
+    private fun updatePreset(transform: (ExportPreset) -> ExportPreset) {
+        val updated = transform(_preset.value)
+        _preset.value = updated
+        viewModelScope.launch {
+            appSettingsRepository.saveLastExportPreset(updated)
+        }
+    }
+}

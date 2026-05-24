@@ -20,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -160,82 +159,82 @@ fun FocusExposureOverlay(
 
     Box(
         modifier =
-            modifier
-                .fillMaxSize()
-                .pointerInput(exposureIndexMin, exposureIndexMax, currentExposureIndex) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        val tapPosition = down.position
+        modifier
+            .fillMaxSize()
+            .pointerInput(exposureIndexMin, exposureIndexMax, currentExposureIndex) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val tapPosition = down.position
 
-                        val gesture = detectInitialGesture()
-                        if (gesture is InitialGestureResult.Cancelled) return@awaitEachGesture
-                        val isDrag = (gesture as InitialGestureResult.Completed).isDrag
+                    val gesture = detectInitialGesture()
+                    if (gesture is InitialGestureResult.Cancelled) return@awaitEachGesture
+                    val isDrag = (gesture as InitialGestureResult.Completed).isDrag
 
-                        if (!isDrag) {
-                            autoHideJob?.cancel()
-                            focusPosition = tapPosition
-                            localEvIndex = 0
-                            dragStartEvIndex = 0
-                            totalDragY = 0f
-                            onExposureReset()
-
-                            scope.launch {
-                                ringAlpha.snapTo(0f)
-                                ringScale.snapTo(RING_START_SCALE)
-                                ringAlpha.animateTo(1f, animationSpec = tween(RING_ALPHA_IN_MS))
-                                ringScale.animateTo(1f, animationSpec = tween(RING_SCALE_IN_MS))
-                            }
-                            if (exposureEnabled) {
-                                showEvBar = true
-                            }
-                            onTapToFocus(tapPosition.x, tapPosition.y, size.width, size.height)
-                            scheduleAutoHide()
-                        }
-                    }
-                }.pointerInput(showEvBar, exposureIndexMin, exposureIndexMax) {
-                    if (!showEvBar || !exposureEnabled) return@pointerInput
-
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        val focusPos = focusPosition ?: return@awaitEachGesture
-
-                        val ringRadius = focusRingSizePx / HALF
-                        val barX = focusPos.x + ringRadius + with(density) { EV_BAR_GAP.toPx() }
-                        val hitAreaLeft =
-                            focusPos.x - ringRadius - with(density) { EV_HIT_AREA_LEFT_EXPANSION.toPx() }
-                        val hitAreaRight = barX + with(density) { EV_HIT_AREA_RIGHT_EXPANSION.toPx() }
-                        val hitAreaTop =
-                            focusPos.y -
-                                with(density) { EV_BAR_HEIGHT.toPx() / HALF + EV_HIT_AREA_VERTICAL_EXPANSION.toPx() }
-                        val hitAreaBottom =
-                            focusPos.y +
-                                with(density) { EV_BAR_HEIGHT.toPx() / HALF + EV_HIT_AREA_VERTICAL_EXPANSION.toPx() }
-
-                        val inHitArea =
-                            down.position.x in hitAreaLeft..hitAreaRight &&
-                                down.position.y in hitAreaTop..hitAreaBottom
-
-                        if (!inHitArea) return@awaitEachGesture
-
+                    if (!isDrag) {
                         autoHideJob?.cancel()
-                        dragStartEvIndex = localEvIndex
+                        focusPosition = tapPosition
+                        localEvIndex = 0
+                        dragStartEvIndex = 0
                         totalDragY = 0f
+                        onExposureReset()
 
-                        trackEvDrag(
-                            dragThresholdPx = dragThresholdPx,
-                            dragStartEvIndex = dragStartEvIndex,
-                            exposureIndexMin = exposureIndexMin,
-                            exposureIndexMax = exposureIndexMax,
-                            currentEvIndex = { localEvIndex },
-                            onEvIndexChanged = { newIndex ->
-                                localEvIndex = newIndex
-                                onExposureAdjust(newIndex)
-                            },
-                        )
-
+                        scope.launch {
+                            ringAlpha.snapTo(0f)
+                            ringScale.snapTo(RING_START_SCALE)
+                            ringAlpha.animateTo(1f, animationSpec = tween(RING_ALPHA_IN_MS))
+                            ringScale.animateTo(1f, animationSpec = tween(RING_SCALE_IN_MS))
+                        }
+                        if (exposureEnabled) {
+                            showEvBar = true
+                        }
+                        onTapToFocus(tapPosition.x, tapPosition.y, size.width, size.height)
                         scheduleAutoHide()
                     }
-                },
+                }
+            }.pointerInput(showEvBar, exposureIndexMin, exposureIndexMax) {
+                if (!showEvBar || !exposureEnabled) return@pointerInput
+
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val focusPos = focusPosition ?: return@awaitEachGesture
+
+                    val ringRadius = focusRingSizePx / HALF
+                    val barX = focusPos.x + ringRadius + with(density) { EV_BAR_GAP.toPx() }
+                    val hitAreaLeft =
+                        focusPos.x - ringRadius - with(density) { EV_HIT_AREA_LEFT_EXPANSION.toPx() }
+                    val hitAreaRight = barX + with(density) { EV_HIT_AREA_RIGHT_EXPANSION.toPx() }
+                    val hitAreaTop =
+                        focusPos.y -
+                            with(density) { EV_BAR_HEIGHT.toPx() / HALF + EV_HIT_AREA_VERTICAL_EXPANSION.toPx() }
+                    val hitAreaBottom =
+                        focusPos.y +
+                            with(density) { EV_BAR_HEIGHT.toPx() / HALF + EV_HIT_AREA_VERTICAL_EXPANSION.toPx() }
+
+                    val inHitArea =
+                        down.position.x in hitAreaLeft..hitAreaRight &&
+                            down.position.y in hitAreaTop..hitAreaBottom
+
+                    if (!inHitArea) return@awaitEachGesture
+
+                    autoHideJob?.cancel()
+                    dragStartEvIndex = localEvIndex
+                    totalDragY = 0f
+
+                    trackEvDrag(
+                        dragThresholdPx = dragThresholdPx,
+                        dragStartEvIndex = dragStartEvIndex,
+                        exposureIndexMin = exposureIndexMin,
+                        exposureIndexMax = exposureIndexMax,
+                        currentEvIndex = { localEvIndex },
+                        onEvIndexChanged = { newIndex ->
+                            localEvIndex = newIndex
+                            onExposureAdjust(newIndex)
+                        },
+                    )
+
+                    scheduleAutoHide()
+                }
+            },
     ) {
         val primaryColor = MaterialTheme.colorScheme.primary
         val focusPos = focusPosition
@@ -303,12 +302,12 @@ fun FocusExposureOverlay(
                     color = PairShotCameraTokens.Foreground.copy(alpha = ringAlpha.value),
                     fontSize = EV_TEXT_FONT_SIZE_SP.sp,
                     modifier =
-                        Modifier.offset {
-                            IntOffset(
-                                x = textOffsetX.roundToPx(),
-                                y = textOffsetY.roundToPx(),
-                            )
-                        },
+                    Modifier.offset {
+                        IntOffset(
+                            x = textOffsetX.roundToPx(),
+                            y = textOffsetY.roundToPx(),
+                        )
+                    },
                 )
             }
         }

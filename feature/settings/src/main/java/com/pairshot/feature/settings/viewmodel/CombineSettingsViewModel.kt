@@ -19,39 +19,39 @@ private const val WHILE_SUBSCRIBED_TIMEOUT_MS = 5_000L
 
 @HiltViewModel
 class CombineSettingsViewModel
-    @Inject
-    constructor(
-        private val combineSettingsRepository: CombineSettingsRepository,
-        watermarkRepository: WatermarkRepository,
-        membershipProvider: MembershipProvider,
-    ) : ViewModel() {
-        val isProSubscriber: StateFlow<Boolean> =
-            membershipProvider
-                .observe()
-                .map { it.isPro }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                    initialValue = false,
-                )
-
-        val combineConfig: StateFlow<CombineConfig> =
-            combineSettingsRepository.configFlow.stateIn(
+@Inject
+constructor(
+    private val combineSettingsRepository: CombineSettingsRepository,
+    watermarkRepository: WatermarkRepository,
+    membershipProvider: MembershipProvider,
+) : ViewModel() {
+    val isProSubscriber: StateFlow<Boolean> =
+        membershipProvider
+            .observe()
+            .map { it.isPro }
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                initialValue = CombineConfig(),
+                initialValue = false,
             )
 
-        val watermarkConfig: StateFlow<WatermarkConfig> =
-            watermarkRepository.watermarkConfigFlow.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = WatermarkConfig(),
-            )
+    val combineConfig: StateFlow<CombineConfig> =
+        combineSettingsRepository.configFlow.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            initialValue = CombineConfig(),
+        )
 
-        fun updateCombineConfig(config: CombineConfig) {
-            viewModelScope.launch {
-                combineSettingsRepository.saveConfig(config)
-            }
+    val watermarkConfig: StateFlow<WatermarkConfig> =
+        watermarkRepository.watermarkConfigFlow.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = WatermarkConfig(),
+        )
+
+    fun updateCombineConfig(config: CombineConfig) {
+        viewModelScope.launch {
+            combineSettingsRepository.saveConfig(config)
         }
     }
+}

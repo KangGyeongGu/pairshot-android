@@ -40,6 +40,8 @@ private const val DARK_ON_ERROR_CONTAINER_ARGB = 0xFFFFDAD6L
 private const val DARK_SUCCESS_ARGB = 0xFF86EFACL
 private const val DARK_WARNING_ARGB = 0xFFFB923CL
 
+private const val CAMERA_SELECTION_HIGHLIGHT_ARGB = 0xFFFFD60AL
+
 val LightBackground = Color(LIGHT_BACKGROUND_ARGB)
 val LightSurface = Color(LIGHT_SURFACE_ARGB)
 val LightSurfaceContainer = Color(LIGHT_SURFACE_CONTAINER_ARGB)
@@ -77,3 +79,5 @@ val DarkErrorContainer = Color(DARK_ERROR_CONTAINER_ARGB)
 val DarkOnErrorContainer = Color(DARK_ON_ERROR_CONTAINER_ARGB)
 val DarkSuccess = Color(DARK_SUCCESS_ARGB)
 val DarkWarning = Color(DARK_WARNING_ARGB)
+
+val CameraSelectionHighlight = Color(CAMERA_SELECTION_HIGHLIGHT_ARGB)

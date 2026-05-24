@@ -36,6 +36,7 @@ import com.pairshot.feature.settings.viewmodel.SettingsViewModel
 import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsEvent
 import com.pairshot.feature.settings.viewmodel.SubscriptionSettingsViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
@@ -55,6 +56,7 @@ fun SettingsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val watermarkConfig by viewModel.watermarkConfig.collectAsStateWithLifecycle()
     val appTheme by viewModel.appTheme.collectAsStateWithLifecycle()
+    val appTextScale by viewModel.appTextScale.collectAsStateWithLifecycle()
     val activationState by promotionViewModel.activationState.collectAsStateWithLifecycle()
     val myPromotions by promotionViewModel.myPromotions.collectAsStateWithLifecycle()
     val myPromotionsLoading by promotionViewModel.myPromotionsLoading.collectAsStateWithLifecycle()
@@ -123,7 +125,7 @@ fun SettingsRoute(
     if (showPromotionDialog) {
         PromotionRegisterDialog(
             activationState = activationState,
-            myPromotions = myPromotions,
+            myPromotions = myPromotions.toImmutableList(),
             myPromotionsLoading = myPromotionsLoading,
             onActivate = { code -> promotionViewModel.activate(code) },
             onLoadMyPromotions = { promotionViewModel.loadMyPromotions() },
@@ -170,8 +172,10 @@ fun SettingsRoute(
         uiState = uiState,
         watermarkConfig = watermarkConfig,
         currentTheme = appTheme,
+        currentTextScale = appTextScale,
         highlight = highlight,
         onThemeChange = viewModel::updateAppTheme,
+        onTextScaleChange = viewModel::updateAppTextScale,
         onClearCache = viewModel::clearCache,
         onLicenseClick = onNavigateToLicense,
         onPrivacyPolicyClick = {

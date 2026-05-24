@@ -4,8 +4,6 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -23,24 +21,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 buildFeatures {
                     compose = true
                 }
-            }
-
-            val composeMetricsDir =
-                layout.buildDirectory
-                    .dir("compose_metrics")
-                    .map { it.asFile.absolutePath }
-
-            tasks.withType<KotlinCompilationTask<*>>().configureEach {
-                compilerOptions.freeCompilerArgs.addAll(
-                    composeMetricsDir.map { dir ->
-                        listOf(
-                            "-P",
-                            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$dir",
-                            "-P",
-                            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$dir",
-                        )
-                    },
-                )
             }
 
             dependencies.apply {

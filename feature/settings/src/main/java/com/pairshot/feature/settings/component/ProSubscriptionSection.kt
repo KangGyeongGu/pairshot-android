@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.billing.domain.SubscriptionStatus
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
@@ -41,38 +40,41 @@ fun ProSubscriptionSection(
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onPromoCode: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SettingsSectionLabel(label = stringResource(R.string.settings_section_pro_subscription))
-    Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+    Column(modifier = modifier) {
+        SettingsSectionLabel(label = stringResource(R.string.settings_section_pro_subscription))
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
 
-    val membershipLabel =
-        if (membership.isPro) {
-            stringResource(R.string.settings_pro_membership_pro)
+        val membershipLabel =
+            if (membership.isPro) {
+                stringResource(R.string.settings_pro_membership_pro)
+            } else {
+                stringResource(R.string.settings_pro_membership_free)
+            }
+        val promoTrailing = promoTrailingText(membership)
+        val hasActiveSubscription = subscriptionStatus is SubscriptionStatus.Active
+
+        if (!membership.isPro) {
+            FreeBlock(
+                membershipLabel = membershipLabel,
+                promoTrailing = promoTrailing,
+                onLearnMore = onLearnMore,
+                onPromoCode = onPromoCode,
+            )
         } else {
-            stringResource(R.string.settings_pro_membership_free)
+            ProBlock(
+                membershipLabel = membershipLabel,
+                promoTrailing = promoTrailing,
+                hasActiveSubscription = hasActiveSubscription,
+                onViewSubscriptionOptions = onViewSubscriptionOptions,
+                onManageSubscription = onManageSubscription,
+                onRestore = onRestore,
+                onPromoCode = onPromoCode,
+            )
         }
-    val promoTrailing = promoTrailingText(membership)
-    val hasActiveSubscription = subscriptionStatus is SubscriptionStatus.Active
-
-    if (!membership.isPro) {
-        FreeBlock(
-            membershipLabel = membershipLabel,
-            promoTrailing = promoTrailing,
-            onLearnMore = onLearnMore,
-            onPromoCode = onPromoCode,
-        )
-    } else {
-        ProBlock(
-            membershipLabel = membershipLabel,
-            promoTrailing = promoTrailing,
-            hasActiveSubscription = hasActiveSubscription,
-            onViewSubscriptionOptions = onViewSubscriptionOptions,
-            onManageSubscription = onManageSubscription,
-            onRestore = onRestore,
-            onPromoCode = onPromoCode,
-        )
+        Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
     }
-    Spacer(modifier = Modifier.height(PairShotCard.innerPadding))
 }
 
 @Composable

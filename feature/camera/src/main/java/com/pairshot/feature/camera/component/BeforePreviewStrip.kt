@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -48,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotStroke
@@ -58,6 +56,7 @@ import com.pairshot.core.ui.component.ImageProfile
 import com.pairshot.core.ui.component.ProfiledAsyncImage
 import com.pairshot.feature.camera.R
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
+import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.abs
 
 internal val BeforeStripHeight: Dp = CameraSpec.beforeStripHeight
@@ -82,7 +81,7 @@ data class StripProgress(
 
 @Composable
 fun BeforePreviewStrip(
-    beforePreviewUris: List<String>,
+    beforePreviewUris: ImmutableList<String>,
     modifier: Modifier = Modifier,
     selectedIndex: Int? = null,
     onSelectIndex: ((Int) -> Unit)? = null,
@@ -134,10 +133,10 @@ fun BeforePreviewStrip(
 
     Box(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .height(stripHeight)
-                .background(PairShotCameraTokens.Letterbox),
+        modifier
+            .fillMaxWidth()
+            .height(stripHeight)
+            .background(PairShotCameraTokens.Letterbox),
     ) {
         if (beforePreviewUris.isEmpty()) {
             Text(
@@ -146,18 +145,18 @@ fun BeforePreviewStrip(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth()
-                        .padding(horizontal = FALLBACK_HORIZONTAL_PADDING),
+                Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .padding(horizontal = FALLBACK_HORIZONTAL_PADDING),
             )
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
                 BoxWithConstraints(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                 ) {
                     val horizontalPadding =
                         if (snapEnabled) {
@@ -205,46 +204,48 @@ fun BeforePreviewStrip(
                                 data = beforeUri,
                                 profile = ImageProfile.THUMBNAIL,
                                 contentDescription =
-                                    stringResource(
-                                        R.string.camera_strip_thumbnail_desc,
-                                        index + 1,
-                                    ),
+                                stringResource(
+                                    R.string.camera_strip_thumbnail_desc,
+                                    index + 1,
+                                ),
                                 contentScale = ContentScale.Crop,
                                 modifier =
-                                    Modifier
-                                        .size(width = ACTIVE_CARD_WIDTH, height = ACTIVE_CARD_HEIGHT)
-                                        .graphicsLayer {
-                                            scaleX = scale
-                                            scaleY = scale
-                                            transformOrigin =
-                                                TransformOrigin(TRANSFORM_ORIGIN_CENTER_X, TRANSFORM_ORIGIN_BOTTOM_Y)
-                                        }.clip(RoundedCornerShape(CARD_CORNER_RADIUS))
-                                        .border(
-                                            width = borderWidth,
-                                            color = borderColor,
-                                            shape = RoundedCornerShape(CARD_CORNER_RADIUS),
-                                        ).then(
-                                            if (isSelected) {
-                                                Modifier.tutorialAnchor(AnchorKey.AFTER_CAMERA_SELECTED_CARD)
-                                            } else {
-                                                Modifier
-                                            },
-                                        ).then(
-                                            if (onSelectIndex != null) {
-                                                Modifier.combinedClickable(
-                                                    onClick = { onSelectIndex(index) },
-                                                    onLongClick =
-                                                        onLongPressIndex?.let { callback ->
-                                                            {
-                                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                                callback(index)
-                                                            }
-                                                        },
-                                                )
-                                            } else {
-                                                Modifier
-                                            },
-                                        ),
+                                Modifier
+                                    .size(width = ACTIVE_CARD_WIDTH, height = ACTIVE_CARD_HEIGHT)
+                                    .graphicsLayer {
+                                        scaleX = scale
+                                        scaleY = scale
+                                        transformOrigin =
+                                            TransformOrigin(TRANSFORM_ORIGIN_CENTER_X, TRANSFORM_ORIGIN_BOTTOM_Y)
+                                    }.clip(RoundedCornerShape(CARD_CORNER_RADIUS))
+                                    .border(
+                                        width = borderWidth,
+                                        color = borderColor,
+                                        shape = RoundedCornerShape(CARD_CORNER_RADIUS),
+                                    ).then(
+                                        if (isSelected) {
+                                            Modifier.tutorialAnchor(AnchorKey.AFTER_CAMERA_SELECTED_CARD)
+                                        } else {
+                                            Modifier
+                                        },
+                                    ).then(
+                                        if (onSelectIndex != null) {
+                                            Modifier.combinedClickable(
+                                                onClick = { onSelectIndex(index) },
+                                                onLongClick =
+                                                onLongPressIndex?.let { callback ->
+                                                    {
+                                                        haptic.performHapticFeedback(
+                                                            HapticFeedbackType.LongPress
+                                                        )
+                                                        callback(index)
+                                                    }
+                                                },
+                                            )
+                                        } else {
+                                            Modifier
+                                        },
+                                    ),
                             )
                         }
                     }
@@ -268,9 +269,9 @@ private fun StripProgressIndicator(
 ) {
     Box(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(PROGRESS_INDICATOR_HEIGHT),
+        Modifier
+            .fillMaxWidth()
+            .height(PROGRESS_INDICATOR_HEIGHT),
         contentAlignment = Alignment.Center,
     ) {
         Text(

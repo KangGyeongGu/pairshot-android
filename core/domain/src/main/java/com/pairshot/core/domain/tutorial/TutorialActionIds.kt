@@ -9,6 +9,7 @@ object TutorialActionIds {
     const val HOME_PAIR_CARD_TAPPED = "home_pair_card_tapped"
     const val AFTER_CAMERA_ENTERED = "after_camera_entered"
     const val AFTER_CAMERA_BEFORE_PREVIEW_OPENED = "after_camera_before_preview_opened"
+    const val AFTER_CAMERA_BEFORE_PREVIEW_DISMISSED = "after_camera_before_preview_dismissed"
     const val AFTER_CAMERA_SHUTTER = "after_camera_shutter"
     const val AFTER_CAMERA_ALL_COMPLETED = "after_camera_all_completed"
     const val AFTER_CAMERA_BACK_TO_HOME = "after_camera_back_to_home"

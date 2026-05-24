@@ -89,16 +89,16 @@ fun AlbumCard(
 
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongPress,
-                ).then(borderModifier)
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongPress,
+            ).then(borderModifier)
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),

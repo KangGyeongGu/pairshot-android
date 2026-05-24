@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,6 +94,7 @@ private fun QrScannerCameraPreview(onBarcode: (String) -> Unit) {
             }
         }
     var hasReported by remember { mutableStateOf(false) }
+    val currentOnBarcode by rememberUpdatedState(onBarcode)
 
     DisposableEffect(lifecycleOwner, previewView) {
         val providerFuture = ProcessCameraProvider.getInstance(context)
@@ -118,7 +120,7 @@ private fun QrScannerCameraPreview(onBarcode: (String) -> Unit) {
                 processImageProxy(proxy, barcodeScanner) { value ->
                     if (!hasReported) {
                         hasReported = true
-                        onBarcode(value)
+                        currentOnBarcode(value)
                     }
                 }
             }

@@ -1,16 +1,13 @@
 package com.pairshot.core.ui.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,33 +17,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
-import com.pairshot.core.designsystem.PairShotTouchTarget
 import kotlin.math.abs
 
-private const val SWITCH_SCALE = 0.67f
 private const val SLIDER_TRACK_SCALE_Y = 0.3f
 private const val SLIDER_SYNC_THRESHOLD = 1e-4f
 
@@ -59,9 +47,9 @@ fun SettingsSectionLabel(
     if (trailingWarning != null) {
         Row(
             modifier =
-                modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = PairShotSpacing.sm),
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = PairShotSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -77,9 +65,9 @@ fun SettingsSectionLabel(
     Text(
         text = label,
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = PairShotSpacing.sm),
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = PairShotSpacing.sm),
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -133,34 +121,12 @@ fun SettingsItem(
     trailingIsError: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .then(
-                    if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
-                ).height(PairShotTouchTarget.large)
-                .padding(horizontal = PairShotCard.innerPadding),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
-        if (trailing != null) {
-            if (trailingIsError) {
-                WarningBadge(text = trailing)
-            } else {
-                Text(
-                    text = trailing,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
+    PairShotListItem(
+        headline = label,
+        trailing = trailing,
+        trailingIsError = trailingIsError,
+        onClick = onClick,
+    )
 }
 
 @Composable
@@ -171,41 +137,13 @@ fun SettingsSwitchItem(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
-    val haptic = LocalHapticFeedback.current
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .then(
-                    if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier,
-                ).height(PairShotTouchTarget.large)
-                .padding(horizontal = PairShotCard.innerPadding),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f),
-        )
-        Switch(
-            checked = checked,
-            onCheckedChange = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onCheckedChange(it)
-            },
-            enabled = enabled,
-            colors =
-                SwitchDefaults.colors(
-                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            modifier =
-                Modifier
-                    .wrapContentHeight(unbounded = true)
-                    .scale(SWITCH_SCALE),
-        )
-    }
+    PairShotSwitchListItem(
+        headline = label,
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        enabled = enabled,
+        onClick = onClick,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -216,6 +154,7 @@ fun SettingsSliderItem(
     valueRange: ClosedFloatingPointRange<Float>,
     valueLabel: (Float) -> String,
     onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
     steps: Int = 0,
     onLiveUpdate: ((Float) -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
@@ -230,12 +169,12 @@ fun SettingsSliderItem(
 
     Column(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -284,9 +223,9 @@ fun SettingsSliderItem(
 }
 
 @Composable
-fun SettingsDivider() {
+fun SettingsDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
-        modifier = Modifier.padding(horizontal = PairShotCard.innerPadding),
+        modifier = modifier.padding(horizontal = PairShotCard.innerPadding),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 }

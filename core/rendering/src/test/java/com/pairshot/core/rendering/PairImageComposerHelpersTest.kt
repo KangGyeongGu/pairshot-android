@@ -3,6 +3,14 @@ package com.pairshot.core.rendering
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.CombineLayout
 import com.pairshot.core.model.LabelAnchor
+import com.pairshot.core.rendering.internal.BorderInsets
+import com.pairshot.core.rendering.internal.LabelRect
+import com.pairshot.core.rendering.internal.VerticalAlignment
+import com.pairshot.core.rendering.internal.computeBorderRegion
+import com.pairshot.core.rendering.internal.computeSingleBorderRegion
+import com.pairshot.core.rendering.internal.resolveBorderLabelEdgePx
+import com.pairshot.core.rendering.internal.resolveLabelFontSize
+import com.pairshot.core.rendering.internal.toBorderVerticalAlignment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -76,13 +84,25 @@ class ComputeBorderRegionTest {
 
     @Test
     fun `HORIZONTAL TOP anchor places region above image, spanning image width`() {
-        val region = computeBorderRegion(image, LabelAnchor.TOP_CENTER, CombineLayout.HORIZONTAL, insets, isBefore = true)
+        val region = computeBorderRegion(
+            image,
+            LabelAnchor.TOP_CENTER,
+            CombineLayout.HORIZONTAL,
+            insets,
+            isBefore = true
+        )
         assertEquals(LabelRect(left = 100, top = 0, width = 1000, height = 60), region)
     }
 
     @Test
     fun `HORIZONTAL BOTTOM anchor places region just below image bottom`() {
-        val region = computeBorderRegion(image, LabelAnchor.BOTTOM_LEFT, CombineLayout.HORIZONTAL, insets, isBefore = false)
+        val region = computeBorderRegion(
+            image,
+            LabelAnchor.BOTTOM_LEFT,
+            CombineLayout.HORIZONTAL,
+            insets,
+            isBefore = false
+        )
         assertEquals(LabelRect(left = 100, top = 1000, width = 1000, height = 70), region)
     }
 
@@ -94,7 +114,13 @@ class ComputeBorderRegionTest {
 
     @Test
     fun `VERTICAL BEFORE BOTTOM lands in center gap (between the two images)`() {
-        val region = computeBorderRegion(image, LabelAnchor.BOTTOM_LEFT, CombineLayout.VERTICAL, insets, isBefore = true)
+        val region = computeBorderRegion(
+            image,
+            LabelAnchor.BOTTOM_LEFT,
+            CombineLayout.VERTICAL,
+            insets,
+            isBefore = true
+        )
         assertEquals(LabelRect(left = 100, top = 1000, width = 1000, height = 80), region)
     }
 
@@ -106,15 +132,39 @@ class ComputeBorderRegionTest {
 
     @Test
     fun `VERTICAL AFTER BOTTOM attaches to canvas bottom, height equals bottom inset`() {
-        val region = computeBorderRegion(image, LabelAnchor.BOTTOM_CENTER, CombineLayout.VERTICAL, insets, isBefore = false)
+        val region = computeBorderRegion(
+            image,
+            LabelAnchor.BOTTOM_CENTER,
+            CombineLayout.VERTICAL,
+            insets,
+            isBefore = false
+        )
         assertEquals(LabelRect(left = 100, top = 1000, width = 1000, height = 70), region)
     }
 
     @Test
     fun `MIDDLE anchor falls back to BOTTOM behavior (asymmetric safety with toBorderVerticalAlignment)`() {
-        val asTopAnchor = computeBorderRegion(image, LabelAnchor.TOP_LEFT, CombineLayout.HORIZONTAL, insets, isBefore = true)
-        val asMiddleAnchor = computeBorderRegion(image, LabelAnchor.MIDDLE_LEFT, CombineLayout.HORIZONTAL, insets, isBefore = true)
-        val asBottomAnchor = computeBorderRegion(image, LabelAnchor.BOTTOM_LEFT, CombineLayout.HORIZONTAL, insets, isBefore = true)
+        val asTopAnchor = computeBorderRegion(
+            image,
+            LabelAnchor.TOP_LEFT,
+            CombineLayout.HORIZONTAL,
+            insets,
+            isBefore = true
+        )
+        val asMiddleAnchor = computeBorderRegion(
+            image,
+            LabelAnchor.MIDDLE_LEFT,
+            CombineLayout.HORIZONTAL,
+            insets,
+            isBefore = true
+        )
+        val asBottomAnchor = computeBorderRegion(
+            image,
+            LabelAnchor.BOTTOM_LEFT,
+            CombineLayout.HORIZONTAL,
+            insets,
+            isBefore = true
+        )
         assertEquals(
             "MIDDLE should collapse to BOTTOM, not TOP",
             asBottomAnchor,

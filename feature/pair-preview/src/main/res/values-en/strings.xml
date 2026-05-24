@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Accessibility -->
     <string name="pair_preview_desc_combined_preview">Combined preview</string>
     <string name="pair_preview_desc_close">Close</string>
 
-    <!-- TopBar menu -->
     <string name="pair_preview_menu_recapture">Recapture</string>
 
-    <!-- Live preview error -->
     <string name="pair_preview_error_compose_failed">Couldn\'t create preview.</string>
     <string name="pair_preview_action_retry">Retry</string>
 
-    <!-- Missing slot -->
     <string name="pair_preview_slot_missing_before">Before photo was deleted from the gallery.</string>
     <string name="pair_preview_slot_missing_after">After photo was deleted from the gallery.</string>
     <string name="pair_preview_slot_capture_before">Retake Before</string>
     <string name="pair_preview_slot_capture_after">Retake After</string>
 
-    <!-- Auto-prune notices -->
     <string name="pair_preview_prune_notice_before">Before photo was deleted from the gallery. You can retake it.</string>
     <string name="pair_preview_prune_notice_after">After photo was deleted from the gallery. You can retake it.</string>
     <string name="pair_preview_prune_notice_deleted">All originals were deleted from the gallery — pair removed.</string>

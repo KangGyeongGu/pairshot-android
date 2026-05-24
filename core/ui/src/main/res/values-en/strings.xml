@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Common Buttons -->
     <string name="common_button_cancel">Cancel</string>
     <string name="common_button_confirm">OK</string>
     <string name="common_button_delete">Delete</string>
@@ -11,7 +10,6 @@
     <string name="common_button_save_to_device">Save to device</string>
     <string name="common_button_export_settings">Export settings</string>
 
-    <!-- Common Accessibility (contentDescription) -->
     <string name="common_desc_back">Back</string>
     <string name="common_desc_settings">Settings</string>
     <string name="common_desc_more">More</string>
@@ -20,19 +18,15 @@
     <string name="common_label_sort_descending">Newest</string>
     <string name="common_label_sort_ascending">Oldest</string>
 
-    <!-- Common Titles -->
     <string name="common_title_settings">Settings</string>
 
-    <!-- PairCard -->
     <string name="pair_card_desc_scheduled">Scheduled</string>
     <string name="pair_card_desc_combined">Combined</string>
     <string name="pair_card_desc_before">Before</string>
     <string name="pair_card_desc_after">After</string>
 
-    <!-- ProfiledAsyncImage -->
     <string name="image_file_missing">No file</string>
 
-    <!-- Dialog: Delete Pair -->
     <string name="dialog_delete_pair_method_title">Choose deletion type</string>
     <plurals name="dialog_delete_pair_summary">
         <item quantity="one">%1$d selected, %2$d combined.</item>
@@ -46,18 +40,15 @@
         <item quantity="other">Delete %1$d pairs?</item>
     </plurals>
 
-    <!-- Snackbar: Success -->
     <string name="snackbar_success_all_after_captured">All After photos captured</string>
     <string name="snackbar_success_cache_cleared">Cache cleared</string>
     <string name="snackbar_success_saved_to_device">Saved to device</string>
     <string name="snackbar_success_saved_zip">Saved %1$s</string>
     <string name="snackbar_info_save_cancelled">Save cancelled</string>
 
-    <!-- Snackbar: Warning -->
     <string name="snackbar_warning_nothing_to_save">No new images to save</string>
     <string name="snackbar_warning_watermark_setup_required">Please complete watermark setup first</string>
 
-    <!-- Snackbar: Error -->
     <string name="snackbar_error_capture_failed">Capture failed. Please try again</string>
     <string name="snackbar_error_save_failed">Save failed. Please try again</string>
     <string name="snackbar_error_unknown">An error occurred. Please try again</string>

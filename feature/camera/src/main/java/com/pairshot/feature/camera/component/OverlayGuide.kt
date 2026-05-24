@@ -22,8 +22,8 @@ fun OverlayGuide(
         contentDescription = null,
         contentScale = ContentScale.Fit,
         modifier =
-            modifier
-                .alpha(alpha)
-                .tutorialAnchor(AnchorKey.AFTER_CAMERA_OVERLAY),
+        modifier
+            .alpha(alpha)
+            .tutorialAnchor(AnchorKey.AFTER_CAMERA_OVERLAY),
     )
 }

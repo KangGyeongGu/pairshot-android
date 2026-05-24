@@ -8,13 +8,13 @@ import javax.inject.Singleton
 
 @Singleton
 class SettingsPremiumGate
-    @Inject
-    constructor() {
-        private val unlocked = MutableStateFlow<Set<PremiumFeature>>(emptySet())
+@Inject
+constructor() {
+    private val unlocked = MutableStateFlow<Set<PremiumFeature>>(emptySet())
 
-        fun isUnlocked(feature: PremiumFeature): Boolean = unlocked.value.contains(feature)
+    fun isUnlocked(feature: PremiumFeature): Boolean = unlocked.value.contains(feature)
 
-        fun unlock(feature: PremiumFeature) {
-            unlocked.update { it + feature }
-        }
+    fun unlock(feature: PremiumFeature) {
+        unlocked.update { it + feature }
     }
+}

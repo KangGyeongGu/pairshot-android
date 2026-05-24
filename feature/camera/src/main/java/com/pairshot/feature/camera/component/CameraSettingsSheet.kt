@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -59,7 +58,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.LocalPairShotExtendedColors
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotCard
@@ -109,39 +107,46 @@ fun CameraSettingsSheet(
         ) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(PairShotCameraTokens.Letterbox.copy(alpha = 0.52f))
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                        ) { onDismiss() },
+                Modifier
+                    .fillMaxSize()
+                    .background(PairShotCameraTokens.Letterbox.copy(alpha = 0.52f))
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    ) { onDismiss() },
             )
         }
 
         AnimatedVisibility(
             visible = visible,
             enter =
-                fadeIn(animationSpec = PairShotMotionTokens.panelEnterTween()) +
-                    scaleIn(initialScale = 0.96f, animationSpec = PairShotMotionTokens.panelEnterTween()),
+            fadeIn(animationSpec = PairShotMotionTokens.panelEnterTween()) +
+                scaleIn(initialScale = 0.96f, animationSpec = PairShotMotionTokens.panelEnterTween()),
             exit =
-                fadeOut(animationSpec = PairShotMotionTokens.panelExitTween()) +
-                    scaleOut(targetScale = 0.98f, animationSpec = PairShotMotionTokens.panelExitTween()),
+            fadeOut(animationSpec = PairShotMotionTokens.panelExitTween()) +
+                scaleOut(targetScale = 0.98f, animationSpec = PairShotMotionTokens.panelExitTween()),
             modifier = Modifier.align(Alignment.Center),
         ) {
             Column(
                 modifier =
-                    Modifier
-                        .padding(horizontal = PairShotCard.innerPadding)
-                        .widthIn(max = CameraSpec.settingsSheetMaxWidth)
-                        .clip(PairShotGlassTokens.shape)
-                        .background(PairShotGlassTokens.surfaceColor)
-                        .border(PairShotGlassTokens.border.width, PairShotGlassTokens.border.brush, PairShotGlassTokens.shape)
-                        .padding(horizontal = PairShotScreen.horizontalPadding, vertical = PairShotScreen.horizontalPadding)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                        ) { },
+                Modifier
+                    .padding(horizontal = PairShotCard.innerPadding)
+                    .widthIn(max = CameraSpec.settingsSheetMaxWidth)
+                    .clip(PairShotGlassTokens.shape)
+                    .background(PairShotGlassTokens.surfaceColor)
+                    .border(
+                        PairShotGlassTokens.border.width,
+                        PairShotGlassTokens.border.brush,
+                        PairShotGlassTokens.shape
+                    )
+                    .padding(
+                        horizontal = PairShotScreen.horizontalPadding,
+                        vertical = PairShotScreen.horizontalPadding
+                    )
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    ) { },
             ) {
                 val settingItems =
                     buildSettingItems(
@@ -188,12 +193,19 @@ fun CameraSettingsSheet(
                 }
 
                 if (overlayAlpha != null && onOverlayAlphaChange != null) {
-                    Spacer(modifier = Modifier.height(PairShotIconSize.md))
-                    OverlayAlphaSlider(
-                        alpha = overlayAlpha,
-                        enabled = overlayEnabled == true,
-                        onAlphaChange = onOverlayAlphaChange,
-                    )
+                    AnimatedVisibility(
+                        visible = overlayEnabled == true,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut(),
+                    ) {
+                        Column {
+                            Spacer(modifier = Modifier.height(PairShotIconSize.md))
+                            OverlayAlphaSlider(
+                                alpha = overlayAlpha,
+                                onAlphaChange = onOverlayAlphaChange,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -366,16 +378,16 @@ private fun SettingIconItem(
     ) {
         Box(
             modifier =
-                Modifier
-                    .size(PairShotSpacing.xxxl)
-                    .clip(CircleShape)
-                    .background(
-                        if (isEnabled && isActive) {
-                            PairShotCameraTokens.Foreground.copy(alpha = 0.18f)
-                        } else {
-                            Color.Transparent
-                        },
-                    ),
+            Modifier
+                .size(PairShotSpacing.xxxl)
+                .clip(CircleShape)
+                .background(
+                    if (isEnabled && isActive) {
+                        PairShotCameraTokens.Foreground.copy(alpha = 0.18f)
+                    } else {
+                        Color.Transparent
+                    },
+                ),
             contentAlignment = Alignment.Center,
         ) {
             if (iconText != null) {
@@ -389,9 +401,9 @@ private fun SettingIconItem(
                     imageVector = icon,
                     contentDescription = label,
                     modifier =
-                        Modifier
-                            .size(PairShotSpacing.xl)
-                            .graphicsLayer(scaleY = if (iconFlippedVertical) -1f else 1f),
+                    Modifier
+                        .size(PairShotSpacing.xl)
+                        .graphicsLayer(scaleY = if (iconFlippedVertical) -1f else 1f),
                     tint = effectiveTint,
                 )
             }
@@ -408,7 +420,6 @@ private fun SettingIconItem(
 @Composable
 private fun OverlayAlphaSlider(
     alpha: Float,
-    enabled: Boolean,
     onAlphaChange: (Float) -> Unit,
 ) {
     var localAlpha by remember { mutableFloatStateOf(alpha) }
@@ -419,17 +430,13 @@ private fun OverlayAlphaSlider(
         if (!isDragged) localAlpha = alpha
     }
 
-    val contentColor =
-        if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    val primaryColor =
-        if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    val contentColor = MaterialTheme.colorScheme.onSurface
+    val primaryColor = MaterialTheme.colorScheme.primary
     val sliderColors =
         SliderDefaults.colors(
             thumbColor = primaryColor,
             activeTrackColor = primaryColor,
             inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant,
-            disabledThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-            disabledActiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
         )
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -454,7 +461,6 @@ private fun OverlayAlphaSlider(
             onValueChange = { localAlpha = it },
             onValueChangeFinished = { onAlphaChange(localAlpha) },
             valueRange = 0f..1.0f,
-            enabled = enabled,
             interactionSource = interactionSource,
             colors = sliderColors,
             thumb = {
@@ -493,7 +499,9 @@ private fun OverlayAlphaSlider(
                 )
                 Text(
                     text = stringResource(R.string.camera_settings_overlay_opacity_hint),
-                    style = PairShotTypographyTokens.labelExtraSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
+                    style = PairShotTypographyTokens.labelExtraSmall.copy(
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                    ),
                     color = warningColor,
                 )
             }

@@ -3,7 +3,7 @@ package com.pairshot.feature.settings.component
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,11 +31,12 @@ import com.pairshot.core.ui.component.SettingsDivider
 import com.pairshot.core.ui.component.SettingsItem
 import com.pairshot.core.ui.component.SettingsSliderItem
 import com.pairshot.feature.settings.R
+import kotlinx.collections.immutable.persistentListOf
 import java.io.File
 import kotlin.math.roundToInt
 
 private val logoPositionOrder =
-    listOf(
+    persistentListOf(
         LogoPosition.TOP_LEFT,
         LogoPosition.TOP_CENTER,
         LogoPosition.TOP_RIGHT,
@@ -110,10 +111,10 @@ private fun LogoRegisteredRow(
 ) {
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(PairShotTouchTarget.large)
-                .padding(horizontal = PairShotCard.innerPadding),
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = PairShotTouchTarget.large)
+            .padding(horizontal = PairShotCard.innerPadding, vertical = PairShotSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

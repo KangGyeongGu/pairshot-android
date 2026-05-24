@@ -32,12 +32,12 @@ fun DeletePairConfirmDialog(
             text = {
                 Text(
                     text =
-                        pluralStringResource(
-                            R.plurals.dialog_delete_pair_summary,
-                            pairCount,
-                            pairCount,
-                            combinedCount,
-                        ),
+                    pluralStringResource(
+                        R.plurals.dialog_delete_pair_summary,
+                        pairCount,
+                        pairCount,
+                        combinedCount,
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -74,11 +74,11 @@ fun DeletePairConfirmDialog(
             text = {
                 Text(
                     text =
-                        pluralStringResource(
-                            R.plurals.dialog_delete_pair_confirm,
-                            pairCount,
-                            pairCount,
-                        ),
+                    pluralStringResource(
+                        R.plurals.dialog_delete_pair_confirm,
+                        pairCount,
+                        pairCount,
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },

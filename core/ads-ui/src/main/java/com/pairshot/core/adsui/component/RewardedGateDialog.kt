@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.R
 import com.pairshot.core.domain.premium.PremiumFeature
@@ -15,6 +16,7 @@ fun RewardedGateDialog(
     feature: PremiumFeature,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val bodyResId =
         when (feature) {
@@ -22,6 +24,7 @@ fun RewardedGateDialog(
             PremiumFeature.COMBINE_DETAIL -> R.string.rewarded_gate_body_combine_detail
         }
     PairShotDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         title = {
             Text(

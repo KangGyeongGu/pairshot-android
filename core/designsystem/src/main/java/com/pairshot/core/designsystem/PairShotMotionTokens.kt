@@ -30,7 +30,11 @@ object PairShotMotionTokens {
 
     fun <T> exitTween() = tween<T>(durationMillis = DURATION_EXIT, easing = EasingExit)
 
-    fun <T> popEnterTween() = tween<T>(durationMillis = DURATION_POP_ENTER, delayMillis = DELAY_POP_ENTER, easing = EasingEnter)
+    fun <T> popEnterTween() = tween<T>(
+        durationMillis = DURATION_POP_ENTER,
+        delayMillis = DELAY_POP_ENTER,
+        easing = EasingEnter
+    )
 
     fun <T> popExitTween() = tween<T>(durationMillis = DURATION_POP_EXIT, easing = EasingExit)
 

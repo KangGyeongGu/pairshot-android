@@ -22,68 +22,68 @@ private val Context.promotionDataStore: DataStore<Preferences> by preferencesDat
 
 @Singleton
 class PromotionPreferencesSource
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-    ) {
-        private val json =
-            Json {
-                ignoreUnknownKeys = true
-                encodeDefaults = false
-            }
-
-        private object Keys {
-            val MEMBERSHIP_JSON = stringPreferencesKey("membership_json")
-            val PENDING_CODE = stringPreferencesKey("pending_code")
-            val PENDING_SINCE = longPreferencesKey("pending_since")
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
+) {
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = false
         }
 
-        val state: Flow<PromotionState> =
-            context.promotionDataStore.data.map { prefs ->
-                val raw = prefs[Keys.MEMBERSHIP_JSON] ?: return@map PromotionState.Empty
-                runCatching { json.decodeFromString<PromotionState>(raw) }
-                    .getOrElse {
-                        Timber.tag(TAG).w(it, "Stored membership decode failed — treating as empty")
-                        PromotionState.Empty
-                    }
-            }
+    private object Keys {
+        val MEMBERSHIP_JSON = stringPreferencesKey("membership_json")
+        val PENDING_CODE = stringPreferencesKey("pending_code")
+        val PENDING_SINCE = longPreferencesKey("pending_since")
+    }
 
-        val pending: Flow<PendingPromotionActivation?> =
-            context.promotionDataStore.data.map { prefs ->
-                val code = prefs[Keys.PENDING_CODE] ?: return@map null
-                val since = prefs[Keys.PENDING_SINCE] ?: return@map null
-                PendingPromotionActivation(code = code, sinceEpochMillis = since)
-            }
-
-        suspend fun save(state: PromotionState) {
-            val encoded = json.encodeToString(PromotionState.serializer(), state)
-            context.promotionDataStore.edit { prefs ->
-                prefs[Keys.MEMBERSHIP_JSON] = encoded
-            }
+    val state: Flow<PromotionState> =
+        context.promotionDataStore.data.map { prefs ->
+            val raw = prefs[Keys.MEMBERSHIP_JSON] ?: return@map PromotionState.Empty
+            runCatching { json.decodeFromString<PromotionState>(raw) }
+                .getOrElse {
+                    Timber.tag(TAG).w(it, "Stored membership decode failed — treating as empty")
+                    PromotionState.Empty
+                }
         }
 
-        suspend fun savePending(
-            code: String,
-            sinceEpochMillis: Long,
-        ) {
-            context.promotionDataStore.edit { prefs ->
-                prefs[Keys.PENDING_CODE] = code
-                prefs[Keys.PENDING_SINCE] = sinceEpochMillis
-            }
+    val pending: Flow<PendingPromotionActivation?> =
+        context.promotionDataStore.data.map { prefs ->
+            val code = prefs[Keys.PENDING_CODE] ?: return@map null
+            val since = prefs[Keys.PENDING_SINCE] ?: return@map null
+            PendingPromotionActivation(code = code, sinceEpochMillis = since)
         }
 
-        suspend fun clearPending() {
-            context.promotionDataStore.edit { prefs ->
-                prefs.remove(Keys.PENDING_CODE)
-                prefs.remove(Keys.PENDING_SINCE)
-            }
-        }
-
-        suspend fun clear() {
-            context.promotionDataStore.edit { prefs -> prefs.clear() }
-        }
-
-        private companion object {
-            const val TAG = "PromotionPrefs"
+    suspend fun save(state: PromotionState) {
+        val encoded = json.encodeToString(PromotionState.serializer(), state)
+        context.promotionDataStore.edit { prefs ->
+            prefs[Keys.MEMBERSHIP_JSON] = encoded
         }
     }
+
+    suspend fun savePending(
+        code: String,
+        sinceEpochMillis: Long,
+    ) {
+        context.promotionDataStore.edit { prefs ->
+            prefs[Keys.PENDING_CODE] = code
+            prefs[Keys.PENDING_SINCE] = sinceEpochMillis
+        }
+    }
+
+    suspend fun clearPending() {
+        context.promotionDataStore.edit { prefs ->
+            prefs.remove(Keys.PENDING_CODE)
+            prefs.remove(Keys.PENDING_SINCE)
+        }
+    }
+
+    suspend fun clear() {
+        context.promotionDataStore.edit { prefs -> prefs.clear() }
+    }
+
+    private companion object {
+        const val TAG = "PromotionPrefs"
+    }
+}

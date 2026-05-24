@@ -15,49 +15,49 @@ import javax.inject.Singleton
 
 @Singleton
 class BillingClientHolder
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-        private val purchasesListener: BillingPurchaseUpdatesListener,
-    ) {
-        private val pendingParams =
-            PendingPurchasesParams
-                .newBuilder()
-                .enableOneTimeProducts()
-                .enablePrepaidPlans()
-                .build()
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
+    private val purchasesListener: BillingPurchaseUpdatesListener,
+) {
+    private val pendingParams =
+        PendingPurchasesParams
+            .newBuilder()
+            .enableOneTimeProducts()
+            .enablePrepaidPlans()
+            .build()
 
-        val client: BillingClient =
-            BillingClient
-                .newBuilder(context)
-                .setListener(purchasesListener)
-                .enablePendingPurchases(pendingParams)
-                .enableAutoServiceReconnection()
-                .build()
+    val client: BillingClient =
+        BillingClient
+            .newBuilder(context)
+            .setListener(purchasesListener)
+            .enablePendingPurchases(pendingParams)
+            .enableAutoServiceReconnection()
+            .build()
 
-        private val _ready = MutableStateFlow(false)
-        val ready: StateFlow<Boolean> = _ready.asStateFlow()
+    private val _ready = MutableStateFlow(false)
+    val ready: StateFlow<Boolean> = _ready.asStateFlow()
 
-        fun ensureConnected() {
-            if (client.isReady) {
-                _ready.value = true
-                return
-            }
-            client.startConnection(
-                object : BillingClientStateListener {
-                    override fun onBillingSetupFinished(result: BillingResult) {
-                        val ok = result.responseCode == BillingClient.BillingResponseCode.OK
-                        _ready.value = ok
-                        if (!ok) {
-                            Timber.w("Billing setup failed: ${result.debugMessage} (code ${result.responseCode})")
-                        }
-                    }
-
-                    override fun onBillingServiceDisconnected() {
-                        _ready.value = false
-                        Timber.w("Billing service disconnected")
-                    }
-                },
-            )
+    fun ensureConnected() {
+        if (client.isReady) {
+            _ready.value = true
+            return
         }
+        client.startConnection(
+            object : BillingClientStateListener {
+                override fun onBillingSetupFinished(result: BillingResult) {
+                    val ok = result.responseCode == BillingClient.BillingResponseCode.OK
+                    _ready.value = ok
+                    if (!ok) {
+                        Timber.w("Billing setup failed: ${result.debugMessage} (code ${result.responseCode})")
+                    }
+                }
+
+                override fun onBillingServiceDisconnected() {
+                    _ready.value = false
+                    Timber.w("Billing service disconnected")
+                }
+            },
+        )
     }
+}

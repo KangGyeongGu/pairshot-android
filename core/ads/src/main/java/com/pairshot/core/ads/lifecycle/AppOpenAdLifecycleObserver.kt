@@ -13,49 +13,49 @@ import javax.inject.Singleton
 
 @Singleton
 class AppOpenAdLifecycleObserver
-    @Inject
-    constructor(
-        private val controller: AppOpenAdController,
-    ) : Application.ActivityLifecycleCallbacks,
-        DefaultLifecycleObserver {
-        @Volatile
-        private var currentActivityRef: WeakReference<Activity>? = null
+@Inject
+constructor(
+    private val controller: AppOpenAdController,
+) : Application.ActivityLifecycleCallbacks,
+    DefaultLifecycleObserver {
+    @Volatile
+    private var currentActivityRef: WeakReference<Activity>? = null
 
-        fun register(application: Application) {
-            application.registerActivityLifecycleCallbacks(this)
-            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        }
-
-        override fun onStart(owner: LifecycleOwner) {
-            val act = currentActivityRef?.get() ?: return
-            controller.onForeground(act)
-        }
-
-        override fun onActivityCreated(
-            activity: Activity,
-            savedInstanceState: Bundle?,
-        ) = Unit
-
-        override fun onActivityStarted(activity: Activity) {
-            currentActivityRef = WeakReference(activity)
-        }
-
-        override fun onActivityResumed(activity: Activity) {
-            currentActivityRef = WeakReference(activity)
-        }
-
-        override fun onActivityPaused(activity: Activity) {
-            if (currentActivityRef?.get() === activity) currentActivityRef = null
-        }
-
-        override fun onActivityStopped(activity: Activity) = Unit
-
-        override fun onActivitySaveInstanceState(
-            activity: Activity,
-            outState: Bundle,
-        ) = Unit
-
-        override fun onActivityDestroyed(activity: Activity) {
-            if (currentActivityRef?.get() === activity) currentActivityRef = null
-        }
+    fun register(application: Application) {
+        application.registerActivityLifecycleCallbacks(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
+
+    override fun onStart(owner: LifecycleOwner) {
+        val act = currentActivityRef?.get() ?: return
+        controller.onForeground(act)
+    }
+
+    override fun onActivityCreated(
+        activity: Activity,
+        savedInstanceState: Bundle?,
+    ) = Unit
+
+    override fun onActivityStarted(activity: Activity) {
+        currentActivityRef = WeakReference(activity)
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        currentActivityRef = WeakReference(activity)
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        if (currentActivityRef?.get() === activity) currentActivityRef = null
+    }
+
+    override fun onActivityStopped(activity: Activity) = Unit
+
+    override fun onActivitySaveInstanceState(
+        activity: Activity,
+        outState: Bundle,
+    ) = Unit
+
+    override fun onActivityDestroyed(activity: Activity) {
+        if (currentActivityRef?.get() === activity) currentActivityRef = null
+    }
+}

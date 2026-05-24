@@ -11,10 +11,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.ActionSheetShape
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.ProvideAppTextScaleDensity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,14 +36,16 @@ fun PairShotBottomSheet(
             )
         },
     ) {
-        Column(
-            modifier =
+        ProvideAppTextScaleDensity {
+            Column(
+                modifier =
                 Modifier
                     .padding(horizontal = PairShotScreen.horizontalPadding)
                     .padding(bottom = PairShotSpacing.sm)
                     .navigationBarsPadding(),
-        ) {
-            content()
+            ) {
+                content()
+            }
         }
     }
 }

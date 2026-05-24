@@ -12,27 +12,27 @@ import javax.inject.Singleton
 
 @Singleton
 class CombinePreviewRenderer
-    @Inject
-    constructor(
-        private val pairImageComposer: PairImageComposer,
-        private val previewSampleProvider: PreviewSampleProvider,
-    ) {
-        suspend fun render(
-            combineConfig: CombineConfig,
-            watermarkConfig: WatermarkConfig,
-        ): Bitmap? {
-            val sample = previewSampleProvider.get()
-            return runCatching {
-                pairImageComposer.composeFromBitmaps(
-                    before = sample,
-                    after = sample,
-                    combineConfig = combineConfig,
-                    watermarkConfig = watermarkConfig,
-                    profile = RenderProfile.PREVIEW,
-                )
-            }.getOrNull()
-        }
+@Inject
+constructor(
+    private val pairImageComposer: PairImageComposer,
+    private val previewSampleProvider: PreviewSampleProvider,
+) {
+    suspend fun render(
+        combineConfig: CombineConfig,
+        watermarkConfig: WatermarkConfig,
+    ): Bitmap? {
+        val sample = previewSampleProvider.get()
+        return runCatching {
+            pairImageComposer.composeFromBitmaps(
+                before = sample,
+                after = sample,
+                combineConfig = combineConfig,
+                watermarkConfig = watermarkConfig,
+                profile = RenderProfile.PREVIEW,
+            )
+        }.getOrNull()
     }
+}
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)

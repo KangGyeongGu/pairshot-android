@@ -20,36 +20,36 @@ import javax.inject.Singleton
 
 @Singleton
 class AppFlowCoordinator
-    @Inject
-    constructor(
-        onboardingStateRepository: OnboardingStateRepository,
-        membershipProvider: MembershipProvider,
-        photoPairRepository: PhotoPairRepository,
-        private val decider: AppFlowDecider,
-    ) {
-        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+@Inject
+constructor(
+    onboardingStateRepository: OnboardingStateRepository,
+    membershipProvider: MembershipProvider,
+    photoPairRepository: PhotoPairRepository,
+    private val decider: AppFlowDecider,
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-        val state: StateFlow<AppFlowState?> =
-            combine(
-                onboardingStateRepository.tutorialCompletedFlow,
-                onboardingStateRepository.onboardingPaywallShownFlow,
-                membershipProvider.observe().map { it.isPro },
-                photoPairRepository.countAll().map { it > 0 },
-            ) { tutorialCompleted, paywallShown, isPro, hasPairs ->
-                AppFlowState(
-                    tutorialCompleted = tutorialCompleted,
-                    onboardingPaywallShown = paywallShown,
-                    isPro = isPro,
-                    hasPairs = hasPairs,
-                )
-            }.stateIn(scope, SharingStarted.Eagerly, null)
+    val state: StateFlow<AppFlowState?> =
+        combine(
+            onboardingStateRepository.tutorialCompletedFlow,
+            onboardingStateRepository.onboardingPaywallShownFlow,
+            membershipProvider.observe().map { it.isPro },
+            photoPairRepository.countAll().map { it > 0 },
+        ) { tutorialCompleted, paywallShown, isPro, hasPairs ->
+            AppFlowState(
+                tutorialCompleted = tutorialCompleted,
+                onboardingPaywallShown = paywallShown,
+                isPro = isPro,
+                hasPairs = hasPairs,
+            )
+        }.stateIn(scope, SharingStarted.Eagerly, null)
 
-        suspend fun current(): AppFlowState = state.filterNotNull().first()
+    suspend fun current(): AppFlowState = state.filterNotNull().first()
 
-        suspend fun decideStartup(): StartupDecision = decider.decideStartup(current())
+    suspend fun decideStartup(): StartupDecision = decider.decideStartup(current())
 
-        suspend fun decidePostTutorial(
-            section: TutorialSection,
-            reason: TutorialFinishReason,
-        ): PostTutorialDecision = decider.decidePostTutorial(current(), section, reason)
-    }
+    suspend fun decidePostTutorial(
+        section: TutorialSection,
+        reason: TutorialFinishReason,
+    ): PostTutorialDecision = decider.decidePostTutorial(current(), section, reason)
+}

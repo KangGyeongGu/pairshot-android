@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotIconSize
 import com.pairshot.core.designsystem.PairShotStroke
@@ -52,19 +51,23 @@ fun ShutterButton(
 
     Box(
         modifier =
-            modifier
-                .size(CameraSpec.shutterOuterSize)
-                .scale(scale)
-                .alpha(if (enabled) 1f else SHUTTER_DISABLED_ALPHA)
-                .border(width = CameraSpec.shutterBorderWidth, color = PairShotCameraTokens.Foreground, shape = CircleShape)
-                .semantics { contentDescription = shutterDesc }
-                .let { base -> if (tutorialAnchorKey != null) base.tutorialAnchor(tutorialAnchorKey) else base }
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    enabled = enabled,
-                    onClick = onClick,
-                ),
+        modifier
+            .size(CameraSpec.shutterOuterSize)
+            .scale(scale)
+            .alpha(if (enabled) 1f else SHUTTER_DISABLED_ALPHA)
+            .border(
+                width = CameraSpec.shutterBorderWidth,
+                color = PairShotCameraTokens.Foreground,
+                shape = CircleShape
+            )
+            .semantics { contentDescription = shutterDesc }
+            .let { base -> if (tutorialAnchorKey != null) base.tutorialAnchor(tutorialAnchorKey) else base }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                onClick = onClick,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Surface(

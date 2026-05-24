@@ -46,15 +46,15 @@ fun AlbumDetailTopBar(
         title = {
             Text(
                 text =
-                    if (isSelectionMode) {
-                        pluralStringResource(
-                            R.plurals.album_topbar_selection_count,
-                            selectedCount,
-                            selectedCount,
-                        )
-                    } else {
-                        title
-                    },
+                if (isSelectionMode) {
+                    pluralStringResource(
+                        R.plurals.album_topbar_selection_count,
+                        selectedCount,
+                        selectedCount,
+                    )
+                } else {
+                    title
+                },
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -115,11 +115,11 @@ fun AlbumDetailTopBar(
             }
         },
         colors =
-            TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                titleContentColor = MaterialTheme.colorScheme.onBackground,
-                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            ),
+        TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+        ),
     )
 }

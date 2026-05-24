@@ -103,244 +103,253 @@ private data class SelectionState(
 
 @HiltViewModel
 class AlbumDetailViewModel
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        private val albumRepository: AlbumRepository,
-        private val deleteAlbumUseCase: DeleteAlbumUseCase,
-        private val renameAlbumUseCase: RenameAlbumUseCase,
-        private val resolvePairNavigationTargetUseCase: ResolvePairNavigationTargetUseCase,
-        private val deletePairsUseCase: DeletePairsUseCase,
-        private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
-        private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
-        private val appSettingsRepository: AppSettingsRepository,
-    ) : ViewModel() {
-        private val _isRefreshing = MutableStateFlow(false)
-        val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+@Inject
+constructor(
+    savedStateHandle: SavedStateHandle,
+    private val albumRepository: AlbumRepository,
+    private val deleteAlbumUseCase: DeleteAlbumUseCase,
+    private val renameAlbumUseCase: RenameAlbumUseCase,
+    private val resolvePairNavigationTargetUseCase: ResolvePairNavigationTargetUseCase,
+    private val deletePairsUseCase: DeletePairsUseCase,
+    private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
+    private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
+    private val appSettingsRepository: AppSettingsRepository,
+) : ViewModel() {
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-        private val route = savedStateHandle.toRoute<AlbumDetail>()
-        val albumId: Long = route.albumId
+    private val route = savedStateHandle.toRoute<AlbumDetail>()
+    val albumId: Long = route.albumId
 
-        private val contentPhaseState = MutableStateFlow<AlbumContentPhase>(AlbumContentPhase.Loading)
-        private val selectionState = MutableStateFlow(SelectionState())
-        private val dialogsState = MutableStateFlow(DialogState())
+    private val contentPhaseState = MutableStateFlow<AlbumContentPhase>(AlbumContentPhase.Loading)
+    private val selectionState = MutableStateFlow(SelectionState())
+    private val dialogsState = MutableStateFlow(DialogState())
 
-        private var latestAlbum: Album? = null
-        private var latestPairs: List<PhotoPair> = emptyList()
+    private var latestAlbum: Album? = null
+    private var latestPairs: List<PhotoPair> = emptyList()
 
-        val sortOrder: StateFlow<SortOrder> =
-            appSettingsRepository.albumSortOrderFlow.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = SortOrder.DESC,
-            )
+    val sortOrder: StateFlow<SortOrder> =
+        appSettingsRepository.albumSortOrderFlow.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = SortOrder.DESC,
+        )
 
-        val uiState: StateFlow<AlbumDetailUiState> =
-            combine(
-                contentPhaseState,
-                selectionState,
-                dialogsState,
-                sortOrder,
-            ) { phase, selection, dialogs, sort ->
-                when (phase) {
-                    AlbumContentPhase.Loading -> {
-                        AlbumDetailUiState.Loading
-                    }
-
-                    AlbumContentPhase.Error -> {
-                        AlbumDetailUiState.Error(UiText.Resource(R.string.album_route_load_failed))
-                    }
-
-                    is AlbumContentPhase.Loaded -> {
-                        AlbumDetailUiState.Success(
-                            album = phase.album,
-                            pairs = phase.pairs,
-                            selectedIds = selection.selectedIds,
-                            isSelectionMode = selection.isSelectionMode,
-                            showRenameDialog = dialogs.showRename,
-                            showDeleteAlbumDialog = dialogs.showDeleteAlbum,
-                            showDeletePairsDialog = dialogs.showDeletePairs,
-                            sortOrder = sort,
-                        )
-                    }
+    val uiState: StateFlow<AlbumDetailUiState> =
+        combine(
+            contentPhaseState,
+            selectionState,
+            dialogsState,
+            sortOrder,
+        ) { phase, selection, dialogs, sort ->
+            when (phase) {
+                AlbumContentPhase.Loading -> {
+                    AlbumDetailUiState.Loading
                 }
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS), AlbumDetailUiState.Loading)
 
-        private val _events = MutableSharedFlow<AlbumDetailEvent>()
-        val events: SharedFlow<AlbumDetailEvent> = _events.asSharedFlow()
+                AlbumContentPhase.Error -> {
+                    AlbumDetailUiState.Error(UiText.Resource(R.string.album_route_load_failed))
+                }
 
-        fun toggleSortOrder() {
-            viewModelScope.launch {
-                val next = if (sortOrder.value == SortOrder.DESC) SortOrder.ASC else SortOrder.DESC
-                appSettingsRepository.updateAlbumSortOrder(next)
+                is AlbumContentPhase.Loaded -> {
+                    AlbumDetailUiState.Success(
+                        album = phase.album,
+                        pairs = phase.pairs,
+                        selectedIds = selection.selectedIds,
+                        isSelectionMode = selection.isSelectionMode,
+                        showRenameDialog = dialogs.showRename,
+                        showDeleteAlbumDialog = dialogs.showDeleteAlbum,
+                        showDeletePairsDialog = dialogs.showDeletePairs,
+                        sortOrder = sort,
+                    )
+                }
             }
-        }
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            AlbumDetailUiState.Loading
+        )
 
-        init {
-            loadAlbum()
-            observePairs()
-        }
+    private val _events = MutableSharedFlow<AlbumDetailEvent>()
+    val events: SharedFlow<AlbumDetailEvent> = _events.asSharedFlow()
 
-        private fun loadAlbum() {
-            viewModelScope.launch {
-                val album = albumRepository.getById(albumId)
-                if (album == null) {
-                    contentPhaseState.value = AlbumContentPhase.Error
-                    return@launch
-                }
-                latestAlbum = album
+    fun toggleSortOrder() {
+        viewModelScope.launch {
+            val next = if (sortOrder.value == SortOrder.DESC) SortOrder.ASC else SortOrder.DESC
+            appSettingsRepository.updateAlbumSortOrder(next)
+        }
+    }
+
+    init {
+        loadAlbum()
+        observePairs()
+    }
+
+    private fun loadAlbum() {
+        viewModelScope.launch {
+            val album = albumRepository.getById(albumId)
+            if (album == null) {
+                contentPhaseState.value = AlbumContentPhase.Error
+                return@launch
+            }
+            latestAlbum = album
+            emitLoadedIfReady()
+        }
+    }
+
+    private fun observePairs() {
+        viewModelScope.launch {
+            albumRepository.observePairs(albumId).collect { pairs ->
+                latestPairs = pairs
                 emitLoadedIfReady()
-            }
-        }
-
-        private fun observePairs() {
-            viewModelScope.launch {
-                albumRepository.observePairs(albumId).collect { pairs ->
-                    latestPairs = pairs
-                    emitLoadedIfReady()
-                }
-            }
-        }
-
-        private fun emitLoadedIfReady() {
-            val album = latestAlbum ?: return
-            contentPhaseState.value = AlbumContentPhase.Loaded(album, latestPairs)
-        }
-
-        fun onPairClick(pairId: Long) {
-            if (selectionState.value.isSelectionMode) {
-                toggleSelection(pairId)
-                return
-            }
-            val pair = latestPairs.firstOrNull { it.id == pairId } ?: return
-            viewModelScope.launch {
-                val event =
-                    when (val target = resolvePairNavigationTargetUseCase(pair)) {
-                        is PairNavigationTarget.AfterCamera -> AlbumDetailEvent.NavigateToAfterCamera(target.pairId, albumId)
-                        is PairNavigationTarget.BeforeRetakeCamera -> AlbumDetailEvent.NavigateToBeforeRetake(target.pairId)
-                        is PairNavigationTarget.PairPreview -> AlbumDetailEvent.NavigateToPairPreview(target.pairId)
-                    }
-                _events.emit(event)
-            }
-        }
-
-        fun onPairLongPress(pairId: Long) {
-            selectionState.update { it.copy(isSelectionMode = true) }
-            toggleSelection(pairId)
-        }
-
-        private fun toggleSelection(pairId: Long) {
-            selectionState.update { state ->
-                val updated =
-                    if (pairId in state.selectedIds) {
-                        state.selectedIds - pairId
-                    } else {
-                        state.selectedIds + pairId
-                    }
-                state.copy(
-                    selectedIds = updated,
-                    isSelectionMode = updated.isNotEmpty(),
-                )
-            }
-        }
-
-        fun exitSelectionMode() {
-            selectionState.value = SelectionState()
-        }
-
-        fun onFabClick() {
-            viewModelScope.launch {
-                _events.emit(AlbumDetailEvent.NavigateToCamera(albumId))
-            }
-        }
-
-        fun onAddPairsClick() {
-            viewModelScope.launch {
-                _events.emit(AlbumDetailEvent.NavigateToPairPicker(albumId))
-            }
-        }
-
-        fun showDeletePairsDialog() {
-            dialogsState.update { it.copy(showDeletePairs = true) }
-        }
-
-        fun dismissDeletePairsDialog() {
-            dialogsState.update { it.copy(showDeletePairs = false) }
-        }
-
-        fun removeSelectedFromAlbum() {
-            val selectedIds = selectionState.value.selectedIds.toList()
-            viewModelScope.launch {
-                if (selectedIds.isNotEmpty()) albumRepository.removePairs(albumId, selectedIds)
-                closeSelectionAndDialog()
-            }
-        }
-
-        fun deleteSelectedPairs() {
-            val selectedIds = selectionState.value.selectedIds
-            if (selectedIds.isEmpty()) {
-                closeSelectionAndDialog()
-                return
-            }
-            val pairsToDelete = latestPairs.filter { it.id in selectedIds }
-            viewModelScope.launch {
-                deletePairsUseCase(pairsToDelete)
-                closeSelectionAndDialog()
-            }
-        }
-
-        fun deleteSelectedCombinedOnly() {
-            val selectedIds = selectionState.value.selectedIds.toList()
-            viewModelScope.launch {
-                if (selectedIds.isNotEmpty()) deleteCombinedPhotosUseCase(selectedIds)
-                closeSelectionAndDialog()
-            }
-        }
-
-        private fun closeSelectionAndDialog() {
-            dialogsState.update { it.copy(showDeletePairs = false) }
-            selectionState.value = SelectionState()
-        }
-
-        fun showRenameDialog() {
-            dialogsState.update { it.copy(showRename = true) }
-        }
-
-        fun dismissRenameDialog() {
-            dialogsState.update { it.copy(showRename = false) }
-        }
-
-        fun confirmRenameAlbum(newName: String) {
-            viewModelScope.launch {
-                renameAlbumUseCase(albumId, newName)
-                latestAlbum = latestAlbum?.copy(name = newName.trim())
-                emitLoadedIfReady()
-                dialogsState.update { it.copy(showRename = false) }
-            }
-        }
-
-        fun showDeleteAlbumDialog() {
-            dialogsState.update { it.copy(showDeleteAlbum = true) }
-        }
-
-        fun dismissDeleteAlbumDialog() {
-            dialogsState.update { it.copy(showDeleteAlbum = false) }
-        }
-
-        fun confirmDeleteAlbum() {
-            viewModelScope.launch {
-                deleteAlbumUseCase(albumId)
-                dialogsState.update { it.copy(showDeleteAlbum = false) }
-                _events.emit(AlbumDetailEvent.NavigateBack)
-            }
-        }
-
-        fun refresh() {
-            if (_isRefreshing.value) return
-            viewModelScope.launch {
-                _isRefreshing.value = true
-                runCatching { syncMissingSourcesUseCase() }
-                _isRefreshing.value = false
             }
         }
     }
+
+    private fun emitLoadedIfReady() {
+        val album = latestAlbum ?: return
+        contentPhaseState.value = AlbumContentPhase.Loaded(album, latestPairs)
+    }
+
+    fun onPairClick(pairId: Long) {
+        if (selectionState.value.isSelectionMode) {
+            toggleSelection(pairId)
+            return
+        }
+        val pair = latestPairs.firstOrNull { it.id == pairId } ?: return
+        viewModelScope.launch {
+            val event =
+                when (val target = resolvePairNavigationTargetUseCase(pair)) {
+                    is PairNavigationTarget.AfterCamera -> AlbumDetailEvent.NavigateToAfterCamera(
+                        target.pairId,
+                        albumId
+                    )
+                    is PairNavigationTarget.BeforeRetakeCamera -> AlbumDetailEvent.NavigateToBeforeRetake(
+                        target.pairId
+                    )
+                    is PairNavigationTarget.PairPreview -> AlbumDetailEvent.NavigateToPairPreview(target.pairId)
+                }
+            _events.emit(event)
+        }
+    }
+
+    fun onPairLongPress(pairId: Long) {
+        selectionState.update { it.copy(isSelectionMode = true) }
+        toggleSelection(pairId)
+    }
+
+    private fun toggleSelection(pairId: Long) {
+        selectionState.update { state ->
+            val updated =
+                if (pairId in state.selectedIds) {
+                    state.selectedIds - pairId
+                } else {
+                    state.selectedIds + pairId
+                }
+            state.copy(
+                selectedIds = updated,
+                isSelectionMode = updated.isNotEmpty(),
+            )
+        }
+    }
+
+    fun exitSelectionMode() {
+        selectionState.value = SelectionState()
+    }
+
+    fun onFabClick() {
+        viewModelScope.launch {
+            _events.emit(AlbumDetailEvent.NavigateToCamera(albumId))
+        }
+    }
+
+    fun onAddPairsClick() {
+        viewModelScope.launch {
+            _events.emit(AlbumDetailEvent.NavigateToPairPicker(albumId))
+        }
+    }
+
+    fun showDeletePairsDialog() {
+        dialogsState.update { it.copy(showDeletePairs = true) }
+    }
+
+    fun dismissDeletePairsDialog() {
+        dialogsState.update { it.copy(showDeletePairs = false) }
+    }
+
+    fun removeSelectedFromAlbum() {
+        val selectedIds = selectionState.value.selectedIds.toList()
+        viewModelScope.launch {
+            if (selectedIds.isNotEmpty()) albumRepository.removePairs(albumId, selectedIds)
+            closeSelectionAndDialog()
+        }
+    }
+
+    fun deleteSelectedPairs() {
+        val selectedIds = selectionState.value.selectedIds
+        if (selectedIds.isEmpty()) {
+            closeSelectionAndDialog()
+            return
+        }
+        val pairsToDelete = latestPairs.filter { it.id in selectedIds }
+        viewModelScope.launch {
+            deletePairsUseCase(pairsToDelete)
+            closeSelectionAndDialog()
+        }
+    }
+
+    fun deleteSelectedCombinedOnly() {
+        val selectedIds = selectionState.value.selectedIds.toList()
+        viewModelScope.launch {
+            if (selectedIds.isNotEmpty()) deleteCombinedPhotosUseCase(selectedIds)
+            closeSelectionAndDialog()
+        }
+    }
+
+    private fun closeSelectionAndDialog() {
+        dialogsState.update { it.copy(showDeletePairs = false) }
+        selectionState.value = SelectionState()
+    }
+
+    fun showRenameDialog() {
+        dialogsState.update { it.copy(showRename = true) }
+    }
+
+    fun dismissRenameDialog() {
+        dialogsState.update { it.copy(showRename = false) }
+    }
+
+    fun confirmRenameAlbum(newName: String) {
+        viewModelScope.launch {
+            renameAlbumUseCase(albumId, newName)
+            latestAlbum = latestAlbum?.copy(name = newName.trim())
+            emitLoadedIfReady()
+            dialogsState.update { it.copy(showRename = false) }
+        }
+    }
+
+    fun showDeleteAlbumDialog() {
+        dialogsState.update { it.copy(showDeleteAlbum = true) }
+    }
+
+    fun dismissDeleteAlbumDialog() {
+        dialogsState.update { it.copy(showDeleteAlbum = false) }
+    }
+
+    fun confirmDeleteAlbum() {
+        viewModelScope.launch {
+            deleteAlbumUseCase(albumId)
+            dialogsState.update { it.copy(showDeleteAlbum = false) }
+            _events.emit(AlbumDetailEvent.NavigateBack)
+        }
+    }
+
+    fun refresh() {
+        if (_isRefreshing.value) return
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            runCatching { syncMissingSourcesUseCase() }
+            _isRefreshing.value = false
+        }
+    }
+}

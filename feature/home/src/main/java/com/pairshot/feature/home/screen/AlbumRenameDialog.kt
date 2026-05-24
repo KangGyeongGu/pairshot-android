@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.ui.component.PairShotDialog
 import com.pairshot.feature.home.R
@@ -19,10 +20,12 @@ fun AlbumRenameDialog(
     currentName: String,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var text by remember { mutableStateOf(currentName) }
 
     PairShotDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         title = {
             Text(

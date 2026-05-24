@@ -27,10 +27,10 @@ fun HomeEmptyAction(
             modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SHOOT_BUTTON),
             shape = MaterialTheme.shapes.medium,
             colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
         ) {
             Text(
                 text = label,

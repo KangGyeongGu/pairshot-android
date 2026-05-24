@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import com.pairshot.core.promotion.domain.Promotion
 import com.pairshot.core.promotion.domain.PromotionEntitlement
 import com.pairshot.core.promotion.domain.PromotionStatus
 import com.pairshot.core.ui.component.PairShotDialog
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.ZoneId
@@ -68,34 +70,38 @@ private const val INACTIVE_ROW_ALPHA = 0.6f
 @Composable
 fun PromotionRegisterDialog(
     activationState: PromotionActivationUiState,
-    myPromotions: List<Promotion>,
+    myPromotions: ImmutableList<Promotion>,
     myPromotionsLoading: Boolean,
-    initialCode: String = "",
     onActivate: (String) -> Unit,
     onLoadMyPromotions: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    initialCode: String = "",
 ) {
     var code by remember(initialCode) { mutableStateOf(initialCode) }
     var mode by remember { mutableStateOf(RegisterMode.Input) }
+    val currentOnLoadMyPromotions by rememberUpdatedState(onLoadMyPromotions)
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
 
     LaunchedEffect(initialCode) {
         if (initialCode.isNotBlank()) code = initialCode
     }
 
     LaunchedEffect(Unit) {
-        onLoadMyPromotions()
+        currentOnLoadMyPromotions()
     }
 
     LaunchedEffect(activationState) {
         if (activationState is PromotionActivationUiState.Success) {
             delay(AUTO_DISMISS_DELAY_MS)
-            onDismiss()
+            currentOnDismiss()
         }
     }
 
     val isLoading = activationState is PromotionActivationUiState.Loading
 
     PairShotDialog(
+        modifier = modifier,
         onDismissRequest = { if (!isLoading) onDismiss() },
         title = {
             Row(
@@ -116,10 +122,10 @@ fun PromotionRegisterDialog(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         modifier =
-                            Modifier.clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                            ) { uriHandler.openUri(BuildConfig.PROMOTION_INFO_URL) },
+                        Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) { uriHandler.openUri(BuildConfig.PROMOTION_INFO_URL) },
                     )
                 }
             }
@@ -140,7 +146,7 @@ fun PromotionRegisterDialog(
 
                 RegisterMode.Scanning -> {
                     ScanContent(
-                        onDetected = { scanned ->
+                        onResult = { scanned ->
                             code = scanned
                             mode = RegisterMode.Input
                         },
@@ -169,15 +175,15 @@ fun PromotionRegisterDialog(
             }
         },
         dismissButton =
-            if (mode == RegisterMode.Input && activationState !is PromotionActivationUiState.Success) {
-                {
-                    TextButton(onClick = onDismiss, enabled = !isLoading) {
-                        Text(text = stringResource(R.string.promotion_dialog_cancel))
-                    }
+        if (mode == RegisterMode.Input && activationState !is PromotionActivationUiState.Success) {
+            {
+                TextButton(onClick = onDismiss, enabled = !isLoading) {
+                    Text(text = stringResource(R.string.promotion_dialog_cancel))
                 }
-            } else {
-                null
-            },
+            }
+        } else {
+            null
+        },
     )
 }
 
@@ -187,7 +193,7 @@ private fun InputContent(
     onCodeChange: (String) -> Unit,
     activationState: PromotionActivationUiState,
     isLoading: Boolean,
-    myPromotions: List<Promotion>,
+    myPromotions: ImmutableList<Promotion>,
     myPromotionsLoading: Boolean,
     onScanClick: () -> Unit,
 ) {
@@ -315,7 +321,7 @@ private fun SuccessFeedback(
 
 @Composable
 private fun PromotionListSection(
-    promotions: List<Promotion>,
+    promotions: ImmutableList<Promotion>,
     isLoading: Boolean,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -400,10 +406,10 @@ private fun PromotionListItemRow(item: Promotion) {
 
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .alpha(rowAlpha)
-                .padding(vertical = 6.dp),
+        Modifier
+            .fillMaxWidth()
+            .alpha(rowAlpha)
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -420,11 +426,11 @@ private fun PromotionListItemRow(item: Promotion) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =
-                        Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(4.dp),
-                            ).padding(horizontal = 4.dp, vertical = 2.dp),
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(4.dp),
+                        ).padding(horizontal = 4.dp, vertical = 2.dp),
                 )
                 item.batchLabel?.let { label ->
                     Spacer(modifier = Modifier.width(6.dp))
@@ -433,18 +439,22 @@ private fun PromotionListItemRow(item: Promotion) {
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier =
-                            Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    shape = RoundedCornerShape(4.dp),
-                                ).padding(horizontal = 4.dp, vertical = 2.dp),
+                        Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(4.dp),
+                            ).padding(horizontal = 4.dp, vertical = 2.dp),
                     )
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
             val durationText =
                 if (item.durationDays != null) {
-                    pluralStringResource(R.plurals.promotion_list_days_format, item.durationDays.toInt(), item.durationDays)
+                    pluralStringResource(
+                        R.plurals.promotion_list_days_format,
+                        item.durationDays.toInt(),
+                        item.durationDays
+                    )
                 } else {
                     stringResource(R.string.promotion_list_unlimited)
                 }
@@ -464,18 +474,18 @@ private fun PromotionListItemRow(item: Promotion) {
 }
 
 @Composable
-private fun ScanContent(onDetected: (String) -> Unit) {
+private fun ScanContent(onResult: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
         PromotionQrScannerPane(
-            onResult = onDetected,
+            onResult = onResult,
             modifier =
-                Modifier
-                    .size(ScannerSize)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.scrim),
+            Modifier
+                .size(ScannerSize)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.scrim),
         )
     }
 }

@@ -10,22 +10,22 @@ data class DeletePairsResult(
 )
 
 class DeletePairsUseCase
-    @Inject
-    constructor(
-        private val photoPairRepository: PhotoPairRepository,
-        private val exportHistoryRepository: ExportHistoryRepository,
-    ) {
-        suspend operator fun invoke(pairs: List<PhotoPair>): DeletePairsResult {
-            if (pairs.isEmpty()) return DeletePairsResult(deleted = 0, failed = 0)
+@Inject
+constructor(
+    private val photoPairRepository: PhotoPairRepository,
+    private val exportHistoryRepository: ExportHistoryRepository,
+) {
+    suspend operator fun invoke(pairs: List<PhotoPair>): DeletePairsResult {
+        if (pairs.isEmpty()) return DeletePairsResult(deleted = 0, failed = 0)
 
-            runCatching { exportHistoryRepository.deleteByPairIds(pairs.map { it.id }) }
+        runCatching { exportHistoryRepository.deleteByPairIds(pairs.map { it.id }) }
 
-            var deleted = 0
-            var failed = 0
-            pairs.forEach { pair ->
-                val outcome = runCatching { photoPairRepository.delete(pair) }
-                if (outcome.isSuccess) deleted++ else failed++
-            }
-            return DeletePairsResult(deleted = deleted, failed = failed)
+        var deleted = 0
+        var failed = 0
+        pairs.forEach { pair ->
+            val outcome = runCatching { photoPairRepository.delete(pair) }
+            if (outcome.isSuccess) deleted++ else failed++
         }
+        return DeletePairsResult(deleted = deleted, failed = failed)
     }
+}

@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotDialogTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.ui.component.DeletePairConfirmDialog
 import com.pairshot.feature.pairpreview.component.MissingSlotPlaceholder
@@ -30,13 +29,13 @@ fun PairPreviewScreen(
     onLivePreviewRetry: () -> Unit,
     showDeleteDialog: Boolean,
     onClose: () -> Unit,
-    onShareSelected: () -> Unit,
+    onShareSelection: () -> Unit,
     onNavigateToAfterCamera: () -> Unit,
     onNavigateToBeforeRetake: () -> Unit,
-    onDeleteRequested: () -> Unit,
+    onDeleteRequest: () -> Unit,
     onDeleteAll: () -> Unit,
     onDeleteCombinedOnly: () -> Unit,
-    onDeleteDismissed: () -> Unit,
+    onDeleteDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -45,10 +44,10 @@ fun PairPreviewScreen(
     ) {
         Surface(
             modifier =
-                Modifier.size(
-                    width = PairShotDialogTokens.width,
-                    height = PairShotDialogTokens.height,
-                ),
+            Modifier.size(
+                width = PairShotDialogTokens.width,
+                height = PairShotDialogTokens.height,
+            ),
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = PairShotDialogTokens.elevation,
@@ -56,9 +55,9 @@ fun PairPreviewScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 PairPreviewTopBar(
                     onClose = onClose,
-                    onShareSelected = onShareSelected,
+                    onShareSelection = onShareSelection,
                     onNavigateToAfterCamera = onNavigateToAfterCamera,
-                    onDeleteRequested = onDeleteRequested,
+                    onDeleteRequest = onDeleteRequest,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -99,7 +98,7 @@ fun PairPreviewScreen(
             combinedCount = if (hasCombined) 1 else 0,
             onDeleteAll = onDeleteAll,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
-            onDismiss = onDeleteDismissed,
+            onDismiss = onDeleteDismiss,
         )
     }
 }

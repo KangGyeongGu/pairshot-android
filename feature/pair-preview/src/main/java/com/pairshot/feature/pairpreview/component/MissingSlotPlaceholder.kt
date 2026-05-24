@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.pairpreview.R
 
 @Composable

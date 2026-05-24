@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotBadge
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.spec.PairCardSpec
@@ -59,15 +58,15 @@ fun PairCard(
 
     Box(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .aspectRatio(PAIR_CARD_ASPECT_RATIO)
-                .clip(MaterialTheme.shapes.medium)
-                .then(borderModifier)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongPress,
-                ),
+        modifier
+            .fillMaxWidth()
+            .aspectRatio(PAIR_CARD_ASPECT_RATIO)
+            .clip(MaterialTheme.shapes.medium)
+            .then(borderModifier)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongPress,
+            ),
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             PairCardSlot(
@@ -85,18 +84,18 @@ fun PairCard(
         if (pair.hasCombined) {
             CombinedStatusBadge(
                 modifier =
-                    Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = BadgeEdgePadding, top = BadgeEdgePadding),
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = BadgeEdgePadding, top = BadgeEdgePadding),
             )
         }
 
         if (isSelectionMode && isSelected) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
             )
         }
     }

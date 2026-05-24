@@ -1,6 +1,5 @@
 package com.pairshot.feature.album.screen
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
@@ -23,6 +21,8 @@ import com.pairshot.feature.album.dialog.AlbumDeletePairsDialog
 import com.pairshot.feature.album.dialog.DeleteAlbumDialog
 import com.pairshot.feature.album.dialog.RenameAlbumDialog
 import com.pairshot.feature.album.viewmodel.AlbumDetailUiState
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import com.pairshot.core.ui.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,9 +94,9 @@ fun AlbumDetailScreen(
                 onAddPairsClick = onAddPairsClick,
                 onCaptureBeforeClick = onCaptureBeforeClick,
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             )
         } else {
             Column(modifier = Modifier.padding(innerPadding)) {
@@ -110,18 +110,18 @@ fun AlbumDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     AlbumPairGridSection(
-                        pairs = uiState.pairs,
-                        selectedIds = uiState.selectedIds,
+                        pairs = uiState.pairs.toImmutableList(),
+                        selectedIds = uiState.selectedIds.toImmutableSet(),
                         isSelectionMode = uiState.isSelectionMode,
                         sortOrder = uiState.sortOrder,
                         onPairClick = onPairClick,
                         onPairLongPress = onPairLongPress,
                         contentPadding =
-                            PaddingValues(
-                                bottom = PairShotSpacing.md,
-                                start = PairShotSpacing.md,
-                                end = PairShotSpacing.md,
-                            ),
+                        PaddingValues(
+                            bottom = PairShotSpacing.md,
+                            start = PairShotSpacing.md,
+                            end = PairShotSpacing.md,
+                        ),
                         modifier = Modifier.fillMaxSize(),
                     )
                 }

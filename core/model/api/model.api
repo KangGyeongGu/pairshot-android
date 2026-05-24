@@ -1,0 +1,551 @@
+public final class com/pairshot/core/model/Album {
+	public fun <init> (JLjava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;JJI)V
+	public synthetic fun <init> (JLjava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;JJIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()J
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/Double;
+	public final fun component5 ()Ljava/lang/Double;
+	public final fun component6 ()J
+	public final fun component7 ()J
+	public final fun component8 ()I
+	public final fun copy (JLjava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;JJI)Lcom/pairshot/core/model/Album;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/Album;JLjava/lang/String;Ljava/lang/String;Ljava/lang/Double;Ljava/lang/Double;JJIILjava/lang/Object;)Lcom/pairshot/core/model/Album;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()Ljava/lang/String;
+	public final fun getCreatedAt ()J
+	public final fun getId ()J
+	public final fun getLatitude ()Ljava/lang/Double;
+	public final fun getLongitude ()Ljava/lang/Double;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getPairCount ()I
+	public final fun getUpdatedAt ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/AppSettings {
+	public static final field Companion Lcom/pairshot/core/model/AppSettings$Companion;
+	public static final field DEFAULT_FILE_NAME_PREFIX Ljava/lang/String;
+	public static final field DEFAULT_OVERLAY_ALPHA F
+	public fun <init> ()V
+	public fun <init> (Lcom/pairshot/core/model/ImageQualityPreset;Ljava/lang/String;ZFZZLcom/pairshot/core/model/FlashMode;ZZLcom/pairshot/core/model/AspectRatio;)V
+	public synthetic fun <init> (Lcom/pairshot/core/model/ImageQualityPreset;Ljava/lang/String;ZFZZLcom/pairshot/core/model/FlashMode;ZZLcom/pairshot/core/model/AspectRatio;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/pairshot/core/model/ImageQualityPreset;
+	public final fun component10 ()Lcom/pairshot/core/model/AspectRatio;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Z
+	public final fun component4 ()F
+	public final fun component5 ()Z
+	public final fun component6 ()Z
+	public final fun component7 ()Lcom/pairshot/core/model/FlashMode;
+	public final fun component8 ()Z
+	public final fun component9 ()Z
+	public final fun copy (Lcom/pairshot/core/model/ImageQualityPreset;Ljava/lang/String;ZFZZLcom/pairshot/core/model/FlashMode;ZZLcom/pairshot/core/model/AspectRatio;)Lcom/pairshot/core/model/AppSettings;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/AppSettings;Lcom/pairshot/core/model/ImageQualityPreset;Ljava/lang/String;ZFZZLcom/pairshot/core/model/FlashMode;ZZLcom/pairshot/core/model/AspectRatio;ILjava/lang/Object;)Lcom/pairshot/core/model/AppSettings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCameraAspectRatio ()Lcom/pairshot/core/model/AspectRatio;
+	public final fun getCameraFlashMode ()Lcom/pairshot/core/model/FlashMode;
+	public final fun getCameraGridEnabled ()Z
+	public final fun getCameraHdrEnabled ()Z
+	public final fun getCameraLevelEnabled ()Z
+	public final fun getCameraNightModeEnabled ()Z
+	public final fun getDefaultOverlayAlpha ()F
+	public final fun getFileNamePrefix ()Ljava/lang/String;
+	public final fun getImageQuality ()Lcom/pairshot/core/model/ImageQualityPreset;
+	public final fun getOverlayEnabled ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/AppSettings$Companion {
+}
+
+public final class com/pairshot/core/model/AppTextScale : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/AppTextScale$Companion;
+	public static final field EXTRA_LARGE Lcom/pairshot/core/model/AppTextScale;
+	public static final field LARGE Lcom/pairshot/core/model/AppTextScale;
+	public static final field NORMAL Lcom/pairshot/core/model/AppTextScale;
+	public static final field SMALL Lcom/pairshot/core/model/AppTextScale;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getFactor ()F
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/AppTextScale;
+	public static fun values ()[Lcom/pairshot/core/model/AppTextScale;
+}
+
+public final class com/pairshot/core/model/AppTextScale$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/AppTextScale;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/AppTextScale;
+}
+
+public final class com/pairshot/core/model/AppTheme : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/AppTheme$Companion;
+	public static final field DARK Lcom/pairshot/core/model/AppTheme;
+	public static final field LIGHT Lcom/pairshot/core/model/AppTheme;
+	public static final field SYSTEM Lcom/pairshot/core/model/AppTheme;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/AppTheme;
+	public static fun values ()[Lcom/pairshot/core/model/AppTheme;
+}
+
+public final class com/pairshot/core/model/AppTheme$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/AppTheme;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/AppTheme;
+}
+
+public final class com/pairshot/core/model/AspectRatio : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/AspectRatio$Companion;
+	public static final field RATIO_16_9 Lcom/pairshot/core/model/AspectRatio;
+	public static final field RATIO_1_1 Lcom/pairshot/core/model/AspectRatio;
+	public static final field RATIO_4_3 Lcom/pairshot/core/model/AspectRatio;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/AspectRatio;
+	public static fun values ()[Lcom/pairshot/core/model/AspectRatio;
+}
+
+public final class com/pairshot/core/model/AspectRatio$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/AspectRatio;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/AspectRatio;
+}
+
+public final class com/pairshot/core/model/CameraCapabilities {
+	public fun <init> ()V
+	public fun <init> (ZZZIIII)V
+	public synthetic fun <init> (ZZZIIIIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun component4 ()I
+	public final fun component5 ()I
+	public final fun component6 ()I
+	public final fun component7 ()I
+	public final fun copy (ZZZIIII)Lcom/pairshot/core/model/CameraCapabilities;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/CameraCapabilities;ZZZIIIIILjava/lang/Object;)Lcom/pairshot/core/model/CameraCapabilities;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExposureIndexMax ()I
+	public final fun getExposureIndexMin ()I
+	public final fun getExposureStepDenominator ()I
+	public final fun getExposureStepNumerator ()I
+	public final fun getHasFlash ()Z
+	public final fun getHdrAvailable ()Z
+	public final fun getNightModeAvailable ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/CombineConfig {
+	public static final field Companion Lcom/pairshot/core/model/CombineConfig$Companion;
+	public fun <init> ()V
+	public fun <init> (Lcom/pairshot/core/model/CombineLayout;ZIIZLjava/lang/String;Ljava/lang/String;Lcom/pairshot/core/model/LabelPlacement;Lcom/pairshot/core/model/LabelPositionMode;Lcom/pairshot/core/model/LabelPosition;Lcom/pairshot/core/model/LabelAnchor;Lcom/pairshot/core/model/LabelAnchor;ZIFIIFZ)V
+	public synthetic fun <init> (Lcom/pairshot/core/model/CombineLayout;ZIIZLjava/lang/String;Ljava/lang/String;Lcom/pairshot/core/model/LabelPlacement;Lcom/pairshot/core/model/LabelPositionMode;Lcom/pairshot/core/model/LabelPosition;Lcom/pairshot/core/model/LabelAnchor;Lcom/pairshot/core/model/LabelAnchor;ZIFIIFZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/pairshot/core/model/CombineLayout;
+	public final fun component10 ()Lcom/pairshot/core/model/LabelPosition;
+	public final fun component11 ()Lcom/pairshot/core/model/LabelAnchor;
+	public final fun component12 ()Lcom/pairshot/core/model/LabelAnchor;
+	public final fun component13 ()Z
+	public final fun component14 ()I
+	public final fun component15 ()F
+	public final fun component16 ()I
+	public final fun component17 ()I
+	public final fun component18 ()F
+	public final fun component19 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun component5 ()Z
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Lcom/pairshot/core/model/LabelPlacement;
+	public final fun component9 ()Lcom/pairshot/core/model/LabelPositionMode;
+	public final fun copy (Lcom/pairshot/core/model/CombineLayout;ZIIZLjava/lang/String;Ljava/lang/String;Lcom/pairshot/core/model/LabelPlacement;Lcom/pairshot/core/model/LabelPositionMode;Lcom/pairshot/core/model/LabelPosition;Lcom/pairshot/core/model/LabelAnchor;Lcom/pairshot/core/model/LabelAnchor;ZIFIIFZ)Lcom/pairshot/core/model/CombineConfig;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/CombineLayout;ZIIZLjava/lang/String;Ljava/lang/String;Lcom/pairshot/core/model/LabelPlacement;Lcom/pairshot/core/model/LabelPositionMode;Lcom/pairshot/core/model/LabelPosition;Lcom/pairshot/core/model/LabelAnchor;Lcom/pairshot/core/model/LabelAnchor;ZIFIIFZILjava/lang/Object;)Lcom/pairshot/core/model/CombineConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAfterLabel ()Ljava/lang/String;
+	public final fun getAfterLabelAnchor ()Lcom/pairshot/core/model/LabelAnchor;
+	public final fun getBeforeLabel ()Ljava/lang/String;
+	public final fun getBeforeLabelAnchor ()Lcom/pairshot/core/model/LabelAnchor;
+	public final fun getBorderColorArgb ()I
+	public final fun getBorderEnabled ()Z
+	public final fun getBorderThicknessDp ()I
+	public final fun getLabelBgAlpha ()F
+	public final fun getLabelBgColorArgb ()I
+	public final fun getLabelBgCornerDp ()I
+	public final fun getLabelBgEnabled ()Z
+	public final fun getLabelBgMatchesBorder ()Z
+	public final fun getLabelEnabled ()Z
+	public final fun getLabelPlacement ()Lcom/pairshot/core/model/LabelPlacement;
+	public final fun getLabelPosition ()Lcom/pairshot/core/model/LabelPosition;
+	public final fun getLabelPositionMode ()Lcom/pairshot/core/model/LabelPositionMode;
+	public final fun getLabelSizeRatio ()F
+	public final fun getLabelTextColorArgb ()I
+	public final fun getLayout ()Lcom/pairshot/core/model/CombineLayout;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/CombineConfig$Companion {
+	public final fun getNoDecoration ()Lcom/pairshot/core/model/CombineConfig;
+}
+
+public final class com/pairshot/core/model/CombineConfigKt {
+	public static final fun effectiveLabelBgColor (Lcom/pairshot/core/model/CombineConfig;)I
+}
+
+public final class com/pairshot/core/model/CombineLayout : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/CombineLayout$Companion;
+	public static final field HORIZONTAL Lcom/pairshot/core/model/CombineLayout;
+	public static final field VERTICAL Lcom/pairshot/core/model/CombineLayout;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/CombineLayout;
+	public static fun values ()[Lcom/pairshot/core/model/CombineLayout;
+}
+
+public final class com/pairshot/core/model/CombineLayout$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/CombineLayout;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/CombineLayout;
+}
+
+public final class com/pairshot/core/model/ExportFormat : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/ExportFormat$Companion;
+	public static final field INDIVIDUAL Lcom/pairshot/core/model/ExportFormat;
+	public static final field ZIP Lcom/pairshot/core/model/ExportFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/ExportFormat;
+	public static fun values ()[Lcom/pairshot/core/model/ExportFormat;
+}
+
+public final class com/pairshot/core/model/ExportFormat$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/ExportFormat;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/ExportFormat;
+}
+
+public final class com/pairshot/core/model/ExportHistoryEntry {
+	public fun <init> (JJLjava/lang/String;Lcom/pairshot/core/model/ExportHistoryKind;J)V
+	public synthetic fun <init> (JJLjava/lang/String;Lcom/pairshot/core/model/ExportHistoryKind;JILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lcom/pairshot/core/model/ExportHistoryKind;
+	public final fun component5 ()J
+	public final fun copy (JJLjava/lang/String;Lcom/pairshot/core/model/ExportHistoryKind;J)Lcom/pairshot/core/model/ExportHistoryEntry;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/ExportHistoryEntry;JJLjava/lang/String;Lcom/pairshot/core/model/ExportHistoryKind;JILjava/lang/Object;)Lcom/pairshot/core/model/ExportHistoryEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreatedAt ()J
+	public final fun getId ()J
+	public final fun getKind ()Lcom/pairshot/core/model/ExportHistoryKind;
+	public final fun getMediaStoreUri ()Ljava/lang/String;
+	public final fun getPairId ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/ExportHistoryKind : java/lang/Enum {
+	public static final field COMBINED Lcom/pairshot/core/model/ExportHistoryKind;
+	public static final field WATERMARKED_AFTER Lcom/pairshot/core/model/ExportHistoryKind;
+	public static final field WATERMARKED_BEFORE Lcom/pairshot/core/model/ExportHistoryKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/ExportHistoryKind;
+	public static fun values ()[Lcom/pairshot/core/model/ExportHistoryKind;
+}
+
+public final class com/pairshot/core/model/ExportPreset {
+	public fun <init> ()V
+	public fun <init> (Lcom/pairshot/core/model/ExportFormat;ZZZZ)V
+	public synthetic fun <init> (Lcom/pairshot/core/model/ExportFormat;ZZZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/pairshot/core/model/ExportFormat;
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun component4 ()Z
+	public final fun component5 ()Z
+	public final fun copy (Lcom/pairshot/core/model/ExportFormat;ZZZZ)Lcom/pairshot/core/model/ExportPreset;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/ExportPreset;Lcom/pairshot/core/model/ExportFormat;ZZZZILjava/lang/Object;)Lcom/pairshot/core/model/ExportPreset;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getApplyCombineConfig ()Z
+	public final fun getFormat ()Lcom/pairshot/core/model/ExportFormat;
+	public final fun getIncludeAfter ()Z
+	public final fun getIncludeBefore ()Z
+	public final fun getIncludeCombined ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/FlashMode : java/lang/Enum {
+	public static final field AUTO Lcom/pairshot/core/model/FlashMode;
+	public static final field Companion Lcom/pairshot/core/model/FlashMode$Companion;
+	public static final field OFF Lcom/pairshot/core/model/FlashMode;
+	public static final field ON Lcom/pairshot/core/model/FlashMode;
+	public static final field TORCH Lcom/pairshot/core/model/FlashMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/FlashMode;
+	public static fun values ()[Lcom/pairshot/core/model/FlashMode;
+}
+
+public final class com/pairshot/core/model/FlashMode$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/FlashMode;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/FlashMode;
+}
+
+public final class com/pairshot/core/model/ImageQualityPreset : java/lang/Enum {
+	public static final field BEST Lcom/pairshot/core/model/ImageQualityPreset;
+	public static final field Companion Lcom/pairshot/core/model/ImageQualityPreset$Companion;
+	public static final field HIGH Lcom/pairshot/core/model/ImageQualityPreset;
+	public static final field LOW Lcom/pairshot/core/model/ImageQualityPreset;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getJpegQuality ()I
+	public final fun getMaxOutputPx ()I
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/ImageQualityPreset;
+	public static fun values ()[Lcom/pairshot/core/model/ImageQualityPreset;
+}
+
+public final class com/pairshot/core/model/ImageQualityPreset$Companion {
+	public final fun fromLegacyJpegQuality (I)Lcom/pairshot/core/model/ImageQualityPreset;
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/ImageQualityPreset;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/ImageQualityPreset;
+}
+
+public final class com/pairshot/core/model/LabelAnchor : java/lang/Enum {
+	public static final field BOTTOM_CENTER Lcom/pairshot/core/model/LabelAnchor;
+	public static final field BOTTOM_LEFT Lcom/pairshot/core/model/LabelAnchor;
+	public static final field BOTTOM_RIGHT Lcom/pairshot/core/model/LabelAnchor;
+	public static final field Companion Lcom/pairshot/core/model/LabelAnchor$Companion;
+	public static final field MIDDLE_CENTER Lcom/pairshot/core/model/LabelAnchor;
+	public static final field MIDDLE_LEFT Lcom/pairshot/core/model/LabelAnchor;
+	public static final field MIDDLE_RIGHT Lcom/pairshot/core/model/LabelAnchor;
+	public static final field TOP_CENTER Lcom/pairshot/core/model/LabelAnchor;
+	public static final field TOP_LEFT Lcom/pairshot/core/model/LabelAnchor;
+	public static final field TOP_RIGHT Lcom/pairshot/core/model/LabelAnchor;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LabelAnchor;
+	public static fun values ()[Lcom/pairshot/core/model/LabelAnchor;
+}
+
+public final class com/pairshot/core/model/LabelAnchor$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/LabelAnchor;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/LabelAnchor;
+}
+
+public final class com/pairshot/core/model/LabelPlacement : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/LabelPlacement$Companion;
+	public static final field INSIDE_BORDER Lcom/pairshot/core/model/LabelPlacement;
+	public static final field INSIDE_IMAGE Lcom/pairshot/core/model/LabelPlacement;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPlacement;
+	public static fun values ()[Lcom/pairshot/core/model/LabelPlacement;
+}
+
+public final class com/pairshot/core/model/LabelPlacement$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPlacement;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/LabelPlacement;
+}
+
+public final class com/pairshot/core/model/LabelPlacementKt {
+	public static final fun coercedForBorderPlacement (Lcom/pairshot/core/model/LabelAnchor;)Lcom/pairshot/core/model/LabelAnchor;
+	public static final fun withLabelPlacement (Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/LabelPlacement;)Lcom/pairshot/core/model/CombineConfig;
+}
+
+public final class com/pairshot/core/model/LabelPosition : java/lang/Enum {
+	public static final field BOTTOM Lcom/pairshot/core/model/LabelPosition;
+	public static final field Companion Lcom/pairshot/core/model/LabelPosition$Companion;
+	public static final field TOP Lcom/pairshot/core/model/LabelPosition;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPosition;
+	public static fun values ()[Lcom/pairshot/core/model/LabelPosition;
+}
+
+public final class com/pairshot/core/model/LabelPosition$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPosition;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/LabelPosition;
+}
+
+public final class com/pairshot/core/model/LabelPositionMode : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/LabelPositionMode$Companion;
+	public static final field FREE Lcom/pairshot/core/model/LabelPositionMode;
+	public static final field FULL_WIDTH Lcom/pairshot/core/model/LabelPositionMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPositionMode;
+	public static fun values ()[Lcom/pairshot/core/model/LabelPositionMode;
+}
+
+public final class com/pairshot/core/model/LabelPositionMode$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/LabelPositionMode;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/LabelPositionMode;
+}
+
+public final class com/pairshot/core/model/LensFacing : java/lang/Enum {
+	public static final field BACK Lcom/pairshot/core/model/LensFacing;
+	public static final field FRONT Lcom/pairshot/core/model/LensFacing;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LensFacing;
+	public static fun values ()[Lcom/pairshot/core/model/LensFacing;
+}
+
+public final class com/pairshot/core/model/LogoPosition : java/lang/Enum {
+	public static final field BOTTOM_CENTER Lcom/pairshot/core/model/LogoPosition;
+	public static final field BOTTOM_LEFT Lcom/pairshot/core/model/LogoPosition;
+	public static final field BOTTOM_RIGHT Lcom/pairshot/core/model/LogoPosition;
+	public static final field CENTER Lcom/pairshot/core/model/LogoPosition;
+	public static final field CENTER_LEFT Lcom/pairshot/core/model/LogoPosition;
+	public static final field CENTER_RIGHT Lcom/pairshot/core/model/LogoPosition;
+	public static final field Companion Lcom/pairshot/core/model/LogoPosition$Companion;
+	public static final field TOP_CENTER Lcom/pairshot/core/model/LogoPosition;
+	public static final field TOP_LEFT Lcom/pairshot/core/model/LogoPosition;
+	public static final field TOP_RIGHT Lcom/pairshot/core/model/LogoPosition;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/LogoPosition;
+	public static fun values ()[Lcom/pairshot/core/model/LogoPosition;
+}
+
+public final class com/pairshot/core/model/LogoPosition$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/LogoPosition;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/LogoPosition;
+}
+
+public final class com/pairshot/core/model/PairStatus : java/lang/Enum {
+	public static final field AFTER_ONLY Lcom/pairshot/core/model/PairStatus;
+	public static final field BEFORE_ONLY Lcom/pairshot/core/model/PairStatus;
+	public static final field PAIRED Lcom/pairshot/core/model/PairStatus;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/PairStatus;
+	public static fun values ()[Lcom/pairshot/core/model/PairStatus;
+}
+
+public final class com/pairshot/core/model/PhotoPair {
+	public fun <init> (JLjava/lang/String;Ljava/lang/String;JLjava/lang/Long;Lcom/pairshot/core/model/PairStatus;Ljava/lang/Float;ZLcom/pairshot/core/model/AspectRatio;)V
+	public synthetic fun <init> (JLjava/lang/String;Ljava/lang/String;JLjava/lang/Long;Lcom/pairshot/core/model/PairStatus;Ljava/lang/Float;ZLcom/pairshot/core/model/AspectRatio;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()J
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()J
+	public final fun component5 ()Ljava/lang/Long;
+	public final fun component6 ()Lcom/pairshot/core/model/PairStatus;
+	public final fun component7 ()Ljava/lang/Float;
+	public final fun component8 ()Z
+	public final fun component9 ()Lcom/pairshot/core/model/AspectRatio;
+	public final fun copy (JLjava/lang/String;Ljava/lang/String;JLjava/lang/Long;Lcom/pairshot/core/model/PairStatus;Ljava/lang/Float;ZLcom/pairshot/core/model/AspectRatio;)Lcom/pairshot/core/model/PhotoPair;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/PhotoPair;JLjava/lang/String;Ljava/lang/String;JLjava/lang/Long;Lcom/pairshot/core/model/PairStatus;Ljava/lang/Float;ZLcom/pairshot/core/model/AspectRatio;ILjava/lang/Object;)Lcom/pairshot/core/model/PhotoPair;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAfterPhotoUri ()Ljava/lang/String;
+	public final fun getAfterTimestamp ()Ljava/lang/Long;
+	public final fun getAspectRatio ()Lcom/pairshot/core/model/AspectRatio;
+	public final fun getBeforePhotoUri ()Ljava/lang/String;
+	public final fun getBeforeTimestamp ()J
+	public final fun getHasCombined ()Z
+	public final fun getId ()J
+	public final fun getStatus ()Lcom/pairshot/core/model/PairStatus;
+	public final fun getZoomLevel ()Ljava/lang/Float;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/RenderProfile {
+	public static final field Companion Lcom/pairshot/core/model/RenderProfile$Companion;
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lcom/pairshot/core/model/RenderProfile;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/RenderProfile;IILjava/lang/Object;)Lcom/pairshot/core/model/RenderProfile;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMaxOutputPx ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/RenderProfile$Companion {
+	public final fun export (I)Lcom/pairshot/core/model/RenderProfile;
+	public final fun forExport (Lcom/pairshot/core/model/ImageQualityPreset;)Lcom/pairshot/core/model/RenderProfile;
+	public final fun getFULL ()Lcom/pairshot/core/model/RenderProfile;
+	public final fun getPREVIEW ()Lcom/pairshot/core/model/RenderProfile;
+}
+
+public final class com/pairshot/core/model/SortOrder : java/lang/Enum {
+	public static final field ASC Lcom/pairshot/core/model/SortOrder;
+	public static final field Companion Lcom/pairshot/core/model/SortOrder$Companion;
+	public static final field DESC Lcom/pairshot/core/model/SortOrder;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/SortOrder;
+	public static fun values ()[Lcom/pairshot/core/model/SortOrder;
+}
+
+public final class com/pairshot/core/model/SortOrder$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/SortOrder;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/SortOrder;
+}
+
+public final class com/pairshot/core/model/StorageInfo {
+	public fun <init> (JJ)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun copy (JJ)Lcom/pairshot/core/model/StorageInfo;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/StorageInfo;JJILjava/lang/Object;)Lcom/pairshot/core/model/StorageInfo;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCacheBytes ()J
+	public final fun getUsedBytes ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/WatermarkConfig {
+	public fun <init> ()V
+	public fun <init> (ZLcom/pairshot/core/model/WatermarkType;Ljava/lang/String;FIFFLjava/lang/String;Lcom/pairshot/core/model/LogoPosition;FF)V
+	public synthetic fun <init> (ZLcom/pairshot/core/model/WatermarkType;Ljava/lang/String;FIFFLjava/lang/String;Lcom/pairshot/core/model/LogoPosition;FFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component10 ()F
+	public final fun component11 ()F
+	public final fun component2 ()Lcom/pairshot/core/model/WatermarkType;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()F
+	public final fun component5 ()I
+	public final fun component6 ()F
+	public final fun component7 ()F
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Lcom/pairshot/core/model/LogoPosition;
+	public final fun copy (ZLcom/pairshot/core/model/WatermarkType;Ljava/lang/String;FIFFLjava/lang/String;Lcom/pairshot/core/model/LogoPosition;FF)Lcom/pairshot/core/model/WatermarkConfig;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/WatermarkConfig;ZLcom/pairshot/core/model/WatermarkType;Ljava/lang/String;FIFFLjava/lang/String;Lcom/pairshot/core/model/LogoPosition;FFILjava/lang/Object;)Lcom/pairshot/core/model/WatermarkConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAlpha ()F
+	public final fun getDiagonalCount ()I
+	public final fun getEnabled ()Z
+	public final fun getLogoAlpha ()F
+	public final fun getLogoPath ()Ljava/lang/String;
+	public final fun getLogoPosition ()Lcom/pairshot/core/model/LogoPosition;
+	public final fun getLogoSizeRatio ()F
+	public final fun getRepeatDensity ()F
+	public final fun getText ()Ljava/lang/String;
+	public final fun getTextSizeRatio ()F
+	public final fun getType ()Lcom/pairshot/core/model/WatermarkType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/model/WatermarkConfigKt {
+	public static final fun isContentMissing (Lcom/pairshot/core/model/WatermarkConfig;)Z
+}
+
+public final class com/pairshot/core/model/WatermarkType : java/lang/Enum {
+	public static final field Companion Lcom/pairshot/core/model/WatermarkType$Companion;
+	public static final field LOGO Lcom/pairshot/core/model/WatermarkType;
+	public static final field TEXT Lcom/pairshot/core/model/WatermarkType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/pairshot/core/model/WatermarkType;
+	public static fun values ()[Lcom/pairshot/core/model/WatermarkType;
+}
+
+public final class com/pairshot/core/model/WatermarkType$Companion {
+	public final fun fromName (Ljava/lang/String;)Lcom/pairshot/core/model/WatermarkType;
+	public final fun getDEFAULT ()Lcom/pairshot/core/model/WatermarkType;
+}
+
+public final class com/pairshot/core/model/ZoomRange {
+	public fun <init> (FFF)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun copy (FFF)Lcom/pairshot/core/model/ZoomRange;
+	public static synthetic fun copy$default (Lcom/pairshot/core/model/ZoomRange;FFFILjava/lang/Object;)Lcom/pairshot/core/model/ZoomRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCurrent ()F
+	public final fun getMax ()F
+	public final fun getMin ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

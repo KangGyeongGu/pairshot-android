@@ -20,74 +20,74 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PromotionViewModel
-    @Inject
-    constructor(
-        observePromotionStateUseCase: ObservePromotionStateUseCase,
-        private val activatePromotionUseCase: ActivatePromotionUseCase,
-        private val repository: PromotionRepository,
-    ) : ViewModel() {
-        val state: StateFlow<PromotionState> =
-            observePromotionStateUseCase().stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                initialValue = PromotionState.Empty,
-            )
+@Inject
+constructor(
+    observePromotionStateUseCase: ObservePromotionStateUseCase,
+    private val activatePromotionUseCase: ActivatePromotionUseCase,
+    private val repository: PromotionRepository,
+) : ViewModel() {
+    val state: StateFlow<PromotionState> =
+        observePromotionStateUseCase().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            initialValue = PromotionState.Empty,
+        )
 
-        val myPromotions: StateFlow<List<Promotion>> =
-            kotlinx.coroutines.flow
-                .MutableStateFlow(emptyList<Promotion>())
-                .also { flow ->
-                    viewModelScope.launch {
-                        state.collect { snapshot -> flow.value = snapshot.promotions }
+    val myPromotions: StateFlow<List<Promotion>> =
+        kotlinx.coroutines.flow
+            .MutableStateFlow(emptyList<Promotion>())
+            .also { flow ->
+                viewModelScope.launch {
+                    state.collect { snapshot -> flow.value = snapshot.promotions }
+                }
+            }.asStateFlow()
+
+    private val _activationState =
+        MutableStateFlow<PromotionActivationUiState>(PromotionActivationUiState.Idle)
+    val activationState: StateFlow<PromotionActivationUiState> = _activationState.asStateFlow()
+
+    private val _myPromotionsLoading = MutableStateFlow(false)
+    val myPromotionsLoading: StateFlow<Boolean> = _myPromotionsLoading.asStateFlow()
+
+    fun activate(code: String) {
+        if (code.isBlank()) {
+            _activationState.value =
+                PromotionActivationUiState.Failure(ActivationResult.Failure.InvalidFormat)
+            return
+        }
+        viewModelScope.launch {
+            _activationState.value = PromotionActivationUiState.Loading
+            val result = activatePromotionUseCase(code.trim())
+            _activationState.value =
+                when (result) {
+                    is ActivationResult.Success -> {
+                        PromotionActivationUiState.Success(
+                            entitlement = result.promotion.entitlement,
+                            durationDays = result.promotion.durationDays,
+                        )
                     }
-                }.asStateFlow()
 
-        private val _activationState =
-            MutableStateFlow<PromotionActivationUiState>(PromotionActivationUiState.Idle)
-        val activationState: StateFlow<PromotionActivationUiState> = _activationState.asStateFlow()
-
-        private val _myPromotionsLoading = MutableStateFlow(false)
-        val myPromotionsLoading: StateFlow<Boolean> = _myPromotionsLoading.asStateFlow()
-
-        fun activate(code: String) {
-            if (code.isBlank()) {
-                _activationState.value =
-                    PromotionActivationUiState.Failure(ActivationResult.Failure.InvalidFormat)
-                return
-            }
-            viewModelScope.launch {
-                _activationState.value = PromotionActivationUiState.Loading
-                val result = activatePromotionUseCase(code.trim())
-                _activationState.value =
-                    when (result) {
-                        is ActivationResult.Success -> {
-                            PromotionActivationUiState.Success(
-                                entitlement = result.promotion.entitlement,
-                                durationDays = result.promotion.durationDays,
-                            )
-                        }
-
-                        is ActivationResult.Failure -> {
-                            PromotionActivationUiState.Failure(result)
-                        }
+                    is ActivationResult.Failure -> {
+                        PromotionActivationUiState.Failure(result)
                     }
-            }
-        }
-
-        fun resetActivationState() {
-            _activationState.value = PromotionActivationUiState.Idle
-        }
-
-        fun loadMyPromotions() {
-            viewModelScope.launch {
-                _myPromotionsLoading.value = true
-                runCatching { repository.refresh() }
-                    .onFailure { Timber.w(it, "fetch my promotions failed") }
-                _myPromotionsLoading.value = false
-            }
-        }
-
-        private companion object {
-            const val WHILE_SUBSCRIBED_TIMEOUT_MS = 5_000L
+                }
         }
     }
+
+    fun resetActivationState() {
+        _activationState.value = PromotionActivationUiState.Idle
+    }
+
+    fun loadMyPromotions() {
+        viewModelScope.launch {
+            _myPromotionsLoading.value = true
+            runCatching { repository.refresh() }
+                .onFailure { Timber.w(it, "fetch my promotions failed") }
+            _myPromotionsLoading.value = false
+        }
+    }
+
+    private companion object {
+        const val WHILE_SUBSCRIBED_TIMEOUT_MS = 5_000L
+    }
+}

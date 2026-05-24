@@ -1,50 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- TopBar -->
     <string name="home_topbar_title">PairShot</string>
     <plurals name="home_topbar_selection_count">
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
     </plurals>
 
-    <!-- Filter -->
     <string name="home_filter_all">All</string>
     <string name="home_filter_album">Albums</string>
 
-    <!-- Buttons -->
     <string name="home_button_create_album">Create album</string>
     <string name="home_button_select_all">Select all</string>
     <string name="home_button_deselect_all">Deselect all</string>
     <string name="home_button_album_rename">Rename</string>
 
-    <!-- Accessibility -->
     <string name="home_desc_deselect">Deselect</string>
     <string name="home_desc_selection_mode">Selection mode</string>
     <string name="home_desc_location">Location</string>
     <string name="home_desc_pair_count">Pair count</string>
 
-    <!-- Date suffix (grid section header) -->
     <string name="home_date_suffix_today">%1$s · Today</string>
     <string name="home_date_suffix_yesterday">%1$s · Yesterday</string>
 
-    <!-- Dialog: Album Create -->
     <string name="home_dialog_album_create_title">Create album</string>
     <string name="home_dialog_album_create_hint">Enter an album name.</string>
     <string name="home_dialog_album_create_placeholder">Album name</string>
 
-    <!-- Dialog: Album Rename -->
     <string name="home_dialog_album_rename_title">Rename album</string>
     <string name="home_dialog_album_rename_placeholder">Album name</string>
 
-    <!-- Dialog: Album Delete -->
     <string name="home_dialog_album_delete_title">Delete album</string>
     <plurals name="home_dialog_album_delete_confirm">
         <item quantity="one">Delete %1$d album?\nAll pairs and combined images within will also be deleted.</item>
         <item quantity="other">Delete %1$d albums?\nAll pairs and combined images within will also be deleted.</item>
     </plurals>
 
-    <!-- ViewModel events -->
     <plurals name="home_event_delete_result">
         <item quantity="one">%1$d deleted · %2$d failed</item>
         <item quantity="other">%1$d deleted · %2$d failed</item>

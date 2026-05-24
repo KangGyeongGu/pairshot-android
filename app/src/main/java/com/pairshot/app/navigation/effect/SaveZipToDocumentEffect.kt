@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.pairshot.app.navigation.SaveDocumentRequest
@@ -34,6 +35,7 @@ fun SaveZipToDocumentEffect(
     val context = LocalContext.current
     var pending by remember { mutableStateOf<SaveDocumentRequest?>(null) }
     var launcherResult by remember { mutableStateOf<Pair<SaveDocumentRequest, Uri?>?>(null) }
+    val currentOnResult by rememberUpdatedState(onResult)
 
     val interstitialAdController =
         remember(context) {
@@ -71,7 +73,7 @@ fun SaveZipToDocumentEffect(
         launcherResult = null
         val (request, destUri) = snapshot
         if (destUri == null) {
-            onResult(SaveDocumentResult.Cancelled(request.sourceFilePath))
+            currentOnResult(SaveDocumentResult.Cancelled(request.sourceFilePath))
             return@LaunchedEffect
         }
         val copyResult =
@@ -86,7 +88,7 @@ fun SaveZipToDocumentEffect(
             }
         copyResult
             .onSuccess {
-                onResult(
+                currentOnResult(
                     SaveDocumentResult.Saved(
                         sourceFilePath = request.sourceFilePath,
                         displayName = request.suggestedName,
@@ -94,8 +96,15 @@ fun SaveZipToDocumentEffect(
                 )
             }.onFailure { error ->
                 Timber.e(error, "zip save to SAF uri failed")
-                val wrapped = if (error is IOException || error is SecurityException) error else IOException("save failed", error)
-                onResult(
+                val wrapped = if (error is IOException || error is SecurityException) {
+                    error
+                } else {
+                    IOException(
+                        "save failed",
+                        error
+                    )
+                }
+                currentOnResult(
                     SaveDocumentResult.Failed(
                         sourceFilePath = request.sourceFilePath,
                         error = wrapped,

@@ -43,25 +43,29 @@ fun PairShotBannerAd(
     modifier: Modifier = Modifier,
     height: Dp? = null,
 ) {
-    if (LocalInspectionMode.current) {
-        Box(modifier = modifier.fillMaxWidth().height(height ?: DefaultAdaptiveBannerFallbackHeight))
-        return
-    }
+    val inspection = LocalInspectionMode.current
     val context = LocalContext.current
-    val entryPoint =
-        remember(context) {
-            EntryPointAccessors.fromApplication(
-                context.applicationContext,
-                AdsEntryPoint::class.java,
-            )
-        }
-    val adsConfig = remember(entryPoint) { entryPoint.adsConfig() }
-    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
-    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
-    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
 
-    val tutorialMode = remember(entryPoint) { entryPoint.tutorialModeProvider() }
-    val isTutorial by tutorialMode.isActive.collectAsStateWithLifecycle()
+    val entryPoint =
+        if (inspection) {
+            null
+        } else {
+            remember(context) {
+                EntryPointAccessors.fromApplication(
+                    context.applicationContext,
+                    AdsEntryPoint::class.java,
+                )
+            }
+        }
+    val adsConfig = entryPoint?.let { remember(it) { it.adsConfig() } }
+    val membershipProvider = entryPoint?.let { remember(it) { it.membershipProvider() } }
+    val adFreeFlow =
+        membershipProvider?.let {
+            remember(it) { it.observe().map { membership -> membership.isAdFree } }
+        }
+    val isAdFree: Boolean? = adFreeFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
+    val tutorialMode = entryPoint?.let { remember(it) { it.tutorialModeProvider() } }
+    val isTutorial: Boolean = tutorialMode?.isActive?.collectAsStateWithLifecycle()?.value == true
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -79,13 +83,32 @@ fun PairShotBannerAd(
             height ?: resolveAdaptiveBannerHeight(activity, adWidth, density)
         }
 
-    if (isAdFree == null) {
-        Box(modifier = modifier.fillMaxWidth().height(slotHeight))
-        return
+    val showAd = !inspection && isAdFree == false && !isTutorial
+    val occupiesSlot = inspection || isAdFree == null || showAd
+
+    val resolvedHeight =
+        when {
+            inspection -> height ?: DefaultAdaptiveBannerFallbackHeight
+            occupiesSlot -> slotHeight
+            else -> 0.dp
+        }
+
+    Box(
+        modifier = modifier.fillMaxWidth().height(resolvedHeight),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (showAd && adsConfig != null) {
+            BannerAdView(adsConfig = adsConfig, context = context, adWidth = adWidth)
+        }
     }
+}
 
-    if (isAdFree == true || isTutorial) return
-
+@Composable
+private fun BannerAdView(
+    adsConfig: AdsConfig,
+    context: Context,
+    adWidth: Int,
+) {
     val adView =
         remember(context, adsConfig, adWidth) {
             buildAdView(context = context, adsConfig = adsConfig, widthDp = adWidth)
@@ -123,18 +146,10 @@ fun PairShotBannerAd(
         }
     }
 
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(slotHeight),
-        contentAlignment = Alignment.Center,
-    ) {
-        AndroidView(
-            factory = { adView },
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    AndroidView(
+        factory = { adView },
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 private fun resolveAdaptiveBannerHeight(

@@ -15,33 +15,33 @@ import javax.inject.Singleton
 
 @Singleton
 class MembershipResolver
-    @Inject
-    constructor(
-        private val billingRepository: BillingRepository,
-        private val promotionRepository: PromotionRepository,
-    ) : MembershipProvider {
-        override fun observe(): Flow<Membership> =
-            combine(
-                billingRepository.subscriptionStatus,
-                promotionRepository.observe(),
-            ) { sub, promo -> resolve(sub, promo) }.distinctUntilChanged()
+@Inject
+constructor(
+    private val billingRepository: BillingRepository,
+    private val promotionRepository: PromotionRepository,
+) : MembershipProvider {
+    override fun observe(): Flow<Membership> =
+        combine(
+            billingRepository.subscriptionStatus,
+            promotionRepository.observe(),
+        ) { sub, promo -> resolve(sub, promo) }.distinctUntilChanged()
 
-        override suspend fun current(): Membership = observe().first()
+    override suspend fun current(): Membership = observe().first()
 
-        private fun resolve(
-            sub: SubscriptionStatus,
-            promo: PromotionState,
-        ): Membership {
-            val subActive = sub is SubscriptionStatus.Active
-            val isPro = subActive || promo.proActive
-            val proExpiry = if (subActive) null else promo.proExpiresAtEpochMillis
-            val isAdFree = isPro || promo.adFreeActive
-            val adFreeExpiry = if (subActive) null else promo.adFreeExpiresAtEpochMillis
-            return Membership(
-                isPro = isPro,
-                isAdFree = isAdFree,
-                proExpiresAtEpochMillis = proExpiry,
-                adFreeExpiresAtEpochMillis = adFreeExpiry,
-            )
-        }
+    private fun resolve(
+        sub: SubscriptionStatus,
+        promo: PromotionState,
+    ): Membership {
+        val subActive = sub is SubscriptionStatus.Active
+        val isPro = subActive || promo.proActive
+        val proExpiry = if (subActive) null else promo.proExpiresAtEpochMillis
+        val isAdFree = isPro || promo.adFreeActive
+        val adFreeExpiry = if (subActive) null else promo.adFreeExpiresAtEpochMillis
+        return Membership(
+            isPro = isPro,
+            isAdFree = isAdFree,
+            proExpiresAtEpochMillis = proExpiry,
+            adFreeExpiresAtEpochMillis = adFreeExpiry,
+        )
     }
+}

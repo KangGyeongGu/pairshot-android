@@ -17,11 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun <T> SegmentedToggleRow(
     label: String,
-    entries: List<T>,
+    entries: ImmutableList<T>,
     selected: T,
     onSelect: (T) -> Unit,
     labelOf: @Composable (T) -> String,
@@ -29,12 +30,12 @@ internal fun <T> SegmentedToggleRow(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -48,33 +49,33 @@ internal fun <T> SegmentedToggleRow(
                 val isSelected = entry == selected
                 Box(
                     modifier =
-                        Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            ).clickable { onSelect(entry) }
-                            .padding(
-                                horizontal = PairShotSpacing.md,
-                                vertical = PairShotSpacing.sm,
-                            ),
+                    Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            } else {
+                                Color.Transparent
+                            },
+                        ).clickable { onSelect(entry) }
+                        .padding(
+                            horizontal = PairShotSpacing.md,
+                            vertical = PairShotSpacing.sm,
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = labelOf(entry),
                         style =
-                            MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        ),
                         color =
-                            if (isSelected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                     )
                 }
             }

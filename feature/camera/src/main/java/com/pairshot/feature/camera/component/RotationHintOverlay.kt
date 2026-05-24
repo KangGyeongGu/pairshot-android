@@ -29,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotTouchTarget
@@ -54,10 +53,10 @@ internal fun RotationHintOverlay(
                 initialValue = 0f,
                 targetValue = 1f,
                 animationSpec =
-                    infiniteRepeatable(
-                        animation = tween(durationMillis = HINT_CYCLE_DURATION_MS, easing = LinearEasing),
-                        repeatMode = RepeatMode.Restart,
-                    ),
+                infiniteRepeatable(
+                    animation = tween(durationMillis = HINT_CYCLE_DURATION_MS, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
                 label = "rotation_hint_phase",
             )
             val hintAlpha =
@@ -70,13 +69,13 @@ internal fun RotationHintOverlay(
 
             Column(
                 modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(HintCornerRadius))
-                        .background(Color.Black.copy(alpha = HINT_BACKGROUND_ALPHA))
-                        .padding(
-                            horizontal = PairShotCard.innerPadding,
-                            vertical = PairShotCard.innerPadding,
-                        ),
+                Modifier
+                    .clip(RoundedCornerShape(HintCornerRadius))
+                    .background(Color.Black.copy(alpha = HINT_BACKGROUND_ALPHA))
+                    .padding(
+                        horizontal = PairShotCard.innerPadding,
+                        vertical = PairShotCard.innerPadding,
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(PairShotSpacing.sm),
             ) {
@@ -85,10 +84,10 @@ internal fun RotationHintOverlay(
                     contentDescription = stringResource(shown.descRes),
                     tint = Color.White,
                     modifier =
-                        Modifier
-                            .size(PairShotTouchTarget.standard)
-                            .rotate(signedAngle)
-                            .alpha(hintAlpha),
+                    Modifier
+                        .size(PairShotTouchTarget.standard)
+                        .rotate(signedAngle)
+                        .alpha(hintAlpha),
                 )
                 Text(
                     text = stringResource(shown.messageRes),

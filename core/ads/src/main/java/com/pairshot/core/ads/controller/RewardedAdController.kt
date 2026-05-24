@@ -24,134 +24,134 @@ import javax.inject.Singleton
 
 @Singleton
 class RewardedAdController
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-        private val adsConfig: AdsConfig,
-        private val adsInitializer: AdsInitializer,
-        private val membershipProvider: MembershipProvider,
-        private val gate: SettingsPremiumGate,
-        private val tutorialMode: TutorialModeProvider,
-        private val fullscreenAdState: FullscreenAdState,
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
+    private val adsConfig: AdsConfig,
+    private val adsInitializer: AdsInitializer,
+    private val membershipProvider: MembershipProvider,
+    private val gate: SettingsPremiumGate,
+    private val tutorialMode: TutorialModeProvider,
+    private val fullscreenAdState: FullscreenAdState,
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val loading = AtomicBoolean(false)
+    private val showing = AtomicBoolean(false)
+
+    @Volatile
+    private var currentAd: RewardedAd? = null
+
+    fun preload() {
+        scope.launch { loadInternal() }
+    }
+
+    fun showIfAvailable(
+        activity: Activity,
+        feature: PremiumFeature,
+        onReward: () -> Unit,
+        onSkip: () -> Unit,
     ) {
-        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-        private val loading = AtomicBoolean(false)
-        private val showing = AtomicBoolean(false)
+        scope.launch {
+            if (tutorialMode.isActive.value) {
+                onReward()
+                return@launch
+            }
+            if (gate.isUnlocked(feature)) {
+                onReward()
+                return@launch
+            }
 
-        @Volatile
-        private var currentAd: RewardedAd? = null
+            if (membershipProvider.current().isAdFree) {
+                gate.unlock(feature)
+                onReward()
+                return@launch
+            }
 
-        fun preload() {
-            scope.launch { loadInternal() }
-        }
+            if (!showing.compareAndSet(false, true)) {
+                onSkip()
+                return@launch
+            }
 
-        fun showIfAvailable(
-            activity: Activity,
-            feature: PremiumFeature,
-            onReward: () -> Unit,
-            onSkip: () -> Unit,
-        ) {
-            scope.launch {
-                if (tutorialMode.isActive.value) {
-                    onReward()
-                    return@launch
-                }
-                if (gate.isUnlocked(feature)) {
-                    onReward()
-                    return@launch
-                }
+            val ad = currentAd
+            if (ad == null) {
+                showing.set(false)
+                onSkip()
+                loadInternal()
+                return@launch
+            }
 
-                if (membershipProvider.current().isAdFree) {
+            if (activity.isFinishing || activity.isDestroyed) {
+                showing.set(false)
+                onSkip()
+                return@launch
+            }
+
+            if (!fullscreenAdState.markShown()) {
+                showing.set(false)
+                onSkip()
+                return@launch
+            }
+
+            var rewarded = false
+            ad.fullScreenContentCallback =
+                fullscreenCallback(
+                    tag = TAG,
+                    fullscreenAdState = fullscreenAdState,
+                    onDismissed = {
+                        currentAd = null
+                        showing.set(false)
+                        if (rewarded) onReward() else onSkip()
+                        scope.launch { loadInternal() }
+                    },
+                    onShowFailed = {
+                        currentAd = null
+                        showing.set(false)
+                        onSkip()
+                        scope.launch { loadInternal() }
+                    },
+                    onShown = { currentAd = null },
+                )
+            runCatching {
+                ad.show(activity) {
+                    rewarded = true
                     gate.unlock(feature)
-                    onReward()
-                    return@launch
                 }
-
-                if (!showing.compareAndSet(false, true)) {
-                    onSkip()
-                    return@launch
-                }
-
-                val ad = currentAd
-                if (ad == null) {
-                    showing.set(false)
-                    onSkip()
-                    loadInternal()
-                    return@launch
-                }
-
-                if (activity.isFinishing || activity.isDestroyed) {
-                    showing.set(false)
-                    onSkip()
-                    return@launch
-                }
-
-                if (!fullscreenAdState.markShown()) {
-                    showing.set(false)
-                    onSkip()
-                    return@launch
-                }
-
-                var rewarded = false
-                ad.fullScreenContentCallback =
-                    fullscreenCallback(
-                        tag = TAG,
-                        fullscreenAdState = fullscreenAdState,
-                        onDismissed = {
-                            currentAd = null
-                            showing.set(false)
-                            if (rewarded) onReward() else onSkip()
-                            scope.launch { loadInternal() }
-                        },
-                        onShowFailed = {
-                            currentAd = null
-                            showing.set(false)
-                            onSkip()
-                            scope.launch { loadInternal() }
-                        },
-                        onShown = { currentAd = null },
-                    )
-                runCatching {
-                    ad.show(activity) {
-                        rewarded = true
-                        gate.unlock(feature)
-                    }
-                }.onFailure { error ->
-                    Timber.tag(TAG).e(error, "show threw")
-                    fullscreenAdState.markDismissed()
-                    currentAd = null
-                    showing.set(false)
-                    onSkip()
-                    scope.launch { loadInternal() }
-                }
+            }.onFailure { error ->
+                Timber.tag(TAG).e(error, "show threw")
+                fullscreenAdState.markDismissed()
+                currentAd = null
+                showing.set(false)
+                onSkip()
+                scope.launch { loadInternal() }
             }
         }
-
-        private suspend fun loadInternal() {
-            if (currentAd != null) return
-            if (!loading.compareAndSet(false, true)) return
-            adsInitializer.awaitReady()
-            val request = AdRequest.Builder().build()
-            RewardedAd.load(
-                context,
-                adsConfig.rewardedAdUnitId,
-                request,
-                object : RewardedAdLoadCallback() {
-                    override fun onAdLoaded(ad: RewardedAd) {
-                        currentAd = ad
-                        loading.set(false)
-                    }
-
-                    override fun onAdFailedToLoad(error: LoadAdError) {
-                        Timber.tag(TAG).w("load failed: %s", error.message)
-                        currentAd = null
-                        loading.set(false)
-                    }
-                },
-            )
-        }
-
-        private companion object {
-            const val TAG = "RewardedAdCtrl"
-        }
     }
+
+    private suspend fun loadInternal() {
+        if (currentAd != null) return
+        if (!loading.compareAndSet(false, true)) return
+        adsInitializer.awaitReady()
+        val request = AdRequest.Builder().build()
+        RewardedAd.load(
+            context,
+            adsConfig.rewardedAdUnitId,
+            request,
+            object : RewardedAdLoadCallback() {
+                override fun onAdLoaded(ad: RewardedAd) {
+                    currentAd = ad
+                    loading.set(false)
+                }
+
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Timber.tag(TAG).w("load failed: %s", error.message)
+                    currentAd = null
+                    loading.set(false)
+                }
+            },
+        )
+    }
+
+    private companion object {
+        const val TAG = "RewardedAdCtrl"
+    }
+}

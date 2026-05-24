@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Album Detail -->
     <plurals name="album_topbar_selection_count">
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
@@ -10,21 +9,16 @@
     <string name="album_menu_rename">Rename album</string>
     <string name="album_menu_delete">Delete album</string>
 
-    <!-- Album Empty -->
     <string name="album_button_add_pair">Add pair</string>
 
-    <!-- Album Selection Bottom Bar -->
     <string name="album_button_remove_from_album">Remove from album</string>
 
-    <!-- Dialog: Delete Album -->
     <string name="album_dialog_delete_title">Delete album</string>
     <string name="album_dialog_delete_message">Delete this album? Pairs will be kept.</string>
 
-    <!-- Dialog: Rename Album -->
     <string name="album_dialog_rename_title">Rename album</string>
     <string name="album_dialog_rename_placeholder">Enter album name</string>
 
-    <!-- Pair Picker -->
     <plurals name="pair_picker_title_selected">
         <item quantity="one">Select pair (%1$d)</item>
         <item quantity="other">Select pairs (%1$d)</item>
@@ -36,7 +30,6 @@
     <string name="pair_picker_empty">No pairs</string>
     <string name="pair_picker_already_added">Already added</string>
 
-    <!-- Route -->
     <string name="album_route_load_failed">Couldn\'t load the album.</string>
 
 </resources>

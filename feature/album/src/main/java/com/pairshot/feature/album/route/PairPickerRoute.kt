@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,11 +24,12 @@ fun PairPickerRoute(
     viewModel: PairPickerViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
 
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
             when (event) {
-                is PairPickerEvent.NavigateBack -> onNavigateBack()
+                is PairPickerEvent.NavigateBack -> currentOnNavigateBack()
             }
         }
     }

@@ -1,0 +1,107 @@
+package com.pairshot.feature.settings.dialog
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.model.AppTextScale
+import com.pairshot.core.ui.component.PairShotBottomSheet
+import com.pairshot.feature.settings.R
+import com.pairshot.core.ui.R as CoreR
+
+@Composable
+internal fun TextScaleDialog(
+    current: AppTextScale,
+    onSelect: (AppTextScale) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var selected by remember { mutableStateOf(current) }
+
+    PairShotBottomSheet(onDismissRequest = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_dialog_text_scale_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(PairShotSpacing.xs))
+        Text(
+            text = stringResource(R.string.settings_dialog_text_scale_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(PairShotSpacing.md))
+
+        AppTextScale.entries.forEach { option ->
+            val labelRes = option.labelResId()
+            Row(
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { selected = option }
+                    .padding(vertical = PairShotSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(
+                    selected = selected == option,
+                    onClick = { selected = option },
+                    colors =
+                    RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.primary,
+                    ),
+                )
+                Text(
+                    text = stringResource(labelRes),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = PairShotSpacing.sm),
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(CoreR.string.common_button_cancel))
+            }
+            TextButton(
+                onClick = {
+                    onSelect(selected)
+                    onDismiss()
+                },
+            ) {
+                Text(
+                    stringResource(R.string.settings_dialog_apply),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+    }
+}
+
+private fun AppTextScale.labelResId(): Int =
+    when (this) {
+        AppTextScale.SMALL -> R.string.settings_text_scale_small
+        AppTextScale.NORMAL -> R.string.settings_text_scale_normal
+        AppTextScale.LARGE -> R.string.settings_text_scale_large
+        AppTextScale.EXTRA_LARGE -> R.string.settings_text_scale_extra_large
+    }
