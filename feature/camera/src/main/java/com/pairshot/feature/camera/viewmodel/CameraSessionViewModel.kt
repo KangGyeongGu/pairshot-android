@@ -8,13 +8,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CameraSessionViewModel
-    @Inject
-    constructor(
-        val cameraSession: CameraSession,
-        val sensorSession: SensorSession,
-    ) : ViewModel() {
-        override fun onCleared() {
-            cameraSession.release()
-            sensorSession.release()
-        }
+@Inject
+constructor(
+    val cameraSession: CameraSession,
+    val sensorSession: SensorSession,
+) : ViewModel() {
+    override fun onCleared() {
+        cameraSession.release()
+        sensorSession.release()
     }
+}

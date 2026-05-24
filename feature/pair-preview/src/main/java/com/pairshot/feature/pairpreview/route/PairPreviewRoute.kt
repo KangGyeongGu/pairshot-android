@@ -140,10 +140,10 @@ fun PairPreviewRoute(
         AnimatedVisibility(
             visible = visible,
             enter =
-                scaleIn(
-                    initialScale = 0.94f,
-                    animationSpec = tween(durationMillis = MODAL_ENTER_DURATION_MS),
-                ) + fadeIn(animationSpec = tween(durationMillis = MODAL_ENTER_DURATION_MS)),
+            scaleIn(
+                initialScale = 0.94f,
+                animationSpec = tween(durationMillis = MODAL_ENTER_DURATION_MS),
+            ) + fadeIn(animationSpec = tween(durationMillis = MODAL_ENTER_DURATION_MS)),
         ) {
             when (val state = uiState) {
                 PairPreviewUiState.Loading -> {

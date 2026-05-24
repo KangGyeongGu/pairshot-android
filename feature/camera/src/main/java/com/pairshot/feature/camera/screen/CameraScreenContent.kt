@@ -20,11 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotSnackbarTokens
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.ui.component.PairShotSnackbarController
@@ -79,9 +77,9 @@ fun CameraScreenContent(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
             ) {
                 com.pairshot.feature.camera.preview.CameraPreviewPane(
                     surfaceRequest = surfaceRequest,
@@ -97,10 +95,10 @@ fun CameraScreenContent(
                     exposureStepDenominator = capabilities.exposureStepDenominator,
                     selectedAspectRatio = settingsState.aspectRatio,
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_PREVIEW),
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_PREVIEW),
                     onZoomRatioChanged = callbacks.onZoomRatioChanged,
                     onPresetTapped = callbacks.onPresetTapped,
                     onDragEnd = callbacks.onDragEnd,
@@ -132,10 +130,10 @@ fun CameraScreenContent(
 
             PairShotBannerAd(
                 modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
             )
 
             CameraSettingsSheet(
@@ -154,10 +152,10 @@ fun CameraScreenContent(
             PairShotSnackbarHost(
                 controller = snackbarController,
                 modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
-                        .padding(top = PairShotSnackbarTokens.topOffset),
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .windowInsetsPadding(WindowInsets.statusBarsIgnoringVisibility)
+                    .padding(top = PairShotSnackbarTokens.topOffset),
             )
         }
     }

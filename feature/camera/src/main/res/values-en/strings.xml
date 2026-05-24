@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- BottomBar Accessibility -->
     <string name="camera_desc_last_thumbnail">Last capture thumbnail</string>
     <string name="camera_desc_home">Go to home</string>
     <string name="camera_desc_switch">Switch camera</string>
     <string name="camera_desc_shutter">Shutter</string>
 
-    <!-- Strip -->
     <string name="camera_strip_empty">No Before photos yet</string>
     <string name="camera_strip_empty_after">No Before photos to shoot</string>
     <string name="camera_strip_thumbnail_desc">Before thumbnail %1$d</string>
@@ -16,11 +14,9 @@
         <item quantity="other">%1$d / %2$d complete</item>
     </plurals>
 
-    <!-- Before Full Preview -->
     <string name="camera_before_full_preview_desc">View Before photo in full screen</string>
     <string name="camera_before_full_preview_close">Close</string>
 
-    <!-- Permission -->
     <string name="camera_permission_title">Camera permission required</string>
     <string name="camera_permission_message">PairShot needs camera access to take photos.</string>
     <string name="camera_permission_allow">Allow permission</string>
@@ -28,7 +24,6 @@
     <string name="camera_permission_denied_message">Please allow PairShot\'s camera permission in the Settings app.</string>
     <string name="camera_permission_go_settings">Open settings</string>
 
-    <!-- Settings Sheet -->
     <string name="camera_settings_grid">Grid</string>
     <string name="camera_settings_flash">Flash</string>
     <string name="camera_settings_night_mode">Night mode</string>

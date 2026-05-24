@@ -157,12 +157,12 @@ fun HomePairGridSection(
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            top = PairShotSpacing.sm,
-                                            bottom = PairShotSpacing.xs,
-                                        ),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        top = PairShotSpacing.sm,
+                                        bottom = PairShotSpacing.xs,
+                                    ),
                             )
                         }
                     }

@@ -44,21 +44,21 @@ fun PairPreviewCenter(
 
     Box(
         modifier =
-            modifier
-                .fillMaxSize()
-                .clipToBounds()
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        val newScale = (scale * zoom).coerceIn(MIN_ZOOM_SCALE, MAX_ZOOM_SCALE)
-                        scale = newScale
-                        offset =
-                            if (newScale > MIN_ZOOM_SCALE) {
-                                offset + pan
-                            } else {
-                                Offset.Zero
-                            }
-                    }
-                },
+        modifier
+            .fillMaxSize()
+            .clipToBounds()
+            .pointerInput(Unit) {
+                detectTransformGestures { _, pan, zoom, _ ->
+                    val newScale = (scale * zoom).coerceIn(MIN_ZOOM_SCALE, MAX_ZOOM_SCALE)
+                    scale = newScale
+                    offset =
+                        if (newScale > MIN_ZOOM_SCALE) {
+                            offset + pan
+                        } else {
+                            Offset.Zero
+                        }
+                }
+            },
         contentAlignment = Alignment.Center,
     ) {
         LivePreviewContent(
@@ -66,14 +66,14 @@ fun PairPreviewCenter(
             failed = livePreviewFailed,
             onRetry = onRetry,
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        translationX = offset.x,
-                        translationY = offset.y,
-                    ),
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    translationX = offset.x,
+                    translationY = offset.y,
+                ),
         )
     }
 }

@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCard
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.Album
 
 @Composable

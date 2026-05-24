@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
@@ -33,9 +32,9 @@ fun HomeFilterRow(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = PairShotScreen.horizontalPadding),
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = PairShotScreen.horizontalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -59,19 +58,19 @@ fun HomeFilterRow(
                         )
                     },
                     colors =
-                        FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
+                    FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
                     border =
-                        FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = selectedMode == mode,
-                            borderColor = MaterialTheme.colorScheme.outlineVariant,
-                            selectedBorderColor = MaterialTheme.colorScheme.primaryContainer,
-                        ),
+                    FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedMode == mode,
+                        borderColor = MaterialTheme.colorScheme.outlineVariant,
+                        selectedBorderColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
                 )
             }
         }
@@ -125,14 +124,14 @@ private fun SortOrderLabel(
         style = MaterialTheme.typography.labelLarge,
         fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
         color =
-            if (selected) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
+        if (selected) {
+            MaterialTheme.colorScheme.onSurface
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
         modifier =
-            Modifier
-                .clickable(onClick = onClick)
-                .padding(horizontal = PairShotSpacing.xs, vertical = PairShotRadius.sm),
+        Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = PairShotSpacing.xs, vertical = PairShotRadius.sm),
     )
 }

@@ -11,27 +11,27 @@ import javax.inject.Singleton
 
 @Singleton
 class WatermarkedBitmapWriter
-    @Inject
-    constructor(
-        private val pairImageComposer: PairImageComposer,
+@Inject
+constructor(
+    private val pairImageComposer: PairImageComposer,
+) {
+    suspend fun combineWithWatermark(
+        beforeUri: String,
+        afterUri: String,
+        destFile: File,
+        config: WatermarkConfig,
+        jpegQuality: Int,
+        combineConfig: CombineConfig = CombineConfig(),
+        profile: RenderProfile = RenderProfile.FULL,
     ) {
-        suspend fun combineWithWatermark(
-            beforeUri: String,
-            afterUri: String,
-            destFile: File,
-            config: WatermarkConfig,
-            jpegQuality: Int,
-            combineConfig: CombineConfig = CombineConfig(),
-            profile: RenderProfile = RenderProfile.FULL,
-        ) {
-            pairImageComposer.composeToFile(
-                beforeUri = Uri.parse(beforeUri),
-                afterUri = Uri.parse(afterUri),
-                destFile = destFile,
-                combineConfig = combineConfig,
-                watermarkConfig = config.copy(enabled = true),
-                jpegQuality = jpegQuality,
-                profile = profile,
-            )
-        }
+        pairImageComposer.composeToFile(
+            beforeUri = Uri.parse(beforeUri),
+            afterUri = Uri.parse(afterUri),
+            destFile = destFile,
+            combineConfig = combineConfig,
+            watermarkConfig = config.copy(enabled = true),
+            jpegQuality = jpegQuality,
+            profile = profile,
+        )
     }
+}

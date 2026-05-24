@@ -10,8 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.navigation.PaywallTrigger
-import com.pairshot.core.rendering.PreviewSampleProvider
-import com.pairshot.core.rendering.WatermarkRenderer
 import com.pairshot.feature.settings.screen.WatermarkSettingsScreen
 import com.pairshot.feature.settings.viewmodel.SettingsViewModel
 import dagger.hilt.android.EntryPointAccessors

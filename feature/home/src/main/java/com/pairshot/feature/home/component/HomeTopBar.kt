@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.domain.tutorial.AnchorKey
@@ -46,11 +45,11 @@ fun HomeTopBar(
             if (selectionMode) {
                 Text(
                     text =
-                        pluralStringResource(
-                            R.plurals.home_topbar_selection_count,
-                            selectedCount,
-                            selectedCount,
-                        ),
+                    pluralStringResource(
+                        R.plurals.home_topbar_selection_count,
+                        selectedCount,
+                        selectedCount,
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -77,9 +76,9 @@ fun HomeTopBar(
                 TextButton(onClick = onToggleSelectAll) {
                     Text(
                         text =
-                            stringResource(
-                                if (allSelected) R.string.home_button_deselect_all else R.string.home_button_select_all,
-                            ),
+                        stringResource(
+                            if (allSelected) R.string.home_button_deselect_all else R.string.home_button_select_all,
+                        ),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -108,10 +107,10 @@ fun HomeTopBar(
             }
         },
         colors =
-            TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-            ),
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+        ),
         modifier = modifier,
     )
 }

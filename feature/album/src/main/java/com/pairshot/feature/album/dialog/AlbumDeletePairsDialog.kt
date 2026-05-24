@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.ui.component.PairShotBottomSheet
 import com.pairshot.feature.album.R
@@ -42,20 +41,20 @@ fun AlbumDeletePairsDialog(
         )
         Text(
             text =
-                if (combinedCount > 0) {
-                    pluralStringResource(
-                        CoreR.plurals.dialog_delete_pair_summary,
-                        pairCount,
-                        pairCount,
-                        combinedCount,
-                    )
-                } else {
-                    pluralStringResource(
-                        CoreR.plurals.dialog_delete_pair_confirm,
-                        pairCount,
-                        pairCount,
-                    )
-                },
+            if (combinedCount > 0) {
+                pluralStringResource(
+                    CoreR.plurals.dialog_delete_pair_summary,
+                    pairCount,
+                    pairCount,
+                    combinedCount,
+                )
+            } else {
+                pluralStringResource(
+                    CoreR.plurals.dialog_delete_pair_confirm,
+                    pairCount,
+                    pairCount,
+                )
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = PairShotSpacing.lg),
@@ -100,9 +99,9 @@ private fun ActionRow(
         color = if (color == Color.Unspecified) MaterialTheme.colorScheme.onSurface else color,
         textAlign = TextAlign.Center,
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = PairShotSpacing.lg),
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = PairShotSpacing.lg),
     )
 }

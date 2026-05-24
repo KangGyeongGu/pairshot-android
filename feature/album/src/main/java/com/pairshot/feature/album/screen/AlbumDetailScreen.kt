@@ -1,6 +1,5 @@
 package com.pairshot.feature.album.screen
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
@@ -94,9 +92,9 @@ fun AlbumDetailScreen(
                 onAddPairsClick = onAddPairsClick,
                 onCaptureBeforeClick = onCaptureBeforeClick,
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             )
         } else {
             Column(modifier = Modifier.padding(innerPadding)) {
@@ -117,11 +115,11 @@ fun AlbumDetailScreen(
                         onPairClick = onPairClick,
                         onPairLongPress = onPairLongPress,
                         contentPadding =
-                            PaddingValues(
-                                bottom = PairShotSpacing.md,
-                                start = PairShotSpacing.md,
-                                end = PairShotSpacing.md,
-                            ),
+                        PaddingValues(
+                            bottom = PairShotSpacing.md,
+                            start = PairShotSpacing.md,
+                            end = PairShotSpacing.md,
+                        ),
                         modifier = Modifier.fillMaxSize(),
                     )
                 }

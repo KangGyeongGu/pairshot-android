@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.designsystem.PairShotSpacing
 
@@ -42,19 +41,19 @@ fun PairShotProgressBar(
         }
         Box(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(PairShotRadius.sm)
-                    .clip(RoundedCornerShape(percent = 50))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            Modifier
+                .fillMaxWidth()
+                .height(PairShotRadius.sm)
+                .clip(RoundedCornerShape(percent = 50))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxWidth(animatedProgress)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(percent = 50))
-                        .background(MaterialTheme.colorScheme.primary),
+                Modifier
+                    .fillMaxWidth(animatedProgress)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(percent = 50))
+                    .background(MaterialTheme.colorScheme.primary),
             )
         }
     }

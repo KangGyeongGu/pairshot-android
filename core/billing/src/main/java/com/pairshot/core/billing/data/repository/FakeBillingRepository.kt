@@ -16,61 +16,61 @@ import javax.inject.Singleton
 
 @Singleton
 class FakeBillingRepository
-    @Inject
-    constructor() : BillingRepository {
-        private val _subscriptionStatus = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
-        override val subscriptionStatus: StateFlow<SubscriptionStatus> = _subscriptionStatus.asStateFlow()
+@Inject
+constructor() : BillingRepository {
+    private val _subscriptionStatus = MutableStateFlow<SubscriptionStatus>(SubscriptionStatus.Inactive)
+    override val subscriptionStatus: StateFlow<SubscriptionStatus> = _subscriptionStatus.asStateFlow()
 
-        override fun start() = Unit
+    override fun start() = Unit
 
-        override suspend fun refresh() = Unit
+    override suspend fun refresh() = Unit
 
-        override suspend fun loadOffers(): Result<List<BillingOffer>> {
-            delay(LOAD_DELAY_MS)
-            val offers =
-                listOf(
-                    BillingOffer(
-                        productId = BillingProductCatalog.PRO_SUBSCRIPTION,
-                        basePlanId = BillingProductCatalog.BASE_PLAN_MONTHLY,
-                        offerId = BillingProductCatalog.OFFER_TRIAL14,
-                        offerToken = "fake-trial-token",
-                        priceFormatted = "₩4,500",
-                        priceAmountMicros = MONTHLY_PRICE_MICROS,
-                        priceCurrencyCode = "KRW",
-                        billingPeriodIso = "P1M",
-                        trialDays = TRIAL_DAYS,
-                    ),
-                    BillingOffer(
-                        productId = BillingProductCatalog.PRO_SUBSCRIPTION,
-                        basePlanId = BillingProductCatalog.BASE_PLAN_YEARLY,
-                        offerId = null,
-                        offerToken = "fake-yearly-token",
-                        priceFormatted = "₩43,200",
-                        priceAmountMicros = YEARLY_PRICE_MICROS,
-                        priceCurrencyCode = "KRW",
-                        billingPeriodIso = "P1Y",
-                        trialDays = null,
-                    ),
-                )
-            return Result.success(offers)
-        }
-
-        override suspend fun launchPurchaseFlow(
-            activity: Activity,
-            offer: BillingOffer,
-        ): PurchaseLaunchResult {
-            delay(PURCHASE_DELAY_MS)
-            _subscriptionStatus.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
-            return PurchaseLaunchResult.Launched
-        }
-
-        override fun manageSubscriptionsIntent(productId: String?): Intent = Intent()
-
-        private companion object {
-            const val LOAD_DELAY_MS = 200L
-            const val PURCHASE_DELAY_MS = 500L
-            const val TRIAL_DAYS = 14
-            const val MONTHLY_PRICE_MICROS = 4_500_000_000L
-            const val YEARLY_PRICE_MICROS = 43_200_000_000L
-        }
+    override suspend fun loadOffers(): Result<List<BillingOffer>> {
+        delay(LOAD_DELAY_MS)
+        val offers =
+            listOf(
+                BillingOffer(
+                    productId = BillingProductCatalog.PRO_SUBSCRIPTION,
+                    basePlanId = BillingProductCatalog.BASE_PLAN_MONTHLY,
+                    offerId = BillingProductCatalog.OFFER_TRIAL14,
+                    offerToken = "fake-trial-token",
+                    priceFormatted = "₩4,500",
+                    priceAmountMicros = MONTHLY_PRICE_MICROS,
+                    priceCurrencyCode = "KRW",
+                    billingPeriodIso = "P1M",
+                    trialDays = TRIAL_DAYS,
+                ),
+                BillingOffer(
+                    productId = BillingProductCatalog.PRO_SUBSCRIPTION,
+                    basePlanId = BillingProductCatalog.BASE_PLAN_YEARLY,
+                    offerId = null,
+                    offerToken = "fake-yearly-token",
+                    priceFormatted = "₩43,200",
+                    priceAmountMicros = YEARLY_PRICE_MICROS,
+                    priceCurrencyCode = "KRW",
+                    billingPeriodIso = "P1Y",
+                    trialDays = null,
+                ),
+            )
+        return Result.success(offers)
     }
+
+    override suspend fun launchPurchaseFlow(
+        activity: Activity,
+        offer: BillingOffer,
+    ): PurchaseLaunchResult {
+        delay(PURCHASE_DELAY_MS)
+        _subscriptionStatus.value = SubscriptionStatus.Active(productId = offer.productId, autoRenew = true)
+        return PurchaseLaunchResult.Launched
+    }
+
+    override fun manageSubscriptionsIntent(productId: String?): Intent = Intent()
+
+    private companion object {
+        const val LOAD_DELAY_MS = 200L
+        const val PURCHASE_DELAY_MS = 500L
+        const val TRIAL_DAYS = 14
+        const val MONTHLY_PRICE_MICROS = 4_500_000_000L
+        const val YEARLY_PRICE_MICROS = 43_200_000_000L
+    }
+}

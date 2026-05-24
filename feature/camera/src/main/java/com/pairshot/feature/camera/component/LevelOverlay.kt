@@ -11,9 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotStroke
 import kotlin.math.abs
@@ -38,9 +36,9 @@ fun LevelOverlay(
     ) {
         Canvas(
             modifier =
-                Modifier
-                    .fillMaxWidth(LEVEL_LINE_WIDTH_FRACTION)
-                    .height(PairShotStroke.thin),
+            Modifier
+                .fillMaxWidth(LEVEL_LINE_WIDTH_FRACTION)
+                .height(PairShotStroke.thin),
         ) {
             rotate(degrees = roll) {
                 drawLine(

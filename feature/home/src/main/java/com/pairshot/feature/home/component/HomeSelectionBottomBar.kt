@@ -38,11 +38,11 @@ fun HomeSelectionBottomBar(
                     imageVector = Icons.Outlined.Share,
                     contentDescription = stringResource(R.string.common_button_share),
                     tint =
-                        if (hasSelection) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        },
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    },
                 )
             },
         )
@@ -56,11 +56,11 @@ fun HomeSelectionBottomBar(
                     imageVector = Icons.Outlined.FileDownload,
                     contentDescription = stringResource(R.string.common_button_save_to_device),
                     tint =
-                        if (hasSelection) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        },
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    },
                 )
             },
         )
@@ -75,11 +75,11 @@ fun HomeSelectionBottomBar(
                     imageVector = Icons.Outlined.Delete,
                     contentDescription = stringResource(R.string.common_button_delete),
                     tint =
-                        if (hasSelection) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.error.copy(alpha = 0.38f)
-                        },
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.error.copy(alpha = 0.38f)
+                    },
                 )
             },
         )
@@ -93,11 +93,11 @@ fun HomeSelectionBottomBar(
                     imageVector = Icons.Outlined.Tune,
                     contentDescription = stringResource(R.string.common_button_export_settings),
                     tint =
-                        if (hasSelection) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                        },
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    },
                 )
             },
         )

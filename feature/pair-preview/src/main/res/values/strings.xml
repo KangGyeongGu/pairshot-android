@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Accessibility -->
     <string name="pair_preview_desc_combined_preview">합성 미리보기</string>
     <string name="pair_preview_desc_close">닫기</string>
 
-    <!-- TopBar menu -->
     <string name="pair_preview_menu_recapture">재촬영</string>
 
-    <!-- Live preview error -->
     <string name="pair_preview_error_compose_failed">미리보기를 만들 수 없습니다.</string>
     <string name="pair_preview_action_retry">다시 시도</string>
 
-    <!-- Missing slot -->
     <string name="pair_preview_slot_missing_before">Before 원본이 갤러리에서 삭제되었습니다.</string>
     <string name="pair_preview_slot_missing_after">After 원본이 갤러리에서 삭제되었습니다.</string>
     <string name="pair_preview_slot_capture_before">Before 다시 촬영</string>
     <string name="pair_preview_slot_capture_after">After 다시 촬영</string>
 
-    <!-- Auto-prune notices -->
     <string name="pair_preview_prune_notice_before">Before 원본이 갤러리에서 삭제되어 정리했습니다. 다시 촬영할 수 있어요.</string>
     <string name="pair_preview_prune_notice_after">After 원본이 갤러리에서 삭제되어 정리했습니다. 다시 촬영할 수 있어요.</string>
     <string name="pair_preview_prune_notice_deleted">원본이 모두 갤러리에서 삭제되어 페어를 정리했습니다.</string>

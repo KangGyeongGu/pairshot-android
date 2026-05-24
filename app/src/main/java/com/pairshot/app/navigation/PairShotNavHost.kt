@@ -67,9 +67,9 @@ fun PairShotNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         enterTransition = {
             fadeIn(animationSpec = PairShotMotionTokens.enterTween())
         },
@@ -179,10 +179,10 @@ fun PairShotNavHost(
         }
         dialog<PairPreview>(
             dialogProperties =
-                DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    dismissOnClickOutside = true,
-                ),
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+            ),
         ) {
             PairPreviewRoute(
                 onDismiss = { navController.popBackStack() },

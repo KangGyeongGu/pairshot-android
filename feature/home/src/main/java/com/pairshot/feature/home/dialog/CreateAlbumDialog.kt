@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.ui.component.PairShotDialog
@@ -90,17 +89,17 @@ fun CreateAlbumDialog(
                         )
                     },
                     supportingText =
-                        if (locationAddress != null) {
-                            {
-                                Text(
-                                    text = locationAddress,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        } else {
-                            null
-                        },
+                    if (locationAddress != null) {
+                        {
+                            Text(
+                                text = locationAddress,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        null
+                    },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge,
                 )

@@ -39,18 +39,18 @@ internal fun CameraBottomBar(
 ) {
     Box(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(height)
-                .background(PairShotCameraTokens.Letterbox)
-                .padding(horizontal = CameraSpec.bottomBarHorizontalPadding),
+        Modifier
+            .fillMaxWidth()
+            .height(height)
+            .background(PairShotCameraTokens.Letterbox)
+            .padding(horizontal = CameraSpec.bottomBarHorizontalPadding),
     ) {
         HomeButton(
             onClick = onThumbnailClick,
             modifier =
-                Modifier
-                    .align(Alignment.CenterStart)
-                    .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_BACK_BUTTON),
+            Modifier
+                .align(Alignment.CenterStart)
+                .tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.CAMERA_BACK_BUTTON),
         )
 
         IconButton(

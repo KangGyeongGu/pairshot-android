@@ -50,158 +50,158 @@ sealed interface PairPreviewUiState {
 
 @HiltViewModel
 class PairPreviewViewModel
-    @Inject
-    constructor(
-        savedStateHandle: SavedStateHandle,
-        private val photoPairRepository: PhotoPairRepository,
-        private val exportHistoryRepository: ExportHistoryRepository,
-        private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
-        combineSettingsRepository: CombineSettingsRepository,
-        watermarkRepository: WatermarkRepository,
-    ) : ViewModel() {
-        private val route = savedStateHandle.toRoute<PairPreview>()
-        val pairId: Long = route.pairId
+@Inject
+constructor(
+    savedStateHandle: SavedStateHandle,
+    private val photoPairRepository: PhotoPairRepository,
+    private val exportHistoryRepository: ExportHistoryRepository,
+    private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
+    combineSettingsRepository: CombineSettingsRepository,
+    watermarkRepository: WatermarkRepository,
+) : ViewModel() {
+    private val route = savedStateHandle.toRoute<PairPreview>()
+    val pairId: Long = route.pairId
 
-        private val hasCombinedState = MutableStateFlow(false)
-        private val deleteDialogVisible = MutableStateFlow(false)
+    private val hasCombinedState = MutableStateFlow(false)
+    private val deleteDialogVisible = MutableStateFlow(false)
 
-        private val pairFlow: StateFlow<PhotoPair?> =
-            photoPairRepository
-                .observeById(pairId)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                    initialValue = null,
-                )
-
-        private val configFlow: StateFlow<CombineConfig> =
-            combineSettingsRepository.configFlow.stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                CombineConfig(),
-            )
-
-        private val watermarkFlow: StateFlow<WatermarkConfig> =
-            watermarkRepository.watermarkConfigFlow.stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                WatermarkConfig(),
-            )
-
-        val uiState: StateFlow<PairPreviewUiState> =
-            combine(
-                pairFlow,
-                hasCombinedState,
-                deleteDialogVisible,
-                configFlow,
-                watermarkFlow,
-            ) { pair, hasCombined, showDialog, config, watermark ->
-                if (pair == null) {
-                    PairPreviewUiState.Loading
-                } else {
-                    PairPreviewUiState.Ready(
-                        pair = pair,
-                        hasCombined = hasCombined,
-                        showDeleteDialog = showDialog,
-                        livePreviewInputs =
-                            if (pair.afterPhotoUri == null) {
-                                null
-                            } else {
-                                LivePreviewInputs(pair, config, watermark)
-                            },
-                    )
-                }
-            }.stateIn(
+    private val pairFlow: StateFlow<PhotoPair?> =
+        photoPairRepository
+            .observeById(pairId)
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
-                initialValue = PairPreviewUiState.Loading,
+                initialValue = null,
             )
 
-        private val _deleteComplete =
-            MutableSharedFlow<Unit>(
-                replay = 0,
-                extraBufferCapacity = 1,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            )
-        val deleteComplete: SharedFlow<Unit> = _deleteComplete.asSharedFlow()
+    private val configFlow: StateFlow<CombineConfig> =
+        combineSettingsRepository.configFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            CombineConfig(),
+        )
 
-        private val _pruneNotice =
-            MutableSharedFlow<PrunePairResult>(
-                replay = 0,
-                extraBufferCapacity = 1,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            )
-        val pruneNotice: SharedFlow<PrunePairResult> = _pruneNotice.asSharedFlow()
+    private val watermarkFlow: StateFlow<WatermarkConfig> =
+        watermarkRepository.watermarkConfigFlow.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            WatermarkConfig(),
+        )
 
-        init {
-            verifyAndLoadPair()
-            refreshHasCombined()
-        }
+    val uiState: StateFlow<PairPreviewUiState> =
+        combine(
+            pairFlow,
+            hasCombinedState,
+            deleteDialogVisible,
+            configFlow,
+            watermarkFlow,
+        ) { pair, hasCombined, showDialog, config, watermark ->
+            if (pair == null) {
+                PairPreviewUiState.Loading
+            } else {
+                PairPreviewUiState.Ready(
+                    pair = pair,
+                    hasCombined = hasCombined,
+                    showDeleteDialog = showDialog,
+                    livePreviewInputs =
+                    if (pair.afterPhotoUri == null) {
+                        null
+                    } else {
+                        LivePreviewInputs(pair, config, watermark)
+                    },
+                )
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(WHILE_SUBSCRIBED_TIMEOUT_MS),
+            initialValue = PairPreviewUiState.Loading,
+        )
 
-        private fun verifyAndLoadPair() {
-            viewModelScope.launch {
-                val pruneResult =
-                    runCatching { photoPairRepository.pruneMissingSources(pairId) }
-                        .onFailure { Timber.w(it, "pruneMissingSources failed for pair=%d", pairId) }
-                        .getOrDefault(PrunePairResult.Healthy)
+    private val _deleteComplete =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val deleteComplete: SharedFlow<Unit> = _deleteComplete.asSharedFlow()
 
-                when (pruneResult) {
-                    PrunePairResult.DeletedEntirely, PrunePairResult.NotFound -> {
-                        _pruneNotice.emit(pruneResult)
-                        _deleteComplete.emit(Unit)
-                    }
+    private val _pruneNotice =
+        MutableSharedFlow<PrunePairResult>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    val pruneNotice: SharedFlow<PrunePairResult> = _pruneNotice.asSharedFlow()
 
-                    PrunePairResult.BeforeDropped,
-                    PrunePairResult.AfterDropped,
-                    -> {
-                        _pruneNotice.emit(pruneResult)
-                    }
+    init {
+        verifyAndLoadPair()
+        refreshHasCombined()
+    }
 
-                    PrunePairResult.Healthy -> {
-                        Unit
-                    }
+    private fun verifyAndLoadPair() {
+        viewModelScope.launch {
+            val pruneResult =
+                runCatching { photoPairRepository.pruneMissingSources(pairId) }
+                    .onFailure { Timber.w(it, "pruneMissingSources failed for pair=%d", pairId) }
+                    .getOrDefault(PrunePairResult.Healthy)
+
+            when (pruneResult) {
+                PrunePairResult.DeletedEntirely, PrunePairResult.NotFound -> {
+                    _pruneNotice.emit(pruneResult)
+                    _deleteComplete.emit(Unit)
                 }
-            }
-        }
 
-        private fun refreshHasCombined() {
-            viewModelScope.launch {
-                hasCombinedState.value =
-                    exportHistoryRepository
-                        .findByPairIdsAndKind(listOf(pairId), ExportHistoryKind.COMBINED)
-                        .isNotEmpty()
-            }
-        }
+                PrunePairResult.BeforeDropped,
+                PrunePairResult.AfterDropped,
+                -> {
+                    _pruneNotice.emit(pruneResult)
+                }
 
-        fun showDeleteDialog() {
-            deleteDialogVisible.value = true
-        }
-
-        fun dismissDeleteDialog() {
-            deleteDialogVisible.value = false
-        }
-
-        fun deletePair() {
-            viewModelScope.launch {
-                val currentPair = pairFlow.value ?: return@launch
-                runCatching { exportHistoryRepository.deleteByPairIds(listOf(currentPair.id)) }
-                    .onFailure { error ->
-                        Timber.w(error, "failed to clear export history for pair ${currentPair.id}")
-                    }
-                runCatching { photoPairRepository.delete(currentPair) }
-                    .onFailure { error ->
-                        Timber.w(error, "failed to delete pair ${currentPair.id}")
-                    }
-                deleteDialogVisible.value = false
-                _deleteComplete.emit(Unit)
-            }
-        }
-
-        fun deleteCombinedOnly() {
-            viewModelScope.launch {
-                deleteCombinedPhotosUseCase(listOf(pairId))
-                hasCombinedState.value = false
-                deleteDialogVisible.value = false
+                PrunePairResult.Healthy -> {
+                    Unit
+                }
             }
         }
     }
+
+    private fun refreshHasCombined() {
+        viewModelScope.launch {
+            hasCombinedState.value =
+                exportHistoryRepository
+                    .findByPairIdsAndKind(listOf(pairId), ExportHistoryKind.COMBINED)
+                    .isNotEmpty()
+        }
+    }
+
+    fun showDeleteDialog() {
+        deleteDialogVisible.value = true
+    }
+
+    fun dismissDeleteDialog() {
+        deleteDialogVisible.value = false
+    }
+
+    fun deletePair() {
+        viewModelScope.launch {
+            val currentPair = pairFlow.value ?: return@launch
+            runCatching { exportHistoryRepository.deleteByPairIds(listOf(currentPair.id)) }
+                .onFailure { error ->
+                    Timber.w(error, "failed to clear export history for pair ${currentPair.id}")
+                }
+            runCatching { photoPairRepository.delete(currentPair) }
+                .onFailure { error ->
+                    Timber.w(error, "failed to delete pair ${currentPair.id}")
+                }
+            deleteDialogVisible.value = false
+            _deleteComplete.emit(Unit)
+        }
+    }
+
+    fun deleteCombinedOnly() {
+        viewModelScope.launch {
+            deleteCombinedPhotosUseCase(listOf(pairId))
+            hasCombinedState.value = false
+            deleteDialogVisible.value = false
+        }
+    }
+}

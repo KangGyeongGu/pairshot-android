@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.navigation.PaywallTrigger
@@ -21,9 +20,9 @@ fun CameraRoute(
 ) {
     Box(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(PairShotCameraTokens.Letterbox),
+        Modifier
+            .fillMaxSize()
+            .background(PairShotCameraTokens.Letterbox),
     ) {
         CameraPermissionGate(onNavigateBack = onNavigateBack) {
             CameraScreen(

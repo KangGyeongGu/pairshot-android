@@ -40,12 +40,12 @@ internal fun <T> PositionPickerGridRow(
     }
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -61,17 +61,17 @@ internal fun <T> PositionPickerGridRow(
                         val isSelected = position == selectedPosition
                         Box(
                             modifier =
-                                Modifier
-                                    .size(PairShotIconSize.md)
-                                    .clip(MaterialTheme.shapes.extraSmall)
-                                    .background(
-                                        if (isSelected) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.surfaceContainerHigh
-                                        },
-                                    ).semantics { selected = isSelected }
-                                    .clickable { onPositionChange(position) },
+                            Modifier
+                                .size(PairShotIconSize.md)
+                                .clip(MaterialTheme.shapes.extraSmall)
+                                .background(
+                                    if (isSelected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceContainerHigh
+                                    },
+                                ).semantics { selected = isSelected }
+                                .clickable { onPositionChange(position) },
                             contentAlignment = Alignment.Center,
                         ) {
                             if (isSelected) {

@@ -173,7 +173,9 @@ class ViewModelBoundaryTest {
             .should()
             .dependOnClassesThat()
             .haveFullyQualifiedName("android.graphics.Matrix")
-            .because("ViewModel must not perform bitmap transform — delegate to infra layer (CameraSession.prepareOverlay)")
+            .because(
+                "ViewModel must not perform bitmap transform — delegate to infra layer (CameraSession.prepareOverlay)"
+            )
 
     @ArchTest
     val `V-13 ViewModel should not depend on infra impl classes`: ArchRule =

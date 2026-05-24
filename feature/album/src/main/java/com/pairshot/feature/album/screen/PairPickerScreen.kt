@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.R
@@ -65,11 +64,11 @@ fun PairPickerScreen(
                     }
                 },
                 colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
             )
         },
         bottomBar = {
@@ -80,16 +79,16 @@ fun PairPickerScreen(
                     onClick = onConfirm,
                     enabled = state.selectedIds.isNotEmpty() && !state.isConfirming,
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .navigationBarsPadding()
-                            .padding(horizontal = PairShotScreen.horizontalPadding, vertical = PairShotSpacing.md),
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = PairShotScreen.horizontalPadding, vertical = PairShotSpacing.md),
                 ) {
                     Text(
                         text =
-                            stringResource(
-                                if (state.isConfirming) R.string.pair_picker_button_adding else R.string.pair_picker_button_add,
-                            ),
+                        stringResource(
+                            if (state.isConfirming) R.string.pair_picker_button_adding else R.string.pair_picker_button_add,
+                        ),
                     )
                 }
             }
@@ -101,12 +100,12 @@ fun PairPickerScreen(
             alreadyInAlbumIds = state.alreadyInAlbumIds,
             onToggle = onToggle,
             contentPadding =
-                androidx.compose.foundation.layout.PaddingValues(
-                    top = innerPadding.calculateTopPadding() + PairShotSpacing.md,
-                    bottom = innerPadding.calculateBottomPadding() + PairShotSpacing.md,
-                    start = PairShotSpacing.md,
-                    end = PairShotSpacing.md,
-                ),
+            androidx.compose.foundation.layout.PaddingValues(
+                top = innerPadding.calculateTopPadding() + PairShotSpacing.md,
+                bottom = innerPadding.calculateBottomPadding() + PairShotSpacing.md,
+                start = PairShotSpacing.md,
+                end = PairShotSpacing.md,
+            ),
             modifier = Modifier.fillMaxSize(),
         )
     }

@@ -94,7 +94,14 @@ fun SaveZipToDocumentEffect(
                 )
             }.onFailure { error ->
                 Timber.e(error, "zip save to SAF uri failed")
-                val wrapped = if (error is IOException || error is SecurityException) error else IOException("save failed", error)
+                val wrapped = if (error is IOException || error is SecurityException) {
+                    error
+                } else {
+                    IOException(
+                        "save failed",
+                        error
+                    )
+                }
                 onResult(
                     SaveDocumentResult.Failed(
                         sourceFilePath = request.sourceFilePath,

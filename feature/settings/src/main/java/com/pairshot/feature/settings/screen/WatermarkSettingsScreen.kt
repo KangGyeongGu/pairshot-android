@@ -72,26 +72,26 @@ fun WatermarkSettingsScreen(
                     }
                 },
                 colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                    ),
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
     ) { innerPadding ->
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
         ) {
             PairShotBannerAd()
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
-                    PaddingValues(
-                        horizontal = PairShotScreen.horizontalPadding,
-                        vertical = PairShotCard.innerPadding,
-                    ),
+                PaddingValues(
+                    horizontal = PairShotScreen.horizontalPadding,
+                    vertical = PairShotCard.innerPadding,
+                ),
             ) {
                 item(key = "label_basic") {
                     SettingsSectionLabel(label = stringResource(R.string.watermark_section_basic))
@@ -126,7 +126,13 @@ fun WatermarkSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(
                             label = stringResource(R.string.watermark_item_text_settings),
-                            trailingWarning = if (showWarning) stringResource(R.string.settings_warning_required) else null,
+                            trailingWarning = if (showWarning) {
+                                stringResource(
+                                    R.string.settings_warning_required
+                                )
+                            } else {
+                                null
+                            },
                         )
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
@@ -143,7 +149,13 @@ fun WatermarkSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
                         SettingsSectionLabel(
                             label = stringResource(R.string.watermark_item_logo_settings),
-                            trailingWarning = if (showWarning) stringResource(R.string.settings_warning_required) else null,
+                            trailingWarning = if (showWarning) {
+                                stringResource(
+                                    R.string.settings_warning_required
+                                )
+                            } else {
+                                null
+                            },
                         )
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }

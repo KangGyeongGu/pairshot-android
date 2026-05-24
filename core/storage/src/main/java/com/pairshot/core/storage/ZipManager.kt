@@ -17,48 +17,48 @@ data class ZipImageEntry(
 
 @Singleton
 class ZipManager
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-    ) {
-        suspend fun createZip(
-            entries: List<ZipImageEntry>,
-            outputUri: Uri,
-            onProgress: (current: Int, total: Int) -> Unit,
-        ) = withContext(Dispatchers.IO) {
-            val resolver = context.contentResolver
-            resolver.openOutputStream(outputUri)?.use { outputStream ->
-                ZipOutputStream(outputStream.buffered()).use { zip ->
-                    entries.forEachIndexed { index, entry ->
-                        resolver.openInputStream(entry.uri)?.use { input ->
-                            zip.putNextEntry(ZipEntry(entry.entryPath))
-                            input.copyTo(zip)
-                            zip.closeEntry()
-                        }
-                        onProgress(index + 1, entries.size)
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
+) {
+    suspend fun createZip(
+        entries: List<ZipImageEntry>,
+        outputUri: Uri,
+        onProgress: (current: Int, total: Int) -> Unit,
+    ) = withContext(Dispatchers.IO) {
+        val resolver = context.contentResolver
+        resolver.openOutputStream(outputUri)?.use { outputStream ->
+            ZipOutputStream(outputStream.buffered()).use { zip ->
+                entries.forEachIndexed { index, entry ->
+                    resolver.openInputStream(entry.uri)?.use { input ->
+                        zip.putNextEntry(ZipEntry(entry.entryPath))
+                        input.copyTo(zip)
+                        zip.closeEntry()
                     }
+                    onProgress(index + 1, entries.size)
                 }
-            } ?: error("cannot open SAF output stream: $outputUri")
-        }
+            }
+        } ?: error("cannot open SAF output stream: $outputUri")
+    }
 
-        suspend fun createZipToFile(
-            entries: List<ZipImageEntry>,
-            outputFile: java.io.File,
-            onProgress: (current: Int, total: Int) -> Unit,
-        ) = withContext(Dispatchers.IO) {
-            outputFile.parentFile?.mkdirs()
-            val resolver = context.contentResolver
-            outputFile.outputStream().buffered().use { outputStream ->
-                ZipOutputStream(outputStream).use { zip ->
-                    entries.forEachIndexed { index, entry ->
-                        resolver.openInputStream(entry.uri)?.use { input ->
-                            zip.putNextEntry(ZipEntry(entry.entryPath))
-                            input.copyTo(zip)
-                            zip.closeEntry()
-                        }
-                        onProgress(index + 1, entries.size)
+    suspend fun createZipToFile(
+        entries: List<ZipImageEntry>,
+        outputFile: java.io.File,
+        onProgress: (current: Int, total: Int) -> Unit,
+    ) = withContext(Dispatchers.IO) {
+        outputFile.parentFile?.mkdirs()
+        val resolver = context.contentResolver
+        outputFile.outputStream().buffered().use { outputStream ->
+            ZipOutputStream(outputStream).use { zip ->
+                entries.forEachIndexed { index, entry ->
+                    resolver.openInputStream(entry.uri)?.use { input ->
+                        zip.putNextEntry(ZipEntry(entry.entryPath))
+                        input.copyTo(zip)
+                        zip.closeEntry()
                     }
+                    onProgress(index + 1, entries.size)
                 }
             }
         }
     }
+}

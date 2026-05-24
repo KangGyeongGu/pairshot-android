@@ -59,13 +59,13 @@ fun BeforePhotoFullPreview(
 
     BoxWithConstraints(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = scrimInteraction,
-                    indication = null,
-                    onClick = onDismiss,
-                ),
+        Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = scrimInteraction,
+                indication = null,
+                onClick = onDismiss,
+            ),
     ) {
         val ratio = aspectRatio ?: FALLBACK_ASPECT_RATIO
         val containerMaxW = maxWidth * PHOTO_MAX_WIDTH_FRACTION
@@ -80,29 +80,29 @@ fun BeforePhotoFullPreview(
 
         Box(
             modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = bottomAnchor)
-                    .size(width = photoWidth, height = photoHeight)
-                    .alpha(visibleAlpha)
-                    .clip(MaterialTheme.shapes.large)
-                    .clipToBounds()
-                    .clickable(
-                        interactionSource = photoInteraction,
-                        indication = null,
-                        onClick = {},
-                    ).pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, _ ->
-                            val newScale = (scale * zoom).coerceIn(MIN_ZOOM_SCALE, MAX_ZOOM_SCALE)
-                            scale = newScale
-                            offset =
-                                if (newScale > MIN_ZOOM_SCALE) {
-                                    offset + pan
-                                } else {
-                                    Offset.Zero
-                                }
-                        }
-                    },
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = bottomAnchor)
+                .size(width = photoWidth, height = photoHeight)
+                .alpha(visibleAlpha)
+                .clip(MaterialTheme.shapes.large)
+                .clipToBounds()
+                .clickable(
+                    interactionSource = photoInteraction,
+                    indication = null,
+                    onClick = {},
+                ).pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        val newScale = (scale * zoom).coerceIn(MIN_ZOOM_SCALE, MAX_ZOOM_SCALE)
+                        scale = newScale
+                        offset =
+                            if (newScale > MIN_ZOOM_SCALE) {
+                                offset + pan
+                            } else {
+                                Offset.Zero
+                            }
+                    }
+                },
         ) {
             ProfiledAsyncImage(
                 data = uri,
@@ -112,14 +112,14 @@ fun BeforePhotoFullPreview(
                 placeholderColor = Color.Transparent,
                 onAspectRatio = { aspectRatio = it },
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                            translationX = offset.x,
-                            translationY = offset.y,
-                        ),
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offset.x,
+                        translationY = offset.y,
+                    ),
             )
         }
     }

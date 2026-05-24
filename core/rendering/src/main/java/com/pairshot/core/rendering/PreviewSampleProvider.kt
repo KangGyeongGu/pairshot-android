@@ -11,19 +11,19 @@ import javax.inject.Singleton
 
 @Singleton
 class PreviewSampleProvider
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-    ) {
-        @Volatile
-        private var cached: Bitmap? = null
+@Inject
+constructor(
+    @ApplicationContext private val context: Context,
+) {
+    @Volatile
+    private var cached: Bitmap? = null
 
-        suspend fun get(): Bitmap =
-            withContext(Dispatchers.IO) {
-                cached?.takeIf { !it.isRecycled } ?: loadSample().also { cached = it }
-            }
+    suspend fun get(): Bitmap =
+        withContext(Dispatchers.IO) {
+            cached?.takeIf { !it.isRecycled } ?: loadSample().also { cached = it }
+        }
 
-        private fun loadSample(): Bitmap =
-            BitmapFactory.decodeResource(context.resources, R.drawable.watermark_preview_sample)
-                ?: error("Failed to decode watermark_preview_sample")
-    }
+    private fun loadSample(): Bitmap =
+        BitmapFactory.decodeResource(context.resources, R.drawable.watermark_preview_sample)
+            ?: error("Failed to decode watermark_preview_sample")
+}

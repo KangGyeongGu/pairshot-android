@@ -124,9 +124,9 @@ private fun ErrorPlaceholder(modifier: Modifier) {
 private fun ErrorContent() {
     Box(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
         Text(

@@ -6,15 +6,15 @@ import javax.inject.Singleton
 
 @Singleton
 class FullscreenAdState
-    @Inject
-    constructor() {
-        private val showing = AtomicBoolean(false)
+@Inject
+constructor() {
+    private val showing = AtomicBoolean(false)
 
-        fun isShowing(): Boolean = showing.get()
+    fun isShowing(): Boolean = showing.get()
 
-        fun markShown(): Boolean = showing.compareAndSet(false, true)
+    fun markShown(): Boolean = showing.compareAndSet(false, true)
 
-        fun markDismissed() {
-            showing.set(false)
-        }
+    fun markDismissed() {
+        showing.set(false)
     }
+}

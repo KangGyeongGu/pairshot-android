@@ -39,7 +39,6 @@
 
     <string name="paywall_logo_content_description">PairShot 로고</string>
 
-    <!-- Pro hint snackbar (shown when paywall is triggered) -->
     <string name="pro_hint_daily_limit">일일 무료 한도를 초과했어요</string>
     <string name="pro_hint_feature_locked">Pro 구독으로 기능 잠금을 해제하세요</string>
 

@@ -38,7 +38,9 @@ class DomainPurityTest {
             .resideInAPackage("..domain..")
             .should()
             .dependOnClassesThat(
-                object : DescribedPredicate<JavaClass>("reside in 'androidx..' (excluding Compose compiler internals)") {
+                object : DescribedPredicate<JavaClass>(
+                    "reside in 'androidx..' (excluding Compose compiler internals)"
+                ) {
                     override fun test(clazz: JavaClass): Boolean =
                         clazz.packageName.startsWith("androidx.") &&
                             !clazz.fullName.startsWith("androidx.compose.runtime.internal.")

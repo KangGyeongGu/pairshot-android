@@ -6,6 +6,12 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.dependencyguard)
+    alias(libs.plugins.aboutlibraries)
+}
+
+dependencyGuard {
+    configuration("releaseRuntimeClasspath")
 }
 
 val localProperties =
@@ -200,6 +206,8 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.archunit.junit5)
+    testImplementation(libs.konsist)
+    testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(composeBom)
     androidTestImplementation(libs.compose.ui.test)

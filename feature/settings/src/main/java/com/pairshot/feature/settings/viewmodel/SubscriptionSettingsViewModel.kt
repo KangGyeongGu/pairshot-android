@@ -30,39 +30,39 @@ sealed interface SubscriptionSettingsEvent {
 
 @HiltViewModel
 class SubscriptionSettingsViewModel
-    @Inject
-    constructor(
-        private val membershipProvider: MembershipProvider,
-        private val billingRepository: BillingRepository,
-    ) : ViewModel() {
-        val state: StateFlow<SubscriptionSettingsState> =
-            combine(
-                membershipProvider.observe(),
-                billingRepository.subscriptionStatus,
-            ) { membership, status ->
-                SubscriptionSettingsState(membership, status)
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
-                initialValue = SubscriptionSettingsState(),
+@Inject
+constructor(
+    private val membershipProvider: MembershipProvider,
+    private val billingRepository: BillingRepository,
+) : ViewModel() {
+    val state: StateFlow<SubscriptionSettingsState> =
+        combine(
+            membershipProvider.observe(),
+            billingRepository.subscriptionStatus,
+        ) { membership, status ->
+            SubscriptionSettingsState(membership, status)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIPTION_TIMEOUT_MS),
+            initialValue = SubscriptionSettingsState(),
+        )
+
+    private val _events = MutableSharedFlow<SubscriptionSettingsEvent>(extraBufferCapacity = 1)
+    val events: SharedFlow<SubscriptionSettingsEvent> = _events.asSharedFlow()
+
+    fun restore() {
+        viewModelScope.launch {
+            billingRepository.refresh()
+            val isPro = membershipProvider.current().isPro
+            _events.tryEmit(
+                if (isPro) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
             )
-
-        private val _events = MutableSharedFlow<SubscriptionSettingsEvent>(extraBufferCapacity = 1)
-        val events: SharedFlow<SubscriptionSettingsEvent> = _events.asSharedFlow()
-
-        fun restore() {
-            viewModelScope.launch {
-                billingRepository.refresh()
-                val isPro = membershipProvider.current().isPro
-                _events.tryEmit(
-                    if (isPro) SubscriptionSettingsEvent.RestoreSuccess else SubscriptionSettingsEvent.RestoreEmpty,
-                )
-            }
-        }
-
-        fun manageSubscriptionsIntent(productId: String?) = billingRepository.manageSubscriptionsIntent(productId)
-
-        private companion object {
-            const val SUBSCRIPTION_TIMEOUT_MS = 5_000L
         }
     }
+
+    fun manageSubscriptionsIntent(productId: String?) = billingRepository.manageSubscriptionsIntent(productId)
+
+    private companion object {
+        const val SUBSCRIPTION_TIMEOUT_MS = 5_000L
+    }
+}

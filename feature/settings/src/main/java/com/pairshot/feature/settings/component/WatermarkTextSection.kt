@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotProBadge
 import com.pairshot.core.designsystem.PairShotSpacing
@@ -106,12 +105,12 @@ internal fun WatermarkTypeItem(
 ) {
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -126,39 +125,39 @@ internal fun WatermarkTypeItem(
                 val isLocked = type == WatermarkType.LOGO && !isProSubscriber
                 Box(
                     modifier =
-                        Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            ).clickable {
-                                if (isLocked) onProLocked() else onTypeChange(type)
-                            }.padding(
-                                horizontal = PairShotSpacing.md,
-                                vertical = PairShotSpacing.sm,
-                            ),
+                    Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            } else {
+                                Color.Transparent
+                            },
+                        ).clickable {
+                            if (isLocked) onProLocked() else onTypeChange(type)
+                        }.padding(
+                            horizontal = PairShotSpacing.md,
+                            vertical = PairShotSpacing.sm,
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text =
-                                when (type) {
-                                    WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
-                                    WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
-                                },
+                            when (type) {
+                                WatermarkType.TEXT -> stringResource(R.string.watermark_type_text)
+                                WatermarkType.LOGO -> stringResource(R.string.watermark_type_logo)
+                            },
                             style =
-                                MaterialTheme.typography.bodySmall.copy(
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                ),
+                            MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            ),
                             color =
-                                if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                         )
                         if (isLocked) {
                             Spacer(modifier = Modifier.width(PairShotSpacing.sm))
@@ -201,12 +200,12 @@ private fun WatermarkTextItem(
 
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = PairShotCard.innerPadding,
-                    vertical = PairShotCard.innerPadding,
-                ),
+        Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = PairShotCard.innerPadding,
+                vertical = PairShotCard.innerPadding,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -227,10 +226,10 @@ private fun WatermarkTextItem(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             modifier =
-                Modifier
-                    .weight(INPUT_WEIGHT)
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { isFocused = it.isFocused },
+            Modifier
+                .weight(INPUT_WEIGHT)
+                .focusRequester(focusRequester)
+                .onFocusChanged { isFocused = it.isFocused },
             decorationBox = { innerTextField ->
                 Column {
                     Box(

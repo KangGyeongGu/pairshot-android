@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.infra.location.LocationResult
@@ -111,7 +110,7 @@ fun HomeScreen(
                 allSelected = allSelected,
                 isProSubscriber = isProSubscriber,
                 onExitSelectionMode =
-                    if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
+                if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,
                 onEnterSelectionMode = onEnterSelectionMode,
                 onNavigateToSettings = onNavigateToSettings,
@@ -149,9 +148,9 @@ fun HomeScreen(
     ) { paddingValues ->
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
         ) {
             PairShotBannerAd()
             Spacer(modifier = Modifier.height(PairShotSpacing.sm))
@@ -252,11 +251,11 @@ fun HomeScreen(
             text = {
                 Text(
                     text =
-                        pluralStringResource(
-                            R.plurals.home_dialog_album_delete_confirm,
-                            selectedAlbumIds.size,
-                            selectedAlbumIds.size,
-                        ),
+                    pluralStringResource(
+                        R.plurals.home_dialog_album_delete_confirm,
+                        selectedAlbumIds.size,
+                        selectedAlbumIds.size,
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

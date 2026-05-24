@@ -18,10 +18,10 @@ private const val PRO_LABEL = "PRO"
 fun PairShotProBadge(modifier: Modifier = Modifier) {
     Box(
         modifier =
-            modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
     ) {
         Text(
             text = PRO_LABEL,

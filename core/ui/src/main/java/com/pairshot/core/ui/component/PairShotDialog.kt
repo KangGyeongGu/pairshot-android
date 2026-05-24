@@ -8,11 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.pairshot.core.designsystem.ModalShape
 import com.pairshot.core.designsystem.PairShotDialogTokens
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.designsystem.ProvideAppTextScaleDensity
 
 private val DialogHorizontalMargin = PairShotSpacing.xxl
 private val DialogConfirmMaxWidth = PairShotDialogTokens.confirmMaxWidth
@@ -55,11 +55,11 @@ fun PairShotDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
-        dismissButton = dismissButton,
-        icon = icon,
-        title = title,
-        text = text,
+        confirmButton = { ProvideAppTextScaleDensity { confirmButton() } },
+        dismissButton = dismissButton?.let { slot -> { ProvideAppTextScaleDensity { slot() } } },
+        icon = icon?.let { slot -> { ProvideAppTextScaleDensity { slot() } } },
+        title = title?.let { slot -> { ProvideAppTextScaleDensity { slot() } } },
+        text = text?.let { slot -> { ProvideAppTextScaleDensity { slot() } } },
         modifier = modifier,
         shape = ModalShape,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,

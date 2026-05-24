@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
-import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.settings.R
 import com.pairshot.core.ui.R as CoreR
 
@@ -149,17 +148,17 @@ fun LicenseScreen(onNavigateBack: () -> Unit) {
                     }
                 },
                 colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                    ),
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
     ) { innerPadding ->
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
         ) {
             PairShotBannerAd()
             LazyColumn(
@@ -171,15 +170,15 @@ fun LicenseScreen(onNavigateBack: () -> Unit) {
                 ) { item ->
                     Column(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.url))
-                                    context.startActivity(intent)
-                                }.padding(
-                                    horizontal = PairShotScreen.horizontalPadding,
-                                    vertical = PairShotCard.innerPadding,
-                                ),
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.url))
+                                context.startActivity(intent)
+                            }.padding(
+                                horizontal = PairShotScreen.horizontalPadding,
+                                vertical = PairShotCard.innerPadding,
+                            ),
                     ) {
                         Text(
                             text = item.name,

@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.designsystem.PairShotRadius
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.SortOrder
@@ -31,8 +30,8 @@ fun SortOrderToggleButton(
         style = MaterialTheme.typography.labelLarge,
         color = color,
         modifier =
-            modifier
-                .clickable(onClick = onToggle)
-                .padding(horizontal = PairShotSpacing.md, vertical = PairShotRadius.sm),
+        modifier
+            .clickable(onClick = onToggle)
+            .padding(horizontal = PairShotSpacing.md, vertical = PairShotRadius.sm),
     )
 }

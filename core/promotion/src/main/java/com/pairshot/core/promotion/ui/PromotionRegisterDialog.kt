@@ -116,10 +116,10 @@ fun PromotionRegisterDialog(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         modifier =
-                            Modifier.clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                            ) { uriHandler.openUri(BuildConfig.PROMOTION_INFO_URL) },
+                        Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) { uriHandler.openUri(BuildConfig.PROMOTION_INFO_URL) },
                     )
                 }
             }
@@ -169,15 +169,15 @@ fun PromotionRegisterDialog(
             }
         },
         dismissButton =
-            if (mode == RegisterMode.Input && activationState !is PromotionActivationUiState.Success) {
-                {
-                    TextButton(onClick = onDismiss, enabled = !isLoading) {
-                        Text(text = stringResource(R.string.promotion_dialog_cancel))
-                    }
+        if (mode == RegisterMode.Input && activationState !is PromotionActivationUiState.Success) {
+            {
+                TextButton(onClick = onDismiss, enabled = !isLoading) {
+                    Text(text = stringResource(R.string.promotion_dialog_cancel))
                 }
-            } else {
-                null
-            },
+            }
+        } else {
+            null
+        },
     )
 }
 
@@ -400,10 +400,10 @@ private fun PromotionListItemRow(item: Promotion) {
 
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .alpha(rowAlpha)
-                .padding(vertical = 6.dp),
+        Modifier
+            .fillMaxWidth()
+            .alpha(rowAlpha)
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -420,11 +420,11 @@ private fun PromotionListItemRow(item: Promotion) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier =
-                        Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(4.dp),
-                            ).padding(horizontal = 4.dp, vertical = 2.dp),
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(4.dp),
+                        ).padding(horizontal = 4.dp, vertical = 2.dp),
                 )
                 item.batchLabel?.let { label ->
                     Spacer(modifier = Modifier.width(6.dp))
@@ -433,18 +433,22 @@ private fun PromotionListItemRow(item: Promotion) {
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier =
-                            Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    shape = RoundedCornerShape(4.dp),
-                                ).padding(horizontal = 4.dp, vertical = 2.dp),
+                        Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(4.dp),
+                            ).padding(horizontal = 4.dp, vertical = 2.dp),
                     )
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
             val durationText =
                 if (item.durationDays != null) {
-                    pluralStringResource(R.plurals.promotion_list_days_format, item.durationDays.toInt(), item.durationDays)
+                    pluralStringResource(
+                        R.plurals.promotion_list_days_format,
+                        item.durationDays.toInt(),
+                        item.durationDays
+                    )
                 } else {
                     stringResource(R.string.promotion_list_unlimited)
                 }
@@ -472,10 +476,10 @@ private fun ScanContent(onDetected: (String) -> Unit) {
         PromotionQrScannerPane(
             onResult = onDetected,
             modifier =
-                Modifier
-                    .size(ScannerSize)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.scrim),
+            Modifier
+                .size(ScannerSize)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.scrim),
         )
     }
 }

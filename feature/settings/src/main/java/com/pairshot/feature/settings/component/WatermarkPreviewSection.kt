@@ -70,19 +70,19 @@ internal fun WatermarkPreviewSection(
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.High,
             modifier =
-                modifier
-                    .fillMaxWidth()
-                    .aspectRatio(
-                        bmp.width.toFloat().coerceAtLeast(1f) /
-                            bmp.height.toFloat().coerceAtLeast(1f),
-                    ),
+            modifier
+                .fillMaxWidth()
+                .aspectRatio(
+                    bmp.width.toFloat().coerceAtLeast(1f) /
+                        bmp.height.toFloat().coerceAtLeast(1f),
+                ),
         )
     } else {
         Box(
             modifier =
-                modifier
-                    .fillMaxWidth()
-                    .aspectRatio(PLACEHOLDER_ASPECT_RATIO),
+            modifier
+                .fillMaxWidth()
+                .aspectRatio(PLACEHOLDER_ASPECT_RATIO),
         )
     }
 }

@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotButton
 import com.pairshot.core.designsystem.PairShotCard
@@ -104,9 +103,9 @@ fun ExportSettingsScreen(
                     }
                 },
                 colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                    ),
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
     ) { innerPadding ->
@@ -116,19 +115,23 @@ fun ExportSettingsScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding =
-                        PaddingValues(
-                            start = PairShotScreen.horizontalPadding,
-                            end = PairShotScreen.horizontalPadding,
-                            top = PairShotCard.innerPadding,
-                            bottom = ACTION_BAR_RESERVED_HEIGHT,
-                        ),
+                    PaddingValues(
+                        start = PairShotScreen.horizontalPadding,
+                        end = PairShotScreen.horizontalPadding,
+                        top = PairShotCard.innerPadding,
+                        bottom = ACTION_BAR_RESERVED_HEIGHT,
+                    ),
                 ) {
                     item(key = "label_include") {
                         SettingsSectionLabel(label = stringResource(R.string.export_section_include))
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_include") {
-                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_INCLUDE)) {
+                        Box(
+                            modifier = Modifier.tutorialAnchor(
+                                com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_INCLUDE
+                            )
+                        ) {
                             ExportIncludeSection(
                                 includeBefore = includeBefore,
                                 includeAfter = includeAfter,
@@ -146,7 +149,11 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_format") {
-                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_FORMAT)) {
+                        Box(
+                            modifier = Modifier.tutorialAnchor(
+                                com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_FORMAT
+                            )
+                        ) {
                             ExportFormatSection(
                                 format = format,
                                 isProSubscriber = isProSubscriber,
@@ -164,16 +171,20 @@ fun ExportSettingsScreen(
                         SettingsSectionLabel(
                             label = stringResource(R.string.export_section_watermark),
                             trailingWarning =
-                                if (watermarkWarning) {
-                                    stringResource(R.string.export_warning_required)
-                                } else {
-                                    null
-                                },
+                            if (watermarkWarning) {
+                                stringResource(R.string.export_warning_required)
+                            } else {
+                                null
+                            },
                         )
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_watermark") {
-                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_WATERMARK)) {
+                        Box(
+                            modifier = Modifier.tutorialAnchor(
+                                com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_WATERMARK
+                            )
+                        ) {
                             ExportWatermarkSection(
                                 applyWatermark = applyWatermark,
                                 onApplyWatermarkChange = onApplyWatermarkChange,
@@ -188,7 +199,11 @@ fun ExportSettingsScreen(
                         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
                     }
                     item(key = "section_combine") {
-                        Box(modifier = Modifier.tutorialAnchor(com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_COMBINE)) {
+                        Box(
+                            modifier = Modifier.tutorialAnchor(
+                                com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_COMBINE
+                            )
+                        ) {
                             ExportCombineSection(
                                 applyCombineConfig = applyCombineConfig,
                                 onApplyCombineConfigChange = onApplyCombineConfigChange,
@@ -207,9 +222,9 @@ fun ExportSettingsScreen(
                 onShare = onShare,
                 onSaveToDevice = onSaveToDevice,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
             )
         }
     }
@@ -223,9 +238,9 @@ private fun ActionBar(
 ) {
     Row(
         modifier =
-            modifier
-                .navigationBarsPadding()
-                .padding(horizontal = ACTION_BAR_HORIZONTAL_PADDING, vertical = ACTION_BAR_VERTICAL_PADDING),
+        modifier
+            .navigationBarsPadding()
+            .padding(horizontal = ACTION_BAR_HORIZONTAL_PADDING, vertical = ACTION_BAR_VERTICAL_PADDING),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         FloatingActionButton(
@@ -234,9 +249,9 @@ private fun ActionBar(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             contentColor = MaterialTheme.colorScheme.onSurface,
             elevation =
-                FloatingActionButtonDefaults.elevation(
-                    defaultElevation = FAB_ELEVATION,
-                ),
+            FloatingActionButtonDefaults.elevation(
+                defaultElevation = FAB_ELEVATION,
+            ),
             modifier = Modifier.size(FAB_SIZE),
         ) {
             Icon(
@@ -250,9 +265,9 @@ private fun ActionBar(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             elevation =
-                FloatingActionButtonDefaults.elevation(
-                    defaultElevation = FAB_ELEVATION,
-                ),
+            FloatingActionButtonDefaults.elevation(
+                defaultElevation = FAB_ELEVATION,
+            ),
             modifier = Modifier.size(FAB_SIZE),
         ) {
             Icon(

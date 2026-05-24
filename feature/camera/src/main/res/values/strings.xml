@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- BottomBar Accessibility -->
     <string name="camera_desc_last_thumbnail">마지막 촬영 썸네일</string>
     <string name="camera_desc_home">홈으로 이동</string>
     <string name="camera_desc_switch">카메라 전환</string>
     <string name="camera_desc_shutter">촬영</string>
 
-    <!-- Strip -->
     <string name="camera_strip_empty">아직 촬영된 Before가 없습니다</string>
     <string name="camera_strip_empty_after">촬영할 Before가 없습니다</string>
     <string name="camera_strip_thumbnail_desc">Before 썸네일 %1$d</string>
@@ -15,11 +13,9 @@
         <item quantity="other">%1$d / %2$d 완료</item>
     </plurals>
 
-    <!-- Before Full Preview -->
     <string name="camera_before_full_preview_desc">Before 원본 사진 크게 보기</string>
     <string name="camera_before_full_preview_close">닫기</string>
 
-    <!-- Permission -->
     <string name="camera_permission_title">카메라 권한 필요</string>
     <string name="camera_permission_message">PairShot은 사진 촬영을 위해 카메라 접근 권한이 필요합니다.</string>
     <string name="camera_permission_allow">권한 허용</string>
@@ -27,7 +23,6 @@
     <string name="camera_permission_denied_message">설정 앱에서 PairShot의 카메라 권한을 직접 허용해 주세요.</string>
     <string name="camera_permission_go_settings">설정으로 이동</string>
 
-    <!-- Settings Sheet -->
     <string name="camera_settings_grid">격자</string>
     <string name="camera_settings_flash">플래시</string>
     <string name="camera_settings_night_mode">야간모드</string>

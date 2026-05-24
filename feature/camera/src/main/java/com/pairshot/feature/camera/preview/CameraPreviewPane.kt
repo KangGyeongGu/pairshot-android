@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -70,16 +69,16 @@ internal fun CameraPreviewPane(
 
     Box(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .pointerInput(zoomUiState.minRatio, zoomUiState.maxRatio) {
-                    detectTransformGestures { _, _, zoom, _ ->
-                        val newRatio =
-                            (latestZoomRatio.value * zoom)
-                                .coerceIn(zoomUiState.minRatio, zoomUiState.maxRatio)
-                        onZoomRatioChanged(newRatio)
-                    }
-                },
+        modifier
+            .fillMaxWidth()
+            .pointerInput(zoomUiState.minRatio, zoomUiState.maxRatio) {
+                detectTransformGestures { _, _, zoom, _ ->
+                    val newRatio =
+                        (latestZoomRatio.value * zoom)
+                            .coerceIn(zoomUiState.minRatio, zoomUiState.maxRatio)
+                    onZoomRatioChanged(newRatio)
+                }
+            },
     ) {
         surfaceRequest?.let { request ->
             Box {
@@ -91,9 +90,9 @@ internal fun CameraPreviewPane(
                 if (blackoutAlpha > 0f) {
                     Box(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .background(PairShotCameraTokens.Letterbox.copy(alpha = blackoutAlpha)),
+                        Modifier
+                            .fillMaxSize()
+                            .background(PairShotCameraTokens.Letterbox.copy(alpha = blackoutAlpha)),
                     )
                 }
             }
@@ -103,9 +102,9 @@ internal fun CameraPreviewPane(
 
         BoxWithConstraints(
             modifier =
-                Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize(),
+            Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(),
         ) {
             val containerRatio =
                 if (maxHeight.value > 0f) {
@@ -136,19 +135,19 @@ internal fun CameraPreviewPane(
                 val maskHeight = ((maxHeight - maxWidth) / 2).coerceAtLeast(0.dp)
                 Box(
                     modifier =
-                        Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxWidth()
-                            .height(maskHeight)
-                            .background(PairShotCameraTokens.Letterbox),
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .height(maskHeight)
+                        .background(PairShotCameraTokens.Letterbox),
                 )
                 Box(
                     modifier =
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .height(maskHeight)
-                            .background(PairShotCameraTokens.Letterbox),
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(maskHeight)
+                        .background(PairShotCameraTokens.Letterbox),
                 )
             }
 
@@ -189,9 +188,9 @@ internal fun CameraPreviewPane(
                     onDragEnd = onDragEnd,
                     onToggleLens = onToggleLens,
                     modifier =
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = PairShotSpacing.md),
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = PairShotSpacing.md),
                 )
             }
         }

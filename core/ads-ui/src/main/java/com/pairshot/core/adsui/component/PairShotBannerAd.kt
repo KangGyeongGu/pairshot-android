@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -125,9 +124,9 @@ fun PairShotBannerAd(
 
     Box(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .height(slotHeight),
+        modifier
+            .fillMaxWidth()
+            .height(slotHeight),
         contentAlignment = Alignment.Center,
     ) {
         AndroidView(
