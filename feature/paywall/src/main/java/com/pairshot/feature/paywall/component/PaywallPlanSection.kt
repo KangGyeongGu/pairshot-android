@@ -34,11 +34,13 @@ import com.pairshot.feature.paywall.PaywallUiState
 import com.pairshot.feature.paywall.R
 import java.text.NumberFormat
 import java.util.Currency
+import kotlin.math.roundToInt
 
 private val PLAN_CARD_CORNER = PairShotSpacing.lg
 private val PLAN_CARD_PADDING = PairShotScreen.horizontalPadding
 private const val MONTHS_PER_YEAR = 12L
 private const val MICROS_PER_UNIT = 1_000_000.0
+private const val PERCENT_SCALE = 100.0
 private const val BADGE_FEATURED_BG_ALPHA = 0.22f
 private const val PLAN_BORDER_ALPHA = 0.4f
 private const val PLAN_SUBTITLE_ALPHA = 0.78f
@@ -52,19 +54,30 @@ internal fun PaywallPlanSection(
     onRetryLoad: () -> Unit,
 ) {
     when {
-        state.loading -> LoadingBlock()
-        state.loadError -> ErrorBlock(onRetryLoad = onRetryLoad)
+        state.loading -> {
+            LoadingBlock()
+        }
+
+        state.loadError -> {
+            ErrorBlock(onRetryLoad = onRetryLoad)
+        }
+
         else -> {
             val yearly = state.yearlyOffer
             val trial = state.trialOffer
             val monthlyBase = state.monthlyOffer
 
             if (yearly != null) {
+                val discount = discountPercent(monthlyBase, yearly)
                 PlanCard(
                     title = stringResource(R.string.paywall_plan_yearly_title),
                     price = stringResource(R.string.paywall_plan_yearly_price, yearly.priceFormatted),
-                    subtitle = stringResource(R.string.paywall_plan_yearly_subtitle, monthlyEquivalent(yearly)),
-                    badge = stringResource(R.string.paywall_plan_yearly_badge),
+                    subtitle =
+                    stringResource(
+                        R.string.paywall_plan_yearly_monthly_equivalent,
+                        monthlyEquivalent(yearly),
+                    ),
+                    badge = discount?.let { stringResource(R.string.paywall_plan_yearly_badge, it) },
                     featured = true,
                     onClick = { onPurchaseYearly(yearly) },
                 )
@@ -72,12 +85,10 @@ internal fun PaywallPlanSection(
             }
 
             if (monthlyBase != null) {
-                val monthlySubtitle =
-                    if (trial != null) stringResource(R.string.paywall_plan_monthly_trial_note) else ""
                 PlanCard(
                     title = stringResource(R.string.paywall_plan_monthly_title),
                     price = stringResource(R.string.paywall_plan_monthly_price, monthlyBase.priceFormatted),
-                    subtitle = monthlySubtitle,
+                    subtitle = if (trial != null) stringResource(R.string.paywall_plan_monthly_trial_note) else "",
                     badge = null,
                     featured = false,
                     onClick = {
@@ -159,8 +170,7 @@ private fun Badge(
             MaterialTheme.colorScheme.primary
         }
     Box(
-        modifier =
-        Modifier
+        modifier = Modifier
             .clip(RoundedCornerShape(PairShotRadius.sm))
             .background(badgeBg)
             .padding(horizontal = PairShotSpacing.sm, vertical = PairShotStroke.thick),
@@ -216,4 +226,16 @@ private fun monthlyEquivalent(yearly: BillingOffer): String {
     runCatching { fmt.currency = Currency.getInstance(yearly.priceCurrencyCode) }
     fmt.maximumFractionDigits = 0
     return fmt.format(perMonthValue)
+}
+
+private fun discountPercent(
+    monthly: BillingOffer?,
+    yearly: BillingOffer?,
+): Int? {
+    if (monthly == null || yearly == null || monthly.priceAmountMicros <= 0L) return null
+    val yearlyFullPriceMicros = monthly.priceAmountMicros * MONTHS_PER_YEAR
+    if (yearly.priceAmountMicros >= yearlyFullPriceMicros) return null
+    val ratio = yearly.priceAmountMicros.toDouble() / yearlyFullPriceMicros.toDouble()
+    val percent = ((1.0 - ratio) * PERCENT_SCALE).roundToInt()
+    return percent.takeIf { it > 0 }
 }

@@ -3,18 +3,18 @@
     <string name="paywall_title">PairShot Pro</string>
     <string name="paywall_subtitle">Effortless before/after photo management.</string>
 
-    <string name="paywall_value_unlimited">Unlimited pair creation</string>
-    <string name="paywall_value_no_ads">Remove all ads</string>
-    <string name="paywall_value_pro_features">Full access to combine and watermark features</string>
+    <string name="paywall_value_unlimited">Unlimited pair cards</string>
+    <string name="paywall_value_no_ads">No ads</string>
+    <string name="paywall_value_pro_features">Full feature access</string>
 
     <string name="paywall_plan_yearly_title">Yearly</string>
     <string name="paywall_plan_yearly_price">%1$s/year</string>
-    <string name="paywall_plan_yearly_subtitle">%1$s/month equivalent · Auto-renews</string>
-    <string name="paywall_plan_yearly_badge">Save 20%</string>
+    <string name="paywall_plan_yearly_monthly_equivalent">%1$s/month</string>
+    <string name="paywall_plan_yearly_badge">Save %1$d%%</string>
 
     <string name="paywall_plan_monthly_title">Monthly</string>
     <string name="paywall_plan_monthly_price">%1$s/month</string>
-    <string name="paywall_plan_monthly_trial_note">2-week free trial, then auto-renews · Cancel anytime</string>
+    <string name="paywall_plan_monthly_trial_note">2-week free trial, then auto-renews</string>
 
     <string name="paywall_continue_free">Continue with free version (5 pairs/day, ads shown)</string>
 

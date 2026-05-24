@@ -109,6 +109,10 @@ fun PaywallScreen(
                 )
 
                 Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
+                CenteredTextLink(
+                    text = stringResource(R.string.paywall_restore),
+                    onClick = onRestore,
+                )
                 if (!dismissible) {
                     CenteredTextLink(
                         text = stringResource(R.string.paywall_continue_free),
@@ -116,10 +120,6 @@ fun PaywallScreen(
                         alpha = CONTINUE_FREE_ALPHA,
                     )
                 }
-                CenteredTextLink(
-                    text = stringResource(R.string.paywall_restore),
-                    onClick = onRestore,
-                )
 
                 Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
                 DisclosureBlock()
