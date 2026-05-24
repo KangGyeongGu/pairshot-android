@@ -5,7 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-private const val GLASS_SURFACE_ARGB = 0x991C1C1EL
+private const val GLASS_SURFACE_ARGB = 0xE61C1C1EL
 private const val GLASS_DESTRUCTIVE_ARGB = 0xFFFF3B30L
 
 object PairShotGlassTokens {
