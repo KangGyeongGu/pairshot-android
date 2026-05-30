@@ -30,6 +30,7 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.DeletePairConfirmDialog
 import com.pairshot.core.ui.component.PairShotDialog
+import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.component.HomeAlbumGridSection
 import com.pairshot.feature.home.component.HomeAlbumSelectionBottomBar
@@ -42,7 +43,6 @@ import com.pairshot.feature.home.dialog.CreateAlbumDialog
 import com.pairshot.feature.home.viewmodel.HomeMode
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -58,10 +58,8 @@ fun HomeScreen(
     mode: HomeMode,
     pairs: ImmutableList<PhotoPair>,
     albums: ImmutableList<Album>,
-    selectionMode: Boolean,
-    selectedIds: ImmutableSet<Long>,
-    albumSelectionMode: Boolean,
-    selectedAlbumIds: ImmutableSet<Long>,
+    pairSelection: SelectionState,
+    albumSelection: SelectionState,
     currentLocation: LocationResult?,
     showCreateAlbumDialog: Boolean,
     sortOrder: SortOrder,
@@ -97,7 +95,7 @@ fun HomeScreen(
     var showAlbumDeleteDialog by remember { mutableStateOf(false) }
     var showAlbumRenameDialog by remember { mutableStateOf(false) }
 
-    val inSelectionMode = selectionMode || albumSelectionMode
+    val inSelectionMode = pairSelection.isSelectionMode || albumSelection.isSelectionMode
     val listIsEmpty = if (mode == HomeMode.PAIRS) pairs.isEmpty() else albums.isEmpty()
     val primaryLabel =
         if (mode == HomeMode.PAIRS) {
@@ -107,9 +105,9 @@ fun HomeScreen(
         }
     val primaryAction: () -> Unit =
         if (mode == HomeMode.PAIRS) onNavigateToCamera else onCreateAlbumClick
-    val currentTotalCount = if (albumSelectionMode) albums.size else pairs.size
+    val currentTotalCount = if (albumSelection.isSelectionMode) albums.size else pairs.size
     val currentSelectedCount =
-        if (albumSelectionMode) selectedAlbumIds.size else selectedIds.size
+        if (albumSelection.isSelectionMode) albumSelection.selectedCount else pairSelection.selectedCount
     val allSelected = currentTotalCount > 0 && currentSelectedCount == currentTotalCount
 
     Scaffold(
@@ -121,7 +119,7 @@ fun HomeScreen(
                 allSelected = allSelected,
                 isProSubscriber = isProSubscriber,
                 onExitSelectionMode =
-                if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
+                if (albumSelection.isSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,
                 onEnterSelectionMode = onEnterSelectionMode,
                 onNavigateToSettings = onNavigateToSettings,
@@ -129,9 +127,9 @@ fun HomeScreen(
         },
         bottomBar = {
             when {
-                selectionMode -> {
+                pairSelection.isSelectionMode -> {
                     HomeSelectionBottomBar(
-                        selectedCount = selectedIds.size,
+                        selectedCount = pairSelection.selectedCount,
                         onShare = onShare,
                         onSaveToDevice = onSaveToDevice,
                         onDelete = { showDeleteConfirmDialog = true },
@@ -139,9 +137,9 @@ fun HomeScreen(
                     )
                 }
 
-                albumSelectionMode -> {
+                albumSelection.isSelectionMode -> {
                     HomeAlbumSelectionBottomBar(
-                        selectedCount = selectedAlbumIds.size,
+                        selectedCount = albumSelection.selectedCount,
                         onRename = { showAlbumRenameDialog = true },
                         onDelete = { showAlbumDeleteDialog = true },
                     )
@@ -197,8 +195,8 @@ fun HomeScreen(
                         HomeMode.PAIRS -> {
                             PairCardGridSection(
                                 pairs = pairs,
-                                selectedIds = selectedIds,
-                                isSelectionMode = selectionMode,
+                                selectedIds = pairSelection.selectedIds,
+                                isSelectionMode = pairSelection.isSelectionMode,
                                 sortOrder = sortOrder,
                                 onPairClick = onPairClick,
                                 onPairLongPress = onPairLongClick,
@@ -214,8 +212,8 @@ fun HomeScreen(
                         HomeMode.ALBUMS -> {
                             HomeAlbumGridSection(
                                 albums = albums,
-                                isSelectionMode = albumSelectionMode,
-                                selectedAlbumIds = selectedAlbumIds,
+                                isSelectionMode = albumSelection.isSelectionMode,
+                                selectedAlbumIds = albumSelection.selectedIds,
                                 onAlbumClick = onAlbumClick,
                                 onAlbumLongPress = onAlbumLongPress,
                                 contentPadding = contentPadding,
@@ -239,9 +237,9 @@ fun HomeScreen(
 
     if (showDeleteConfirmDialog) {
         val combinedInSelection =
-            pairs.count { it.id in selectedIds && it.hasCombined }
+            pairs.count { it.id in pairSelection.selectedIds && it.hasCombined }
         DeletePairConfirmDialog(
-            pairCount = selectedIds.size,
+            pairCount = pairSelection.selectedCount,
             combinedCount = combinedInSelection,
             onDeleteAll = {
                 showDeleteConfirmDialog = false
@@ -269,8 +267,8 @@ fun HomeScreen(
                     text =
                     pluralStringResource(
                         R.plurals.home_dialog_album_delete_confirm,
-                        selectedAlbumIds.size,
-                        selectedAlbumIds.size,
+                        albumSelection.selectedCount,
+                        albumSelection.selectedCount,
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -303,7 +301,7 @@ fun HomeScreen(
 
     if (showAlbumRenameDialog) {
         val currentName =
-            albums.firstOrNull { it.id in selectedAlbumIds }?.name.orEmpty()
+            albums.firstOrNull { it.id in albumSelection.selectedIds }?.name.orEmpty()
         AlbumRenameDialog(
             currentName = currentName,
             onConfirm = { newName ->

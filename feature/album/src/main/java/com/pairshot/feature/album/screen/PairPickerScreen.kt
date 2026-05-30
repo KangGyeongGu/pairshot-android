@@ -47,11 +47,11 @@ fun PairPickerScreen(
             CenterAlignedTopAppBar(
                 title = {
                     val countLabel =
-                        if (state.selectedIds.isNotEmpty()) {
+                        if (state.selection.hasSelection) {
                             pluralStringResource(
                                 R.plurals.pair_picker_title_selected,
-                                state.selectedIds.size,
-                                state.selectedIds.size,
+                                state.selection.selectedCount,
+                                state.selection.selectedCount,
                             )
                         } else {
                             stringResource(R.string.pair_picker_title)
@@ -83,7 +83,7 @@ fun PairPickerScreen(
             ) {
                 Button(
                     onClick = onConfirm,
-                    enabled = state.selectedIds.isNotEmpty() && !state.isConfirming,
+                    enabled = state.selection.hasSelection && !state.isConfirming,
                     modifier =
                     Modifier
                         .fillMaxWidth()
@@ -118,7 +118,7 @@ fun PairPickerScreen(
         }
         PairCardGridSection(
             pairs = state.pairs.toImmutableList(),
-            selectedIds = state.selectedIds.toImmutableSet(),
+            selectedIds = state.selection.selectedIds,
             isSelectionMode = true,
             sortOrder = SortOrder.DESC,
             onPairClick = onToggle,

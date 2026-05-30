@@ -18,7 +18,6 @@ import com.pairshot.feature.home.viewmodel.HomeEvent
 import com.pairshot.feature.home.viewmodel.HomeViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,10 +47,8 @@ fun HomeRoute(
     val mode by viewModel.mode.collectAsStateWithLifecycle()
     val pairs by viewModel.pairs.collectAsStateWithLifecycle()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
-    val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
-    val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
-    val albumSelectionMode by viewModel.albumSelectionMode.collectAsStateWithLifecycle()
-    val selectedAlbumIds by viewModel.selectedAlbumIds.collectAsStateWithLifecycle()
+    val pairSelection by viewModel.pairSelection.collectAsStateWithLifecycle()
+    val albumSelection by viewModel.albumSelection.collectAsStateWithLifecycle()
     val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
@@ -119,10 +116,8 @@ fun HomeRoute(
         mode = mode,
         pairs = pairs.toImmutableList(),
         albums = albums.toImmutableList(),
-        selectionMode = selectionMode,
-        selectedIds = selectedIds.toImmutableSet(),
-        albumSelectionMode = albumSelectionMode,
-        selectedAlbumIds = selectedAlbumIds.toImmutableSet(),
+        pairSelection = pairSelection,
+        albumSelection = albumSelection,
         currentLocation = currentLocation,
         showCreateAlbumDialog = showCreateAlbumDialog,
         sortOrder = sortOrder,
@@ -130,7 +125,7 @@ fun HomeRoute(
         onToggleSortOrder = viewModel::toggleSortOrder,
         onPairClick = viewModel::onPairCardClick,
         onPairLongClick = { id ->
-            if (!selectionMode) {
+            if (!pairSelection.isSelectionMode) {
                 viewModel.enterSelectionMode(id)
                 tutorialActions.report(TutorialActionIds.HOME_SELECTION_MODE_ENTERED)
             } else {

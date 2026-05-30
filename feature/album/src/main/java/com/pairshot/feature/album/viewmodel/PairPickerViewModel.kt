@@ -8,6 +8,7 @@ import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.navigation.PairPicker
+import com.pairshot.core.ui.state.SelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,15 +34,10 @@ sealed interface PairPickerUiState {
     data class Ready(
         val pairs: List<PhotoPair>,
         val alreadyInAlbumIds: Set<Long>,
-        val selectedIds: Set<Long>,
+        val selection: SelectionState,
         val isConfirming: Boolean,
     ) : PairPickerUiState
 }
-
-private data class PickerSelectionState(
-    val selectedIds: Set<Long> = emptySet(),
-    val isConfirming: Boolean = false,
-)
 
 @HiltViewModel
 class PairPickerViewModel
@@ -56,18 +52,24 @@ constructor(
 
     private val allPairsFlow = MutableStateFlow<List<PhotoPair>?>(null)
     private val albumPairIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
-    private val selectionFlow = MutableStateFlow(PickerSelectionState())
+    private val selectionFlow = MutableStateFlow(SelectionState(isSelectionMode = true))
+    private val isConfirmingFlow = MutableStateFlow(false)
 
     val uiState: StateFlow<PairPickerUiState> =
-        combine(allPairsFlow, albumPairIdsFlow, selectionFlow) { pairs, albumIds, selection ->
+        combine(
+            allPairsFlow,
+            albumPairIdsFlow,
+            selectionFlow,
+            isConfirmingFlow,
+        ) { pairs, albumIds, selection, isConfirming ->
             if (pairs == null) {
                 PairPickerUiState.Loading
             } else {
                 PairPickerUiState.Ready(
                     pairs = pairs,
                     alreadyInAlbumIds = albumIds,
-                    selectedIds = selection.selectedIds,
-                    isConfirming = selection.isConfirming,
+                    selection = selection,
+                    isConfirming = isConfirming,
                 )
             }
         }.stateIn(
@@ -102,13 +104,7 @@ constructor(
 
     fun toggleSelection(pairId: Long) {
         selectionFlow.update { state ->
-            val updated =
-                if (pairId in state.selectedIds) {
-                    state.selectedIds - pairId
-                } else {
-                    state.selectedIds + pairId
-                }
-            state.copy(selectedIds = updated)
+            state.copy(selectedIds = state.toggle(pairId).selectedIds)
         }
     }
 
@@ -118,7 +114,7 @@ constructor(
             viewModelScope.launch { _events.emit(PairPickerEvent.NavigateBack) }
             return
         }
-        selectionFlow.update { it.copy(isConfirming = true) }
+        isConfirmingFlow.value = true
         viewModelScope.launch {
             albumRepository.addPairs(albumId, selectedIds)
             _events.emit(PairPickerEvent.NavigateBack)

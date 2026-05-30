@@ -18,6 +18,7 @@ import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.navigation.AlbumDetail
+import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.album.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,8 +72,7 @@ sealed interface AlbumDetailUiState {
     data class Success(
         val album: Album,
         val pairs: List<PhotoPair>,
-        val selectedIds: Set<Long> = emptySet(),
-        val isSelectionMode: Boolean = false,
+        val selection: SelectionState = SelectionState(),
         val showRenameDialog: Boolean = false,
         val showDeleteAlbumDialog: Boolean = false,
         val showDeletePairsDialog: Boolean = false,
@@ -95,11 +95,6 @@ private data class DialogState(
     val showRename: Boolean = false,
     val showDeleteAlbum: Boolean = false,
     val showDeletePairs: Boolean = false,
-)
-
-private data class SelectionState(
-    val selectedIds: Set<Long> = emptySet(),
-    val isSelectionMode: Boolean = false,
 )
 
 @HiltViewModel
@@ -160,8 +155,7 @@ constructor(
                     AlbumDetailUiState.Success(
                         album = phase.album,
                         pairs = phase.pairs,
-                        selectedIds = selection.selectedIds,
-                        isSelectionMode = selection.isSelectionMode,
+                        selection = selection,
                         showRenameDialog = dialogs.showRename,
                         showDeleteAlbumDialog = dialogs.showDeleteAlbum,
                         showDeletePairsDialog = dialogs.showDeletePairs,
@@ -218,7 +212,7 @@ constructor(
 
     fun onPairClick(pairId: Long) {
         if (selectionState.value.isSelectionMode) {
-            toggleSelection(pairId)
+            selectionState.update { it.toggle(pairId) }
             return
         }
         val pair = latestPairs.firstOrNull { it.id == pairId } ?: return
@@ -239,23 +233,11 @@ constructor(
     }
 
     fun onPairLongPress(pairId: Long) {
-        selectionState.update { it.copy(isSelectionMode = true) }
-        toggleSelection(pairId)
+        selectionState.update { it.toggle(pairId) }
     }
 
-    private fun toggleSelection(pairId: Long) {
-        selectionState.update { state ->
-            val updated =
-                if (pairId in state.selectedIds) {
-                    state.selectedIds - pairId
-                } else {
-                    state.selectedIds + pairId
-                }
-            state.copy(
-                selectedIds = updated,
-                isSelectionMode = updated.isNotEmpty(),
-            )
-        }
+    fun enterSelectionMode() {
+        selectionState.value = SelectionState(isSelectionMode = true)
     }
 
     fun exitSelectionMode() {
