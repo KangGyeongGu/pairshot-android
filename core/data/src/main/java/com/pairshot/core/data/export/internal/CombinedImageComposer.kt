@@ -3,7 +3,6 @@ package com.pairshot.core.data.export.internal
 import android.net.Uri
 import com.pairshot.core.data.export.ShareImagePreparer
 import com.pairshot.core.data.export.WatermarkedBitmapWriter
-import com.pairshot.core.domain.export.needsIndividualDecoration
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ImageQualityPreset
 import com.pairshot.core.model.RenderProfile
@@ -61,7 +60,7 @@ constructor(
         watermarkConfig: WatermarkConfig?,
         imageQuality: ImageQualityPreset,
     ) {
-        if (needsIndividualDecoration(combineConfig, watermarkConfig)) {
+        if (needsDecoration(combineConfig, watermarkConfig)) {
             pairImageComposer.composeSingleToFile(
                 sourceUri = Uri.parse(sourceUri),
                 destFile = destFile,
@@ -74,5 +73,13 @@ constructor(
         } else {
             shareImagePreparer.copyFromContentUri(sourceUri, destFile)
         }
+    }
+
+    private fun needsDecoration(
+        combineConfig: CombineConfig,
+        watermarkConfig: WatermarkConfig?,
+    ): Boolean {
+        val watermarkOn = watermarkConfig != null && watermarkConfig.enabled
+        return watermarkOn || combineConfig.borderEnabled || combineConfig.labelEnabled
     }
 }

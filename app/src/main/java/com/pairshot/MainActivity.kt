@@ -19,7 +19,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -226,13 +225,7 @@ private fun AppRootContent(
 
         progress?.let { p ->
             TopProgressPill(
-                label =
-                pluralStringResource(
-                    R.plurals.progress_label_with_count,
-                    p.total,
-                    p.label.asString(),
-                    p.total,
-                ),
+                label = p.label.asString(),
                 progress = if (p.total > 0) p.current.toFloat() / p.total else 0f,
                 progressText = "${p.current}/${p.total}",
                 modifier =

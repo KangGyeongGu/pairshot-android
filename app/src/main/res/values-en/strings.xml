@@ -4,8 +4,5 @@
 
     <string name="progress_sharing">Preparing to share</string>
     <string name="progress_saving">Saving to device</string>
-    <plurals name="progress_label_with_count">
-        <item quantity="one">%1$s · %2$d item</item>
-        <item quantity="other">%1$s · %2$d items</item>
-    </plurals>
+    <string name="progress_zipping">Zipping</string>
 </resources>

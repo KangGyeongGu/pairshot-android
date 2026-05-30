@@ -5,20 +5,16 @@ import com.pairshot.core.data.repository.AppSettingsRepositoryImpl
 import com.pairshot.core.data.repository.CombineSettingsRepositoryImpl
 import com.pairshot.core.data.repository.ExportHistoryRepositoryImpl
 import com.pairshot.core.data.repository.ExportPresetRepositoryImpl
-import com.pairshot.core.data.repository.GalleryExportRepositoryImpl
+import com.pairshot.core.data.repository.ExportRepositoryImpl
 import com.pairshot.core.data.repository.OnboardingStateRepositoryImpl
 import com.pairshot.core.data.repository.PhotoPairRepositoryImpl
-import com.pairshot.core.data.repository.ShareExportRepositoryImpl
 import com.pairshot.core.data.repository.StorageRepositoryImpl
 import com.pairshot.core.data.repository.WatermarkRepositoryImpl
-import com.pairshot.core.data.repository.ZipExportRepositoryImpl
 import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.combine.CombineSettingsRepository
 import com.pairshot.core.domain.combine.ExportHistoryRepository
 import com.pairshot.core.domain.export.ExportPresetRepository
-import com.pairshot.core.domain.export.GalleryExportRepository
-import com.pairshot.core.domain.export.ShareExportRepository
-import com.pairshot.core.domain.export.ZipExportRepository
+import com.pairshot.core.domain.export.ExportRepository
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.OnboardingStateRepository
@@ -43,15 +39,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindGalleryExportRepository(impl: GalleryExportRepositoryImpl): GalleryExportRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindZipExportRepository(impl: ZipExportRepositoryImpl): ZipExportRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindShareExportRepository(impl: ShareExportRepositoryImpl): ShareExportRepository
+    abstract fun bindExportRepository(impl: ExportRepositoryImpl): ExportRepository
 
     @Binds
     @Singleton
