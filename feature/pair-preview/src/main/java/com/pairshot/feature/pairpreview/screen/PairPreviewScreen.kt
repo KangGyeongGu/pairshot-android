@@ -11,16 +11,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotDialogTokens
 import com.pairshot.core.model.PairStatus
-import com.pairshot.core.ui.component.DeletePairConfirmDialog
-import com.pairshot.feature.pairpreview.component.DeleteAfterConfirmDialog
+import com.pairshot.core.ui.component.ConfirmActionBottomSheet
+import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.feature.pairpreview.R
 import com.pairshot.feature.pairpreview.component.MissingSlotPlaceholder
 import com.pairshot.feature.pairpreview.component.MissingSlotSide
 import com.pairshot.feature.pairpreview.component.PairPreviewBottomBar
 import com.pairshot.feature.pairpreview.component.PairPreviewCenter
 import com.pairshot.feature.pairpreview.component.PairPreviewTopBar
+import com.pairshot.core.ui.R as CoreR
 
 @Composable
 @Suppress("LongParameterList")
@@ -106,19 +109,23 @@ fun PairPreviewScreen(
     }
 
     if (showDeleteDialog) {
-        DeletePairConfirmDialog(
+        DeletePairsBottomSheet(
             pairCount = 1,
             combinedCount = if (hasCombined) 1 else 0,
-            onDeleteAll = onDeleteAll,
+            onDeletePairs = onDeleteAll,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
             onDismiss = onDeleteDismiss,
         )
     }
 
     if (showDeleteAfterDialog) {
-        DeleteAfterConfirmDialog(
+        ConfirmActionBottomSheet(
+            title = stringResource(R.string.pair_preview_delete_after_title),
+            message = stringResource(R.string.pair_preview_delete_after_body),
+            confirmLabel = stringResource(CoreR.string.common_button_delete),
             onConfirm = onDeleteAfterConfirm,
             onDismiss = onDeleteAfterDismiss,
+            confirmIsDestructive = true,
         )
     }
 }

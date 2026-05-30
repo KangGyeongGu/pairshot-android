@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,8 +26,8 @@ import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
-import com.pairshot.core.ui.component.DeletePairConfirmDialog
-import com.pairshot.core.ui.component.PairShotDialog
+import com.pairshot.core.ui.component.ConfirmActionBottomSheet
+import com.pairshot.core.ui.component.DeletePairsBottomSheet
 import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.component.HomeAlbumGridSection
@@ -238,10 +236,10 @@ fun HomeScreen(
     if (showDeleteConfirmDialog) {
         val combinedInSelection =
             pairs.count { it.id in pairSelection.selectedIds && it.hasCombined }
-        DeletePairConfirmDialog(
+        DeletePairsBottomSheet(
             pairCount = pairSelection.selectedCount,
             combinedCount = combinedInSelection,
-            onDeleteAll = {
+            onDeletePairs = {
                 showDeleteConfirmDialog = false
                 onDeleteSelection()
             },
@@ -254,48 +252,21 @@ fun HomeScreen(
     }
 
     if (showAlbumDeleteDialog) {
-        PairShotDialog(
-            onDismissRequest = { showAlbumDeleteDialog = false },
-            title = {
-                Text(
-                    text = stringResource(R.string.home_dialog_album_delete_title),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+        ConfirmActionBottomSheet(
+            title = stringResource(R.string.home_dialog_album_delete_title),
+            message =
+            pluralStringResource(
+                R.plurals.home_dialog_album_delete_confirm,
+                albumSelection.selectedCount,
+                albumSelection.selectedCount,
+            ),
+            confirmLabel = stringResource(CoreR.string.common_button_delete),
+            onConfirm = {
+                showAlbumDeleteDialog = false
+                onDeleteAlbums()
             },
-            text = {
-                Text(
-                    text =
-                    pluralStringResource(
-                        R.plurals.home_dialog_album_delete_confirm,
-                        albumSelection.selectedCount,
-                        albumSelection.selectedCount,
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showAlbumDeleteDialog = false
-                        onDeleteAlbums()
-                    },
-                ) {
-                    Text(
-                        text = stringResource(CoreR.string.common_button_delete),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAlbumDeleteDialog = false }) {
-                    Text(
-                        text = stringResource(CoreR.string.common_button_cancel),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            },
+            onDismiss = { showAlbumDeleteDialog = false },
+            confirmIsDestructive = true,
         )
     }
 

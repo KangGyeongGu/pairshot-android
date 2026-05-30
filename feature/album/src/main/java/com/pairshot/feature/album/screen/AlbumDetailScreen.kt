@@ -12,13 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairCardGridSection
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.ui.component.ConfirmActionBottomSheet
+import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.feature.album.R
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
 import com.pairshot.feature.album.component.AlbumFilterRow
 import com.pairshot.feature.album.component.AlbumPrimaryActionBar
 import com.pairshot.feature.album.component.AlbumSelectionBottomBar
-import com.pairshot.feature.album.dialog.AlbumDeletePairsDialog
-import com.pairshot.feature.album.dialog.DeleteAlbumDialog
 import com.pairshot.feature.album.dialog.RenameAlbumDialog
 import com.pairshot.feature.album.viewmodel.AlbumDetailUiState
 import kotlinx.collections.immutable.toImmutableList
@@ -143,22 +144,27 @@ fun AlbumDetailScreen(
     }
 
     if (uiState.showDeleteAlbumDialog) {
-        DeleteAlbumDialog(
+        ConfirmActionBottomSheet(
+            title = stringResource(R.string.album_dialog_delete_title),
+            message = stringResource(R.string.album_dialog_delete_message),
+            confirmLabel = stringResource(CoreR.string.common_button_delete),
             onConfirm = onDeleteAlbumConfirm,
             onDismiss = onDeleteAlbumDismiss,
+            confirmIsDestructive = true,
         )
     }
 
     if (uiState.showDeletePairsDialog) {
         val combinedInSelection =
             uiState.pairs.count { it.id in uiState.selection.selectedIds && it.hasCombined }
-        AlbumDeletePairsDialog(
+        DeletePairsBottomSheet(
             pairCount = uiState.selection.selectedCount,
             combinedCount = combinedInSelection,
-            onRemoveFromAlbum = onRemoveFromAlbum,
             onDeletePairs = onDeletePairs,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
             onDismiss = onDeletePairsDismiss,
+            removeFromAlbumLabel = stringResource(R.string.album_button_remove_from_album),
+            onRemoveFromAlbum = onRemoveFromAlbum,
         )
     }
 }

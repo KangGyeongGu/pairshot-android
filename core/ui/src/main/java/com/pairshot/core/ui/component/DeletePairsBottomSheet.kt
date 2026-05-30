@@ -1,4 +1,4 @@
-package com.pairshot.feature.album.dialog
+package com.pairshot.core.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
@@ -15,42 +15,51 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.pairshot.core.designsystem.PairShotSpacing
-import com.pairshot.core.ui.component.PairShotBottomSheet
-import com.pairshot.feature.album.R
-import com.pairshot.core.ui.R as CoreR
+import com.pairshot.core.ui.R
 
 @Composable
-fun AlbumDeletePairsDialog(
+fun DeletePairsBottomSheet(
     pairCount: Int,
     combinedCount: Int,
-    onRemoveFromAlbum: () -> Unit,
     onDeletePairs: () -> Unit,
     onDeleteCombinedOnly: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    removeFromAlbumLabel: String? = null,
+    onRemoveFromAlbum: (() -> Unit)? = null,
 ) {
+    val showCombinedOnly = combinedCount > 0
+    val showRemoveFromAlbum = removeFromAlbumLabel != null && onRemoveFromAlbum != null
+
     PairShotBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
     ) {
         Text(
-            text = stringResource(CoreR.string.dialog_delete_pair_method_title),
+            text =
+            stringResource(
+                if (showCombinedOnly || showRemoveFromAlbum) {
+                    R.string.dialog_delete_pair_method_title
+                } else {
+                    R.string.dialog_delete_pair_title
+                },
+            ),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(vertical = PairShotSpacing.sm),
         )
         Text(
             text =
-            if (combinedCount > 0) {
+            if (showCombinedOnly) {
                 pluralStringResource(
-                    CoreR.plurals.dialog_delete_pair_summary,
+                    R.plurals.dialog_delete_pair_summary,
                     pairCount,
                     pairCount,
                     combinedCount,
                 )
             } else {
                 pluralStringResource(
-                    CoreR.plurals.dialog_delete_pair_confirm,
+                    R.plurals.dialog_delete_pair_confirm,
                     pairCount,
                     pairCount,
                 )
@@ -59,28 +68,30 @@ fun AlbumDeletePairsDialog(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = PairShotSpacing.lg),
         )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-        ActionRow(
-            label = stringResource(R.string.album_button_remove_from_album),
-            onClick = onRemoveFromAlbum,
-        )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-        ActionRow(
-            label = stringResource(CoreR.string.dialog_delete_pair_button_all),
+        DeleteActionDivider()
+        if (showRemoveFromAlbum) {
+            DeleteActionRow(
+                label = removeFromAlbumLabel,
+                onClick = onRemoveFromAlbum,
+            )
+            DeleteActionDivider()
+        }
+        DeleteActionRow(
+            label = stringResource(R.string.dialog_delete_pair_button_all),
             onClick = onDeletePairs,
             color = MaterialTheme.colorScheme.error,
         )
-        if (combinedCount > 0) {
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-            ActionRow(
-                label = stringResource(CoreR.string.dialog_delete_pair_button_combined_only),
+        if (showCombinedOnly) {
+            DeleteActionDivider()
+            DeleteActionRow(
+                label = stringResource(R.string.dialog_delete_pair_button_combined_only),
                 onClick = onDeleteCombinedOnly,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-        ActionRow(
-            label = stringResource(CoreR.string.common_button_cancel),
+        DeleteActionDivider()
+        DeleteActionRow(
+            label = stringResource(R.string.common_button_cancel),
             onClick = onDismiss,
         )
         Spacer(modifier = Modifier.height(PairShotSpacing.sm))
@@ -88,7 +99,7 @@ fun AlbumDeletePairsDialog(
 }
 
 @Composable
-private fun ActionRow(
+private fun DeleteActionRow(
     label: String,
     onClick: () -> Unit,
     color: Color = Color.Unspecified,
@@ -104,4 +115,9 @@ private fun ActionRow(
             .clickable(onClick = onClick)
             .padding(vertical = PairShotSpacing.lg),
     )
+}
+
+@Composable
+private fun DeleteActionDivider() {
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
 }
