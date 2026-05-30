@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.pairshot.core.domain.album.AddPairsToAlbumUseCase
 import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.model.PhotoPair
@@ -46,6 +47,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val photoPairRepository: PhotoPairRepository,
     private val albumRepository: AlbumRepository,
+    private val addPairsToAlbumUseCase: AddPairsToAlbumUseCase,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<PairPicker>()
     val albumId: Long = route.albumId
@@ -116,7 +118,7 @@ constructor(
         }
         isConfirmingFlow.value = true
         viewModelScope.launch {
-            albumRepository.addPairs(albumId, selectedIds)
+            addPairsToAlbumUseCase(albumId, selectedIds)
             _events.emit(PairPickerEvent.NavigateBack)
         }
     }

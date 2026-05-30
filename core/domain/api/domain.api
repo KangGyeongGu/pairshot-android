@@ -1,3 +1,8 @@
+public final class com/pairshot/core/domain/album/AddPairsToAlbumUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;)V
+	public final fun invoke (JLjava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public abstract interface class com/pairshot/core/domain/album/AlbumRepository {
 	public abstract fun addPairs (JLjava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun create (Lcom/pairshot/core/model/Album;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
