@@ -22,6 +22,7 @@ fun RewardedGateDialog(
         when (feature) {
             PremiumFeature.WATERMARK_DETAIL -> R.string.rewarded_gate_body_watermark_detail
             PremiumFeature.COMBINE_DETAIL -> R.string.rewarded_gate_body_combine_detail
+            PremiumFeature.EXPORT_PRESET -> R.string.rewarded_gate_body_export_preset
         }
     PairShotDialog(
         modifier = modifier,

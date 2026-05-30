@@ -1,5 +1,8 @@
 package com.pairshot.core.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class WatermarkConfig(
     val enabled: Boolean = false,
     val type: WatermarkType = WatermarkType.TEXT,

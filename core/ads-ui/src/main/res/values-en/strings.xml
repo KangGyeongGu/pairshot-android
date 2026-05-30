@@ -4,6 +4,7 @@
     <string name="rewarded_gate_title">Watch an ad to continue</string>
     <string name="rewarded_gate_body_watermark_detail">Watch a short ad to unlock the watermark detail settings.\nCoupon holders skip the ad.</string>
     <string name="rewarded_gate_body_combine_detail">Watch a short ad to unlock the combine detail settings.\nCoupon holders skip the ad.</string>
+    <string name="rewarded_gate_body_export_preset">Watch a short ad to unlock additional presets.\nCoupon holders skip the ad.</string>
     <string name="rewarded_gate_confirm">Watch ad</string>
     <string name="rewarded_gate_load_failed">Could not load the ad. Please try again shortly.</string>
 </resources>

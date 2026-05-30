@@ -3,6 +3,7 @@ package com.pairshot.feature.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pairshot.core.domain.combine.CombineSettingsRepository
+import com.pairshot.core.domain.export.ExportPresetRepository
 import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.CombineConfig
@@ -22,6 +23,7 @@ class CombineSettingsViewModel
 @Inject
 constructor(
     private val combineSettingsRepository: CombineSettingsRepository,
+    private val exportPresetRepository: ExportPresetRepository,
     watermarkRepository: WatermarkRepository,
     membershipProvider: MembershipProvider,
 ) : ViewModel() {
@@ -52,6 +54,7 @@ constructor(
     fun updateCombineConfig(config: CombineConfig) {
         viewModelScope.launch {
             combineSettingsRepository.saveConfig(config)
+            exportPresetRepository.syncActiveSlotCombine(config)
         }
     }
 }

@@ -15,4 +15,6 @@ dependencies {
     implementation(project(":core:ads"))
     implementation(project(":core:ads-ui"))
     implementation(project(":feature:tutorial"))
+
+    implementation(libs.kotlinx.collections.immutable)
 }

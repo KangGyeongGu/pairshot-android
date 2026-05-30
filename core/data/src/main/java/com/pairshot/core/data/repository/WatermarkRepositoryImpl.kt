@@ -47,12 +47,12 @@ constructor(
             destFile.absolutePath
         }
 
-    override suspend fun pruneOldLogoFiles(keepPath: String) =
+    override suspend fun pruneOldLogoFiles(keepPaths: Set<String>) =
         withContext(Dispatchers.IO) {
             val logoDir = File(context.filesDir, "watermark_logo")
             if (!logoDir.exists()) return@withContext
             logoDir.listFiles()?.forEach { existing ->
-                if (existing.absolutePath != keepPath) existing.delete()
+                if (existing.absolutePath !in keepPaths) existing.delete()
             }
         }
 

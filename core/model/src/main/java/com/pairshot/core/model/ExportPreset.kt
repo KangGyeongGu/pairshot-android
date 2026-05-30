@@ -1,5 +1,7 @@
 package com.pairshot.core.model
 
+import kotlinx.serialization.Serializable
+
 enum class ExportFormat {
     ZIP,
     INDIVIDUAL,
@@ -12,6 +14,7 @@ enum class ExportFormat {
     }
 }
 
+@Serializable
 data class ExportPreset(
     val format: ExportFormat = ExportFormat.INDIVIDUAL,
     val includeBefore: Boolean = false,

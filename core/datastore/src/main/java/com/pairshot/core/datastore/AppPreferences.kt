@@ -63,6 +63,8 @@ constructor(
         val CURRENT_TUTORIAL_SECTION = stringPreferencesKey("current_tutorial_section")
         val TUTORIAL_SANDBOX_PAIR_IDS = stringSetPreferencesKey("tutorial_sandbox_pair_ids")
         val TUTORIAL_SANDBOX_TEMP_FILES = stringSetPreferencesKey("tutorial_sandbox_temp_files")
+        val EXPORT_PRESET_SLOTS_JSON = stringPreferencesKey("export_preset_slots_json")
+        val ACTIVE_EXPORT_PRESET_ID = stringPreferencesKey("active_export_preset_id")
     }
 
     val imageQuality: Flow<String> =
@@ -369,6 +371,24 @@ constructor(
     suspend fun setTutorialSandboxTempFiles(paths: Set<String>) {
         context.appDataStore.edit { prefs ->
             prefs[Keys.TUTORIAL_SANDBOX_TEMP_FILES] = paths
+        }
+    }
+
+    val exportPresetSlotsJson: Flow<String?> =
+        context.appDataStore.data.map { prefs -> prefs[Keys.EXPORT_PRESET_SLOTS_JSON] }
+
+    suspend fun setExportPresetSlotsJson(json: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[Keys.EXPORT_PRESET_SLOTS_JSON] = json
+        }
+    }
+
+    val activeExportPresetId: Flow<String?> =
+        context.appDataStore.data.map { prefs -> prefs[Keys.ACTIVE_EXPORT_PRESET_ID] }
+
+    suspend fun setActiveExportPresetId(id: String) {
+        context.appDataStore.edit { prefs ->
+            prefs[Keys.ACTIVE_EXPORT_PRESET_ID] = id
         }
     }
 }

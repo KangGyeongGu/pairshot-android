@@ -4,6 +4,7 @@
     <string name="rewarded_gate_title">광고 시청 후 사용 가능</string>
     <string name="rewarded_gate_body_watermark_detail">워터마크 상세 설정은 짧은 광고를 본 뒤 이용할 수 있어요.\n쿠폰이 활성화된 경우 광고 없이 진입합니다.</string>
     <string name="rewarded_gate_body_combine_detail">합성 상세 설정은 짧은 광고를 본 뒤 이용할 수 있어요.\n쿠폰이 활성화된 경우 광고 없이 진입합니다.</string>
+    <string name="rewarded_gate_body_export_preset">추가 프리셋은 짧은 광고를 본 뒤 이용할 수 있어요.\n쿠폰이 활성화된 경우 광고 없이 진입합니다.</string>
     <string name="rewarded_gate_confirm">광고 보기</string>
     <string name="rewarded_gate_load_failed">광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</string>
 </resources>

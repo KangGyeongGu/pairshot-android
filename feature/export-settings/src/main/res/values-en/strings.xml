@@ -22,4 +22,21 @@
 
     <string name="export_settings_help_desc">Replay tutorial</string>
 
+    <string name="export_section_presets">Presets</string>
+    <string name="export_preset_default_name">Default</string>
+    <string name="export_preset_add_label">Add</string>
+    <string name="export_preset_add_desc">Add preset</string>
+    <string name="export_preset_add_locked_desc">Add preset (Pro)</string>
+    <string name="export_preset_name_placeholder">Preset name</string>
+    <string name="export_preset_name_dialog_title_create">Create preset</string>
+    <string name="export_preset_name_dialog_title_rename">Rename</string>
+    <string name="export_preset_action_rename">Rename</string>
+    <string name="export_preset_action_delete">Delete preset</string>
+    <string name="export_preset_error_name_blank">Please enter a name.</string>
+    <string name="export_preset_error_name_too_long">Name is too long.</string>
+    <string name="export_preset_error_name_duplicate">Name is already in use.</string>
+    <string name="export_preset_error_limit_reached">Up to 4 presets can be created.</string>
+    <string name="export_preset_error_cannot_delete_default">The default preset cannot be deleted.</string>
+    <string name="export_preset_error_unknown">Something went wrong.</string>
+
 </resources>

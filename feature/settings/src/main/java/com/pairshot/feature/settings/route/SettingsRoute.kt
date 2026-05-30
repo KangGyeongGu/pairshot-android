@@ -150,6 +150,7 @@ fun SettingsRoute(
                         when (pendingFeature) {
                             PremiumFeature.WATERMARK_DETAIL -> onNavigateToWatermarkSettings()
                             PremiumFeature.COMBINE_DETAIL -> onNavigateToCombineSettings()
+                            PremiumFeature.EXPORT_PRESET -> Unit
                         }
                     },
                     onSkip = {

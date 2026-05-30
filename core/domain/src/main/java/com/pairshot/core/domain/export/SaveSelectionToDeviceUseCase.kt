@@ -36,27 +36,44 @@ constructor(
     ): SaveToDeviceResult {
         require(pairIds.isNotEmpty()) { "no pairs to export" }
 
-        val effectiveCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
-        val effectiveFormat = enforceProFormat(preset.format)
+        val isPro = membershipProvider.current().isPro
+        val baseCombine = if (preset.applyCombineConfig) combineConfig else CombineConfig.NoDecoration
+        val effectiveCombine = enforceProCombine(baseCombine, isPro)
+        val effectiveWatermark = enforceProWatermark(watermarkConfig, isPro)
+        val effectiveFormat = enforceProFormat(preset.format, isPro)
 
         return when (effectiveFormat) {
-            ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, watermarkConfig, onProgress)
+            ExportFormat.ZIP -> saveZip(pairIds, preset, effectiveCombine, effectiveWatermark, onProgress)
             ExportFormat.INDIVIDUAL -> saveIndividuals(
                 pairIds,
                 preset,
                 effectiveCombine,
-                watermarkConfig,
-                onProgress
+                effectiveWatermark,
+                onProgress,
             )
         }
     }
 
-    private suspend fun enforceProFormat(format: ExportFormat): ExportFormat =
-        if (format == ExportFormat.ZIP && !membershipProvider.current().isPro) {
-            ExportFormat.INDIVIDUAL
+    private fun enforceProFormat(
+        format: ExportFormat,
+        isPro: Boolean,
+    ): ExportFormat =
+        if (!isPro && format == ExportFormat.ZIP) ExportFormat.INDIVIDUAL else format
+
+    private fun enforceProWatermark(
+        config: WatermarkConfig?,
+        isPro: Boolean,
+    ): WatermarkConfig? =
+        if (isPro || config == null) {
+            config
         } else {
-            format
+            WatermarkConfig(enabled = config.enabled)
         }
+
+    private fun enforceProCombine(
+        config: CombineConfig,
+        isPro: Boolean,
+    ): CombineConfig = if (isPro) config else CombineConfig()
 
     private suspend fun saveZip(
         pairIds: List<Long>,

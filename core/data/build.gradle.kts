@@ -2,6 +2,7 @@ plugins {
     id("pairshot.android.library")
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -21,6 +22,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
     implementation(libs.glide)
 }

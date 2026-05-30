@@ -28,6 +28,8 @@
     <string name="tutorial_msg_export_format">개별 이미지 또는 ZIP 파일로 묶어서 내보낼 수 있어요.</string>
     <string name="tutorial_msg_export_watermark">내보낼 사진들에 워터마크를 적용할 수 있어요.</string>
     <string name="tutorial_msg_export_combine">내보낼 사진들에 테두리 등 합성을 적용할 수 있어요.</string>
+    <string name="tutorial_msg_export_presets">상황 별 내보낼 옵션들을 미리 저장해둘 수 있어요.</string>
+    <string name="tutorial_msg_export_preset_default_card">생성 후 옵션을 변경해두면 자동으로 저장돼요.</string>
 
     <string name="tutorial_button_skip">건너뛰기</string>
     <string name="tutorial_button_next">다음 ›</string>

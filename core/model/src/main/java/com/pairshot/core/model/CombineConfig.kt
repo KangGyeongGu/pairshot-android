@@ -1,5 +1,8 @@
 package com.pairshot.core.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CombineConfig(
     val layout: CombineLayout = CombineLayout.HORIZONTAL,
     val borderEnabled: Boolean = true,

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -39,6 +41,7 @@ import com.pairshot.core.designsystem.PairShotCard
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.ExportFormat
+import com.pairshot.core.model.ExportPresetSlot
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.model.isContentMissing
 import com.pairshot.core.ui.component.SettingsSectionLabel
@@ -46,6 +49,7 @@ import com.pairshot.feature.exportsettings.R
 import com.pairshot.feature.exportsettings.component.ExportCombineSection
 import com.pairshot.feature.exportsettings.component.ExportFormatSection
 import com.pairshot.feature.exportsettings.component.ExportIncludeSection
+import com.pairshot.feature.exportsettings.component.ExportPresetSection
 import com.pairshot.feature.exportsettings.component.ExportWatermarkSection
 import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import com.pairshot.core.ui.R as CoreR
@@ -62,6 +66,8 @@ fun ExportSettingsScreen(
     applyWatermark: Boolean,
     applyCombineConfig: Boolean,
     isProSubscriber: Boolean,
+    slots: kotlinx.collections.immutable.ImmutableList<ExportPresetSlot>,
+    activeSlotId: String,
     onIncludeBeforeChange: (Boolean) -> Unit,
     onIncludeAfterChange: (Boolean) -> Unit,
     onIncludeCombinedChange: (Boolean) -> Unit,
@@ -72,10 +78,14 @@ fun ExportSettingsScreen(
     onNavigateToWatermarkSettings: () -> Unit,
     onNavigateToCombineSettings: () -> Unit,
     onProLock: () -> Unit,
+    onSelectSlot: (String) -> Unit,
+    onLongPressSlot: (ExportPresetSlot) -> Unit,
+    onAddSlot: () -> Unit,
     onShare: () -> Unit,
     onSaveToDevice: () -> Unit,
     onReplayTutorial: () -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     Scaffold(
         modifier = modifier,
@@ -116,6 +126,7 @@ fun ExportSettingsScreen(
                 PairShotBannerAd()
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    state = listState,
                     contentPadding =
                     PaddingValues(
                         start = PairShotScreen.horizontalPadding,
@@ -210,6 +221,29 @@ fun ExportSettingsScreen(
                                 applyCombineConfig = applyCombineConfig,
                                 onApplyCombineConfigChange = onApplyCombineConfigChange,
                                 onNavigateToCombineSettings = onNavigateToCombineSettings,
+                            )
+                        }
+                    }
+
+                    item(key = "label_presets") {
+                        Spacer(modifier = Modifier.height(PairShotSpacing.xxl))
+                        SettingsSectionLabel(label = stringResource(R.string.export_section_presets))
+                        Spacer(modifier = Modifier.height(PairShotSpacing.sm))
+                    }
+                    item(key = "section_presets") {
+                        Box(
+                            modifier = Modifier.tutorialAnchor(
+                                com.pairshot.core.domain.tutorial.AnchorKey.EXPORT_SECTION_PRESETS,
+                            ),
+                        ) {
+                            ExportPresetSection(
+                                slots = slots,
+                                activeSlotId = activeSlotId,
+                                isProSubscriber = isProSubscriber,
+                                onSelectSlot = onSelectSlot,
+                                onLongPressSlot = onLongPressSlot,
+                                onAddSlot = onAddSlot,
+                                onProLock = onProLock,
                             )
                         }
                     }
