@@ -53,7 +53,6 @@ private val LOGO_CORNER = PairShotSpacing.md
 private val LOGO_SHADOW_ELEVATION = PairShotSpacing.md
 private const val LOGO_SHADOW_AMBIENT_ALPHA = 0.18f
 private const val LOGO_SHADOW_SPOT_ALPHA = 0.28f
-private const val CONTINUE_FREE_ALPHA = 0.9f
 private const val LEGAL_ALPHA = 0.65f
 private const val DISCLOSURE_ALPHA = 0.6f
 
@@ -109,17 +108,18 @@ fun PaywallScreen(
                 )
 
                 Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
-                CenteredTextLink(
-                    text = stringResource(R.string.paywall_restore),
-                    onClick = onRestore,
-                )
                 if (!dismissible) {
                     CenteredTextLink(
                         text = stringResource(R.string.paywall_continue_free),
                         onClick = onContinueFree,
-                        alpha = CONTINUE_FREE_ALPHA,
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
+                CenteredTextLink(
+                    text = stringResource(R.string.paywall_restore),
+                    onClick = onRestore,
+                )
 
                 Spacer(modifier = Modifier.height(PairShotScreen.horizontalPadding))
                 DisclosureBlock()
@@ -247,12 +247,14 @@ private fun ValueProp(text: String) {
 private fun CenteredTextLink(
     text: String,
     onClick: () -> Unit,
-    alpha: Float = 1f,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    fontWeight: FontWeight? = null,
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+        color = color,
+        fontWeight = fontWeight,
         textAlign = TextAlign.Center,
         modifier =
         Modifier
