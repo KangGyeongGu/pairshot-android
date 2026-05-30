@@ -17,6 +17,7 @@ import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.navigation.PairPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -44,6 +45,7 @@ sealed interface PairPreviewUiState {
         val pair: PhotoPair,
         val hasCombined: Boolean,
         val showDeleteDialog: Boolean,
+        val showDeleteAfterDialog: Boolean,
         val livePreviewInputs: LivePreviewInputs?,
     ) : PairPreviewUiState
 }
@@ -64,6 +66,12 @@ constructor(
 
     private val hasCombinedState = MutableStateFlow(false)
     private val deleteDialogVisible = MutableStateFlow(false)
+    private val deleteAfterDialogVisible = MutableStateFlow(false)
+
+    private val dialogVisibilityFlow: Flow<Pair<Boolean, Boolean>> =
+        combine(deleteDialogVisible, deleteAfterDialogVisible) { delete, deleteAfter ->
+            delete to deleteAfter
+        }
 
     private val pairFlow: StateFlow<PhotoPair?> =
         photoPairRepository
@@ -92,10 +100,11 @@ constructor(
         combine(
             pairFlow,
             hasCombinedState,
-            deleteDialogVisible,
+            dialogVisibilityFlow,
             configFlow,
             watermarkFlow,
-        ) { pair, hasCombined, showDialog, config, watermark ->
+        ) { pair, hasCombined, dialogs, config, watermark ->
+            val (showDialog, showAfterDialog) = dialogs
             if (pair == null) {
                 PairPreviewUiState.Loading
             } else {
@@ -103,6 +112,7 @@ constructor(
                     pair = pair,
                     hasCombined = hasCombined,
                     showDeleteDialog = showDialog,
+                    showDeleteAfterDialog = showAfterDialog,
                     livePreviewInputs =
                     if (pair.afterPhotoUri == null) {
                         null
@@ -202,6 +212,30 @@ constructor(
             deleteCombinedPhotosUseCase(listOf(pairId))
             hasCombinedState.value = false
             deleteDialogVisible.value = false
+        }
+    }
+
+    fun showDeleteAfterDialog() {
+        deleteAfterDialogVisible.value = true
+    }
+
+    fun dismissDeleteAfterDialog() {
+        deleteAfterDialogVisible.value = false
+    }
+
+    fun deleteAfterOnly() {
+        viewModelScope.launch {
+            val currentPair = pairFlow.value ?: return@launch
+            if (currentPair.afterPhotoUri == null) {
+                deleteAfterDialogVisible.value = false
+                return@launch
+            }
+            runCatching { photoPairRepository.clearAfter(currentPair.id) }
+                .onFailure { error ->
+                    Timber.w(error, "failed to clear AFTER for pair ${currentPair.id}")
+                }
+            deleteAfterDialogVisible.value = false
+            _deleteComplete.emit(Unit)
         }
     }
 }

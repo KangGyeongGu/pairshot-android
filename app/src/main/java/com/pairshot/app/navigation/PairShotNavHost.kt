@@ -191,6 +191,7 @@ fun PairShotNavHost(
             PairPreviewRoute(
                 onDismiss = { navController.popBackStack() },
                 onShareSelection = { pairId -> onShareSelection(setOf(pairId)) },
+                onSaveSelectionToDevice = { pairId -> onSaveSelectionToDevice(setOf(pairId)) },
                 onNavigateToAfterCamera = { pairId ->
                     navController.navigate(AfterCamera(initialPairId = pairId))
                 },

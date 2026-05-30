@@ -15,12 +15,15 @@ import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotDialogTokens
 import com.pairshot.core.model.PairStatus
 import com.pairshot.core.ui.component.DeletePairConfirmDialog
+import com.pairshot.feature.pairpreview.component.DeleteAfterConfirmDialog
 import com.pairshot.feature.pairpreview.component.MissingSlotPlaceholder
 import com.pairshot.feature.pairpreview.component.MissingSlotSide
+import com.pairshot.feature.pairpreview.component.PairPreviewBottomBar
 import com.pairshot.feature.pairpreview.component.PairPreviewCenter
 import com.pairshot.feature.pairpreview.component.PairPreviewTopBar
 
 @Composable
+@Suppress("LongParameterList")
 fun PairPreviewScreen(
     hasCombined: Boolean,
     pairStatus: PairStatus,
@@ -28,14 +31,19 @@ fun PairPreviewScreen(
     livePreviewFailed: Boolean,
     onLivePreviewRetry: () -> Unit,
     showDeleteDialog: Boolean,
+    showDeleteAfterDialog: Boolean,
     onClose: () -> Unit,
     onShareSelection: () -> Unit,
+    onSaveToDevice: () -> Unit,
     onNavigateToAfterCamera: () -> Unit,
     onNavigateToBeforeRetake: () -> Unit,
     onDeleteRequest: () -> Unit,
     onDeleteAll: () -> Unit,
     onDeleteCombinedOnly: () -> Unit,
     onDeleteDismiss: () -> Unit,
+    onDeleteAfterRequest: () -> Unit,
+    onDeleteAfterConfirm: () -> Unit,
+    onDeleteAfterDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -53,11 +61,10 @@ fun PairPreviewScreen(
             shadowElevation = PairShotDialogTokens.elevation,
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+                PairShotBannerAd()
+
                 PairPreviewTopBar(
                     onClose = onClose,
-                    onShareSelection = onShareSelection,
-                    onNavigateToAfterCamera = onNavigateToAfterCamera,
-                    onDeleteRequest = onDeleteRequest,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -87,7 +94,13 @@ fun PairPreviewScreen(
                     }
                 }
 
-                PairShotBannerAd()
+                PairPreviewBottomBar(
+                    hasAfter = pairStatus == PairStatus.PAIRED,
+                    onShareClick = onShareSelection,
+                    onSaveToDeviceClick = onSaveToDevice,
+                    onDeleteAfterClick = onDeleteAfterRequest,
+                    onDeleteClick = onDeleteRequest,
+                )
             }
         }
     }
@@ -99,6 +112,13 @@ fun PairPreviewScreen(
             onDeleteAll = onDeleteAll,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
             onDismiss = onDeleteDismiss,
+        )
+    }
+
+    if (showDeleteAfterDialog) {
+        DeleteAfterConfirmDialog(
+            onConfirm = onDeleteAfterConfirm,
+            onDismiss = onDeleteAfterDismiss,
         )
     }
 }

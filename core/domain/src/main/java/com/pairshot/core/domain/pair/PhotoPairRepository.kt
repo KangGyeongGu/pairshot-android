@@ -40,6 +40,8 @@ interface PhotoPairRepository {
         tempFileUri: String,
     )
 
+    suspend fun clearAfter(pairId: Long)
+
     suspend fun pruneMissingSources(pairId: Long): PrunePairResult
 
     suspend fun pruneAllMissingSources(): List<PrunePairResult>
