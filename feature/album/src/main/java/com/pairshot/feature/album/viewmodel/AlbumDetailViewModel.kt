@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
+import com.pairshot.core.domain.album.RemovePairsFromAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
 import com.pairshot.core.domain.pair.CanCreatePairUseCase
@@ -105,6 +106,7 @@ constructor(
     private val albumRepository: AlbumRepository,
     private val deleteAlbumUseCase: DeleteAlbumUseCase,
     private val renameAlbumUseCase: RenameAlbumUseCase,
+    private val removePairsFromAlbumUseCase: RemovePairsFromAlbumUseCase,
     private val resolvePairNavigationTargetUseCase: ResolvePairNavigationTargetUseCase,
     private val deletePairsUseCase: DeletePairsUseCase,
     private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
@@ -267,7 +269,7 @@ constructor(
     fun removeSelectedFromAlbum() {
         val selectedIds = selectionState.value.selectedIds.toList()
         viewModelScope.launch {
-            if (selectedIds.isNotEmpty()) albumRepository.removePairs(albumId, selectedIds)
+            removePairsFromAlbumUseCase(albumId, selectedIds)
             closeSelectionAndDialog()
         }
     }

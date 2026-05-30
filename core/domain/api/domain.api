@@ -21,6 +21,11 @@ public final class com/pairshot/core/domain/album/DeleteAlbumUseCase {
 	public final fun invoke (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class com/pairshot/core/domain/album/RemovePairsFromAlbumUseCase {
+	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;)V
+	public final fun invoke (JLjava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class com/pairshot/core/domain/album/RenameAlbumUseCase {
 	public fun <init> (Lcom/pairshot/core/domain/album/AlbumRepository;)V
 	public final fun invoke (JLjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -119,19 +124,6 @@ public final class com/pairshot/core/domain/export/ExportItem$CombinedImage : co
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/pairshot/core/domain/export/ExportItem$ZipAssembly : com/pairshot/core/domain/export/ExportItem {
-	public fun <init> ()V
-	public fun <init> (J)V
-	public synthetic fun <init> (JILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()J
-	public final fun copy (J)Lcom/pairshot/core/domain/export/ExportItem$ZipAssembly;
-	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/ExportItem$ZipAssembly;JILjava/lang/Object;)Lcom/pairshot/core/domain/export/ExportItem$ZipAssembly;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun getPairId ()J
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
 public final class com/pairshot/core/domain/export/ExportPlan {
 	public fun <init> (Lcom/pairshot/core/domain/export/ExportDestination;Lcom/pairshot/core/model/ExportFormat;Ljava/util/List;Ljava/util/List;Lcom/pairshot/core/model/CombineConfig;Lcom/pairshot/core/model/WatermarkConfig;Z)V
 	public final fun component1 ()Lcom/pairshot/core/domain/export/ExportDestination;
@@ -172,10 +164,41 @@ public abstract interface class com/pairshot/core/domain/export/ExportPresetRepo
 	public abstract fun syncActiveSlotWatermark (Lcom/pairshot/core/model/WatermarkConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface class com/pairshot/core/domain/export/ExportProgress {
+	public abstract fun getCurrent ()I
+	public abstract fun getTotal ()I
+}
+
+public final class com/pairshot/core/domain/export/ExportProgress$Compressing : com/pairshot/core/domain/export/ExportProgress {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lcom/pairshot/core/domain/export/ExportProgress$Compressing;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/ExportProgress$Compressing;IIILjava/lang/Object;)Lcom/pairshot/core/domain/export/ExportProgress$Compressing;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCurrent ()I
+	public fun getTotal ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/pairshot/core/domain/export/ExportProgress$Rendering : com/pairshot/core/domain/export/ExportProgress {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lcom/pairshot/core/domain/export/ExportProgress$Rendering;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/export/ExportProgress$Rendering;IIILjava/lang/Object;)Lcom/pairshot/core/domain/export/ExportProgress$Rendering;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCurrent ()I
+	public fun getTotal ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public abstract interface class com/pairshot/core/domain/export/ExportRepository {
 	public abstract fun discardPreparedZip (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun executeSaveToDevice (Lcom/pairshot/core/domain/export/ExportPlan;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun executeShare (Lcom/pairshot/core/domain/export/ExportPlan;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun executeSaveToDevice (Lcom/pairshot/core/domain/export/ExportPlan;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun executeShare (Lcom/pairshot/core/domain/export/ExportPlan;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class com/pairshot/core/domain/export/PlanExportUseCase {
