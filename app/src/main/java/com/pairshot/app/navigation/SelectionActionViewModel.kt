@@ -11,6 +11,7 @@ import com.pairshot.core.domain.export.ShareSelectionUseCase
 import com.pairshot.core.domain.export.ZipExportRepository
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.settings.OnboardingStateRepository
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportPreset
@@ -83,6 +84,7 @@ constructor(
     private val combineSettingsRepository: CombineSettingsRepository,
     private val watermarkRepository: WatermarkRepository,
     private val appSettingsRepository: AppSettingsRepository,
+    private val onboardingStateRepository: OnboardingStateRepository,
 ) : ViewModel() {
     private val _exportAction = MutableSharedFlow<ExportAction>()
     val exportAction: SharedFlow<ExportAction> = _exportAction.asSharedFlow()
@@ -95,6 +97,12 @@ constructor(
 
     private val _progress = MutableStateFlow<Progress?>(null)
     val progress: StateFlow<Progress?> = _progress.asStateFlow()
+
+    private val _firstSaveReviewRequest = MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1,
+    )
+    val firstSaveReviewRequest: SharedFlow<Unit> = _firstSaveReviewRequest.asSharedFlow()
 
     fun shareSelection(ids: Set<Long>) {
         if (ids.isEmpty()) return
@@ -182,6 +190,7 @@ constructor(
                 _messages.emit(
                     SelectionMessage.Success(UiText.Resource(R.string.snackbar_success_saved_to_device)),
                 )
+                maybeEmitFirstSaveReviewRequest()
             }
 
             is SaveToDeviceResult.ZipReadyForSave -> {
@@ -202,6 +211,12 @@ constructor(
         }
     }
 
+    private suspend fun maybeEmitFirstSaveReviewRequest() {
+        if (onboardingStateRepository.isFirstSaveReviewRequested()) return
+        onboardingStateRepository.markFirstSaveReviewRequested()
+        _firstSaveReviewRequest.emit(Unit)
+    }
+
     fun onSaveDocumentResult(result: SaveDocumentResult) {
         viewModelScope.launch {
             when (result) {
@@ -214,6 +229,7 @@ constructor(
                             ),
                         ),
                     )
+                    maybeEmitFirstSaveReviewRequest()
                 }
 
                 is SaveDocumentResult.Cancelled -> {

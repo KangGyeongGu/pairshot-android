@@ -34,6 +34,7 @@ import com.pairshot.app.navigation.SelectionActionViewModel
 import com.pairshot.app.navigation.SelectionMessage
 import com.pairshot.app.navigation.StartupDecisionViewModel
 import com.pairshot.app.navigation.effect.ExportShareEffect
+import com.pairshot.app.navigation.effect.InAppReviewEffect
 import com.pairshot.app.navigation.effect.SaveZipToDocumentEffect
 import com.pairshot.app.shell.AppShellViewModel
 import com.pairshot.core.ads.di.AdsEntryPoint
@@ -207,6 +208,11 @@ private fun AppRootContent(
     SaveZipToDocumentEffect(
         requests = selectionVm.saveDocumentRequests,
         onResult = selectionVm::onSaveDocumentResult,
+    )
+
+    InAppReviewEffect(
+        requests = selectionVm.firstSaveReviewRequest,
+        activity = activity,
     )
 
     Box(modifier = Modifier.fillMaxSize()) {

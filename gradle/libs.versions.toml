@@ -76,6 +76,8 @@ kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotli
 
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.4" }
 
+play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version = "2.0.2" }
+
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.10.1" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 

@@ -22,4 +22,8 @@ constructor(
     override suspend fun isTutorialCompleted(): Boolean = appPreferences.tutorialCompleted.first()
 
     override suspend fun isExportSettingsTutorialCompleted(): Boolean = appPreferences.exportSettingsTutorialCompleted.first()
+
+    override suspend fun isFirstSaveReviewRequested(): Boolean = appPreferences.firstSaveReviewRequested.first()
+
+    override suspend fun markFirstSaveReviewRequested() = appPreferences.setFirstSaveReviewRequested(true)
 }

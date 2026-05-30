@@ -163,11 +163,23 @@ fun PairPreviewRoute(
                         onLivePreviewRetry = { retryToken += 1 },
                         showDeleteDialog = state.showDeleteDialog,
                         showDeleteAfterDialog = state.showDeleteAfterDialog,
-                        onClose = onDismiss,
-                        onShareSelection = { onShareSelection(viewModel.pairId) },
-                        onSaveToDevice = { onSaveSelectionToDevice(viewModel.pairId) },
-                        onNavigateToAfterCamera = { onNavigateToAfterCamera(viewModel.pairId) },
-                        onNavigateToBeforeRetake = { onNavigateToBeforeRetake(viewModel.pairId) },
+                        onClose = currentOnDismiss,
+                        onShareSelection = {
+                            onShareSelection(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onSaveToDevice = {
+                            onSaveSelectionToDevice(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onNavigateToAfterCamera = {
+                            onNavigateToAfterCamera(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onNavigateToBeforeRetake = {
+                            onNavigateToBeforeRetake(viewModel.pairId)
+                            currentOnDismiss()
+                        },
                         onDeleteRequest = viewModel::showDeleteDialog,
                         onDeleteAll = viewModel::deletePair,
                         onDeleteCombinedOnly = viewModel::deleteCombinedOnly,

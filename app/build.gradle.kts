@@ -180,6 +180,8 @@ dependencies {
 
     implementation(libs.datastore.preferences)
 
+    implementation(libs.play.review.ktx)
+
     implementation(libs.activity.compose)
     implementation(libs.core.splashscreen)
 
