@@ -23,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.pairshot.core.adsui.component.PairCardGridSection
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.model.SortOrder
+import com.pairshot.core.ui.component.PairCardGridSection
 import com.pairshot.feature.album.R
 import com.pairshot.feature.album.viewmodel.PairPickerUiState
 import kotlinx.collections.immutable.toImmutableList
@@ -122,7 +122,6 @@ fun PairPickerScreen(
             isSelectionMode = true,
             sortOrder = SortOrder.DESC,
             onPairClick = onToggle,
-            showAds = false,
             disabledIds = state.alreadyInAlbumIds.toImmutableSet(),
             disabledLabel = stringResource(R.string.pair_picker_already_added),
             contentPadding =

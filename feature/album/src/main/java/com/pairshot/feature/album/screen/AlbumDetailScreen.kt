@@ -10,10 +10,11 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.pairshot.core.adsui.component.PairCardGridSection
+import com.pairshot.core.adsui.component.rememberPairCardNativeAdSlot
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.ui.component.ConfirmActionBottomSheet
 import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.core.ui.component.PairCardGridSection
 import com.pairshot.feature.album.R
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
@@ -110,6 +111,7 @@ fun AlbumDetailScreen(
                         onEnterSelectionMode = onEnterSelectionMode,
                     )
                 }
+                val adSlot = rememberPairCardNativeAdSlot()
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
@@ -128,6 +130,9 @@ fun AlbumDetailScreen(
                             start = PairShotSpacing.md,
                             end = PairShotSpacing.md,
                         ),
+                        adFree = adSlot.isAdFree,
+                        onAdSlotCountChange = adSlot::onAdSlotCountChange,
+                        adSlot = { slotIndex -> adSlot.Content(slotIndex) },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }

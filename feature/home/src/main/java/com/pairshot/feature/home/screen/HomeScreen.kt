@@ -18,8 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.pairshot.core.adsui.component.PairCardGridSection
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.adsui.component.rememberPairCardNativeAdSlot
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.infra.location.LocationResult
@@ -28,6 +28,7 @@ import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.ConfirmActionBottomSheet
 import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.core.ui.component.PairCardGridSection
 import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.component.HomeAlbumGridSection
@@ -184,6 +185,7 @@ fun HomeScreen(
                         bottom = PairShotSpacing.sm,
                     )
                 val today = remember { LocalDate.now(ZoneId.systemDefault()) }
+                val adSlot = rememberPairCardNativeAdSlot()
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
@@ -199,6 +201,9 @@ fun HomeScreen(
                                 onPairClick = onPairClick,
                                 onPairLongPress = onPairLongClick,
                                 contentPadding = contentPadding,
+                                adFree = adSlot.isAdFree,
+                                onAdSlotCountChange = adSlot::onAdSlotCountChange,
+                                adSlot = { slotIndex -> adSlot.Content(slotIndex) },
                                 dateHeaderLabel = { date ->
                                     formatHomeDateLabel(date = date, today = today)
                                 },

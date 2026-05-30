@@ -1,4 +1,4 @@
-package com.pairshot.core.adsui.component
+package com.pairshot.core.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,27 +12,19 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pairshot.core.ads.controller.NativeAdPool
-import com.pairshot.core.ads.di.AdsEntryPoint
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.pair.PairListItem
 import com.pairshot.core.domain.pair.buildPairListWithAds
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
-import com.pairshot.core.ui.component.PairCard
-import dagger.hilt.android.EntryPointAccessors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -56,11 +48,14 @@ fun PairCardGridSection(
     modifier: Modifier = Modifier,
     firstPairModifier: Modifier = Modifier,
     onPairLongPress: (Long) -> Unit = {},
-    showAds: Boolean = true,
+    adFree: Boolean = true,
     disabledIds: ImmutableSet<Long> = persistentSetOf(),
     disabledLabel: String? = null,
     dateHeaderLabel: @Composable (LocalDate) -> String = { it.format(DefaultDateFormatter) },
+    onAdSlotCountChange: (Int) -> Unit = {},
+    adSlot: @Composable (slotIndex: Int) -> Unit = {},
 ) {
+    val currentOnAdSlotCountChange by rememberUpdatedState(onAdSlotCountChange)
     val sortedPairs =
         remember(pairs, sortOrder) {
             when (sortOrder) {
@@ -69,24 +64,21 @@ fun PairCardGridSection(
             }
         }
 
-    val adContext = rememberAdContext(enabled = showAds)
     val firstPairId =
         remember(sortedPairs) { sortedPairs.firstOrNull()?.id }
 
     val items =
-        remember(sortedPairs, adContext.isAdFree) {
+        remember(sortedPairs, adFree) {
             buildPairListWithAds(
                 pairs = sortedPairs,
-                adFree = adContext.isAdFree == true,
+                adFree = adFree,
                 sectionKeyOf = { it.beforeTimestamp.toLocalDate() },
             )
         }
     val totalAdSlots = remember(items) { items.count { it is PairListItem.Ad } }
 
-    LaunchedEffect(totalAdSlots, adContext.isAdFree) {
-        if (adContext.isAdFree == false && totalAdSlots > 0) {
-            adContext.pool?.ensurePreloaded(totalAdSlots)
-        }
+    LaunchedEffect(totalAdSlots, adFree) {
+        currentOnAdSlotCountChange(totalAdSlots)
     }
 
     LazyVerticalGrid(
@@ -143,53 +135,14 @@ fun PairCardGridSection(
                 }
 
                 is PairListItem.Ad -> {
-                    val slot = entry.slotIndex
-                    val nativeAd = adContext.nativeAds.getOrNull(slot)
-                    if (nativeAd != null) {
-                        item(
-                            key = "ad_$slot",
-                            span = { GridItemSpan(maxLineSpan) },
-                        ) {
-                            PairShotNativeAdCard(nativeAd = nativeAd)
-                        }
+                    item(
+                        key = "ad_${entry.slotIndex}",
+                        span = { GridItemSpan(maxLineSpan) },
+                    ) {
+                        adSlot(entry.slotIndex)
                     }
                 }
             }
         }
     }
-}
-
-private data class AdContext(
-    val isAdFree: Boolean?,
-    val pool: NativeAdPool?,
-    val nativeAds: List<com.google.android.gms.ads.nativead.NativeAd>,
-)
-
-@Composable
-private fun rememberAdContext(enabled: Boolean): AdContext {
-    val isInspection = LocalInspectionMode.current
-    if (!enabled || isInspection) {
-        return AdContext(isAdFree = true, pool = null, nativeAds = emptyList())
-    }
-
-    val context = LocalContext.current
-    val entryPoint =
-        remember(context) {
-            EntryPointAccessors.fromApplication(
-                context.applicationContext,
-                AdsEntryPoint::class.java,
-            )
-        }
-    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
-    val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
-    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
-    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
-
-    val nativeAdPool = remember(poolProvider) { poolProvider.get() }
-    DisposableEffect(nativeAdPool) {
-        onDispose { nativeAdPool.close() }
-    }
-    val nativeAds by nativeAdPool.observeAds().collectAsStateWithLifecycle()
-
-    return AdContext(isAdFree = isAdFree, pool = nativeAdPool, nativeAds = nativeAds)
 }
