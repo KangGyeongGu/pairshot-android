@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pairshot.core.domain.combine.CombineSettingsRepository
 import com.pairshot.core.domain.export.ExportAction
-import com.pairshot.core.domain.export.HasSavableSelectionUseCase
-import com.pairshot.core.domain.export.SaveSelectionToDeviceUseCase
+import com.pairshot.core.domain.export.ExportDestination
+import com.pairshot.core.domain.export.ExportProgress
+import com.pairshot.core.domain.export.ExportRepository
+import com.pairshot.core.domain.export.PlanExportUseCase
 import com.pairshot.core.domain.export.SaveToDeviceResult
-import com.pairshot.core.domain.export.ShareSelectionUseCase
-import com.pairshot.core.domain.export.ZipExportRepository
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.settings.OnboardingStateRepository
 import com.pairshot.core.domain.settings.WatermarkRepository
 import com.pairshot.core.model.CombineConfig
 import com.pairshot.core.model.ExportPreset
@@ -75,14 +76,13 @@ sealed interface SaveDocumentResult {
 class SelectionActionViewModel
 @Inject
 constructor(
-    private val shareSelectionUseCase: ShareSelectionUseCase,
-    private val saveSelectionToDeviceUseCase: SaveSelectionToDeviceUseCase,
-    private val hasSavableSelectionUseCase: HasSavableSelectionUseCase,
+    private val planExportUseCase: PlanExportUseCase,
+    private val exportRepository: ExportRepository,
     private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
-    private val zipExportRepository: ZipExportRepository,
     private val combineSettingsRepository: CombineSettingsRepository,
     private val watermarkRepository: WatermarkRepository,
     private val appSettingsRepository: AppSettingsRepository,
+    private val onboardingStateRepository: OnboardingStateRepository,
 ) : ViewModel() {
     private val _exportAction = MutableSharedFlow<ExportAction>()
     val exportAction: SharedFlow<ExportAction> = _exportAction.asSharedFlow()
@@ -95,6 +95,12 @@ constructor(
 
     private val _progress = MutableStateFlow<Progress?>(null)
     val progress: StateFlow<Progress?> = _progress.asStateFlow()
+
+    private val _firstSaveReviewRequest = MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1,
+    )
+    val firstSaveReviewRequest: SharedFlow<Unit> = _firstSaveReviewRequest.asSharedFlow()
 
     fun shareSelection(ids: Set<Long>) {
         if (ids.isEmpty()) return
@@ -110,17 +116,27 @@ constructor(
                 )
                 return@launch
             }
-            val shareLabel = UiText.Resource(com.pairshot.R.string.progress_sharing)
-            _progress.value = Progress(shareLabel, 0, ids.size)
+            val plan =
+                planExportUseCase(
+                    pairIds = ids.toList(),
+                    preset = preset,
+                    combineConfig = combine,
+                    watermarkConfig = watermark,
+                    destination = ExportDestination.SHARE,
+                )
+            if (plan.isEmpty) {
+                _messages.emit(
+                    SelectionMessage.Warning(UiText.Resource(R.string.snackbar_warning_nothing_to_save)),
+                )
+                return@launch
+            }
+            val renderingLabel = UiText.Resource(com.pairshot.R.string.progress_sharing)
+            val zipLabel = UiText.Resource(com.pairshot.R.string.progress_zipping)
+            _progress.value = Progress(renderingLabel, current = 0, total = plan.totalUnits)
             runCatching {
                 val action =
-                    shareSelectionUseCase(
-                        pairIds = ids.toList(),
-                        preset = preset,
-                        watermarkConfig = watermark,
-                        combineConfig = combine,
-                    ) { current, total ->
-                        _progress.value = Progress(shareLabel, current, total)
+                    exportRepository.executeShare(plan) { event ->
+                        _progress.value = event.toProgress(renderingLabel, zipLabel)
                     }
                 _exportAction.emit(action)
             }.onFailure { error ->
@@ -145,26 +161,26 @@ constructor(
                 )
                 return@launch
             }
-            val hasWork =
-                runCatching {
-                    hasSavableSelectionUseCase(ids.toList(), preset, watermark)
-                }.getOrDefault(false)
-            if (!hasWork) {
+            val plan =
+                planExportUseCase(
+                    pairIds = ids.toList(),
+                    preset = preset,
+                    combineConfig = combine,
+                    watermarkConfig = watermark,
+                    destination = ExportDestination.SAVE_TO_DEVICE,
+                )
+            if (plan.isEmpty) {
                 _messages.emit(
                     SelectionMessage.Warning(UiText.Resource(R.string.snackbar_warning_nothing_to_save)),
                 )
                 return@launch
             }
-            val saveLabel = UiText.Resource(com.pairshot.R.string.progress_saving)
-            _progress.value = Progress(saveLabel, 0, ids.size)
+            val renderingLabel = UiText.Resource(com.pairshot.R.string.progress_saving)
+            val zipLabel = UiText.Resource(com.pairshot.R.string.progress_zipping)
+            _progress.value = Progress(renderingLabel, current = 0, total = plan.totalUnits)
             runCatching {
-                saveSelectionToDeviceUseCase(
-                    pairIds = ids.toList(),
-                    preset = preset,
-                    watermarkConfig = watermark,
-                    combineConfig = combine,
-                ) { current, total ->
-                    _progress.value = Progress(saveLabel, current, total)
+                exportRepository.executeSaveToDevice(plan) { event ->
+                    _progress.value = event.toProgress(renderingLabel, zipLabel)
                 }
             }.onSuccess { result ->
                 handleSaveResult(result)
@@ -182,6 +198,7 @@ constructor(
                 _messages.emit(
                     SelectionMessage.Success(UiText.Resource(R.string.snackbar_success_saved_to_device)),
                 )
+                maybeEmitFirstSaveReviewRequest()
             }
 
             is SaveToDeviceResult.ZipReadyForSave -> {
@@ -202,6 +219,12 @@ constructor(
         }
     }
 
+    private suspend fun maybeEmitFirstSaveReviewRequest() {
+        if (onboardingStateRepository.isFirstSaveReviewRequested()) return
+        onboardingStateRepository.markFirstSaveReviewRequested()
+        _firstSaveReviewRequest.emit(Unit)
+    }
+
     fun onSaveDocumentResult(result: SaveDocumentResult) {
         viewModelScope.launch {
             when (result) {
@@ -214,6 +237,7 @@ constructor(
                             ),
                         ),
                     )
+                    maybeEmitFirstSaveReviewRequest()
                 }
 
                 is SaveDocumentResult.Cancelled -> {
@@ -229,7 +253,7 @@ constructor(
                     )
                 }
             }
-            zipExportRepository.discardPreparedZip(result.sourceFilePath)
+            exportRepository.discardPreparedZip(result.sourceFilePath)
         }
     }
 
@@ -243,6 +267,15 @@ constructor(
         return Triple(preset, combine, watermark)
     }
 }
+
+private fun ExportProgress.toProgress(
+    renderingLabel: UiText,
+    zipLabel: UiText,
+): Progress =
+    when (this) {
+        is ExportProgress.Rendering -> Progress(renderingLabel, current, total)
+        is ExportProgress.Compressing -> Progress(zipLabel, current, total)
+    }
 
 data class Progress(
     val label: UiText,

@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,27 +19,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.adsui.component.PairShotBannerAd
+import com.pairshot.core.adsui.component.rememberPairCardNativeAdSlot
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
-import com.pairshot.core.ui.component.DeletePairConfirmDialog
-import com.pairshot.core.ui.component.PairShotDialog
+import com.pairshot.core.ui.component.ConfirmActionBottomSheet
+import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.core.ui.component.PairCardGridSection
+import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.feature.home.R
 import com.pairshot.feature.home.component.HomeAlbumGridSection
 import com.pairshot.feature.home.component.HomeAlbumSelectionBottomBar
 import com.pairshot.feature.home.component.HomeEmptyAction
 import com.pairshot.feature.home.component.HomeFilterRow
-import com.pairshot.feature.home.component.HomePairGridSection
 import com.pairshot.feature.home.component.HomePrimaryActionBar
 import com.pairshot.feature.home.component.HomeSelectionBottomBar
 import com.pairshot.feature.home.component.HomeTopBar
 import com.pairshot.feature.home.dialog.CreateAlbumDialog
 import com.pairshot.feature.home.viewmodel.HomeMode
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import com.pairshot.core.ui.R as CoreR
+
+private val HomeDateFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("yyyy. MM. dd", Locale.KOREAN)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +57,8 @@ fun HomeScreen(
     mode: HomeMode,
     pairs: ImmutableList<PhotoPair>,
     albums: ImmutableList<Album>,
-    selectionMode: Boolean,
-    selectedIds: ImmutableSet<Long>,
-    albumSelectionMode: Boolean,
-    selectedAlbumIds: ImmutableSet<Long>,
+    pairSelection: SelectionState,
+    albumSelection: SelectionState,
     currentLocation: LocationResult?,
     showCreateAlbumDialog: Boolean,
     sortOrder: SortOrder,
@@ -88,7 +94,7 @@ fun HomeScreen(
     var showAlbumDeleteDialog by remember { mutableStateOf(false) }
     var showAlbumRenameDialog by remember { mutableStateOf(false) }
 
-    val inSelectionMode = selectionMode || albumSelectionMode
+    val inSelectionMode = pairSelection.isSelectionMode || albumSelection.isSelectionMode
     val listIsEmpty = if (mode == HomeMode.PAIRS) pairs.isEmpty() else albums.isEmpty()
     val primaryLabel =
         if (mode == HomeMode.PAIRS) {
@@ -98,9 +104,9 @@ fun HomeScreen(
         }
     val primaryAction: () -> Unit =
         if (mode == HomeMode.PAIRS) onNavigateToCamera else onCreateAlbumClick
-    val currentTotalCount = if (albumSelectionMode) albums.size else pairs.size
+    val currentTotalCount = if (albumSelection.isSelectionMode) albums.size else pairs.size
     val currentSelectedCount =
-        if (albumSelectionMode) selectedAlbumIds.size else selectedIds.size
+        if (albumSelection.isSelectionMode) albumSelection.selectedCount else pairSelection.selectedCount
     val allSelected = currentTotalCount > 0 && currentSelectedCount == currentTotalCount
 
     Scaffold(
@@ -112,7 +118,7 @@ fun HomeScreen(
                 allSelected = allSelected,
                 isProSubscriber = isProSubscriber,
                 onExitSelectionMode =
-                if (albumSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
+                if (albumSelection.isSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,
                 onEnterSelectionMode = onEnterSelectionMode,
                 onNavigateToSettings = onNavigateToSettings,
@@ -120,9 +126,9 @@ fun HomeScreen(
         },
         bottomBar = {
             when {
-                selectionMode -> {
+                pairSelection.isSelectionMode -> {
                     HomeSelectionBottomBar(
-                        selectedCount = selectedIds.size,
+                        selectedCount = pairSelection.selectedCount,
                         onShare = onShare,
                         onSaveToDevice = onSaveToDevice,
                         onDelete = { showDeleteConfirmDialog = true },
@@ -130,9 +136,9 @@ fun HomeScreen(
                     )
                 }
 
-                albumSelectionMode -> {
+                albumSelection.isSelectionMode -> {
                     HomeAlbumSelectionBottomBar(
-                        selectedCount = selectedAlbumIds.size,
+                        selectedCount = albumSelection.selectedCount,
                         onRename = { showAlbumRenameDialog = true },
                         onDelete = { showAlbumDeleteDialog = true },
                     )
@@ -178,6 +184,8 @@ fun HomeScreen(
                         end = PairShotSpacing.md,
                         bottom = PairShotSpacing.sm,
                     )
+                val today = remember { LocalDate.now(ZoneId.systemDefault()) }
+                val adSlot = rememberPairCardNativeAdSlot()
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
@@ -185,14 +193,21 @@ fun HomeScreen(
                 ) {
                     when (mode) {
                         HomeMode.PAIRS -> {
-                            HomePairGridSection(
+                            PairCardGridSection(
                                 pairs = pairs,
-                                selectedIds = selectedIds,
-                                selectionMode = selectionMode,
+                                selectedIds = pairSelection.selectedIds,
+                                isSelectionMode = pairSelection.isSelectionMode,
                                 sortOrder = sortOrder,
                                 onPairClick = onPairClick,
-                                onPairLongClick = onPairLongClick,
+                                onPairLongPress = onPairLongClick,
                                 contentPadding = contentPadding,
+                                adFree = adSlot.isAdFree,
+                                onAdSlotCountChange = adSlot::onAdSlotCountChange,
+                                adSlot = { slotIndex -> adSlot.Content(slotIndex) },
+                                dateHeaderLabel = { date ->
+                                    formatHomeDateLabel(date = date, today = today)
+                                },
+                                firstPairModifier = Modifier.tutorialAnchor(AnchorKey.HOME_PAIR_CARD_FIRST),
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
@@ -200,8 +215,8 @@ fun HomeScreen(
                         HomeMode.ALBUMS -> {
                             HomeAlbumGridSection(
                                 albums = albums,
-                                isSelectionMode = albumSelectionMode,
-                                selectedAlbumIds = selectedAlbumIds,
+                                isSelectionMode = albumSelection.isSelectionMode,
+                                selectedAlbumIds = albumSelection.selectedIds,
                                 onAlbumClick = onAlbumClick,
                                 onAlbumLongPress = onAlbumLongPress,
                                 contentPadding = contentPadding,
@@ -225,11 +240,11 @@ fun HomeScreen(
 
     if (showDeleteConfirmDialog) {
         val combinedInSelection =
-            pairs.count { it.id in selectedIds && it.hasCombined }
-        DeletePairConfirmDialog(
-            pairCount = selectedIds.size,
+            pairs.count { it.id in pairSelection.selectedIds && it.hasCombined }
+        DeletePairsBottomSheet(
+            pairCount = pairSelection.selectedCount,
             combinedCount = combinedInSelection,
-            onDeleteAll = {
+            onDeletePairs = {
                 showDeleteConfirmDialog = false
                 onDeleteSelection()
             },
@@ -242,54 +257,27 @@ fun HomeScreen(
     }
 
     if (showAlbumDeleteDialog) {
-        PairShotDialog(
-            onDismissRequest = { showAlbumDeleteDialog = false },
-            title = {
-                Text(
-                    text = stringResource(R.string.home_dialog_album_delete_title),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+        ConfirmActionBottomSheet(
+            title = stringResource(R.string.home_dialog_album_delete_title),
+            message =
+            pluralStringResource(
+                R.plurals.home_dialog_album_delete_confirm,
+                albumSelection.selectedCount,
+                albumSelection.selectedCount,
+            ),
+            confirmLabel = stringResource(CoreR.string.common_button_delete),
+            onConfirm = {
+                showAlbumDeleteDialog = false
+                onDeleteAlbums()
             },
-            text = {
-                Text(
-                    text =
-                    pluralStringResource(
-                        R.plurals.home_dialog_album_delete_confirm,
-                        selectedAlbumIds.size,
-                        selectedAlbumIds.size,
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showAlbumDeleteDialog = false
-                        onDeleteAlbums()
-                    },
-                ) {
-                    Text(
-                        text = stringResource(CoreR.string.common_button_delete),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAlbumDeleteDialog = false }) {
-                    Text(
-                        text = stringResource(CoreR.string.common_button_cancel),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            },
+            onDismiss = { showAlbumDeleteDialog = false },
+            confirmIsDestructive = true,
         )
     }
 
     if (showAlbumRenameDialog) {
         val currentName =
-            albums.firstOrNull { it.id in selectedAlbumIds }?.name.orEmpty()
+            albums.firstOrNull { it.id in albumSelection.selectedIds }?.name.orEmpty()
         AlbumRenameDialog(
             currentName = currentName,
             onConfirm = { newName ->
@@ -298,5 +286,18 @@ fun HomeScreen(
             },
             onDismiss = { showAlbumRenameDialog = false },
         )
+    }
+}
+
+@Composable
+private fun formatHomeDateLabel(
+    date: LocalDate,
+    today: LocalDate,
+): String {
+    val base = date.format(HomeDateFormatter)
+    return when (date) {
+        today -> stringResource(R.string.home_date_suffix_today, base)
+        today.minusDays(1) -> stringResource(R.string.home_date_suffix_yesterday, base)
+        else -> base
     }
 }

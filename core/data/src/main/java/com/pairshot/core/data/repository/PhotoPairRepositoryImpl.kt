@@ -61,9 +61,11 @@ constructor(
             photoPairDao.getById(id)?.toDomain()
         }
 
-    override fun observeById(id: Long): Flow<PhotoPair?> = photoPairDao.observeById(
-        id
-    ).map { entity -> entity?.toDomain() }
+    override fun observeById(id: Long): Flow<PhotoPair?> =
+        photoPairDao
+            .observeById(
+                id,
+            ).map { entity -> entity?.toDomain() }
 
     override suspend fun getByIds(ids: List<Long>): List<PhotoPair> =
         withContext(Dispatchers.IO) {
@@ -268,6 +270,23 @@ constructor(
             }
         } finally {
             if (!tutorialActive) deleteTempFile(tempFileUri)
+        }
+    }
+
+    override suspend fun clearAfter(pairId: Long) {
+        withContext(Dispatchers.IO) {
+            val entity = photoPairDao.getById(pairId) ?: return@withContext
+            entity.afterPhotoUri?.let { uri ->
+                runCatching { deleteGalleryUriLogOnFailure(uri, "after delete failed during clearAfter") }
+                    .onFailure { Timber.w(it, "after gallery delete threw: %s", uri) }
+            }
+            photoPairDao.update(
+                entity.copy(
+                    afterPhotoUri = null,
+                    afterTimestamp = null,
+                    status = PairStatus.BEFORE_ONLY.name,
+                ),
+            )
         }
     }
 

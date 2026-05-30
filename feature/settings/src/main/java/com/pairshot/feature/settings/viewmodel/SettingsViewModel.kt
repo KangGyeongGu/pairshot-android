@@ -2,6 +2,7 @@ package com.pairshot.feature.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pairshot.core.domain.export.ExportPresetRepository
 import com.pairshot.core.domain.membership.MembershipProvider
 import com.pairshot.core.domain.settings.AppInfo
 import com.pairshot.core.domain.settings.AppSettingsRepository
@@ -61,6 +62,7 @@ constructor(
     private val clearCacheUseCase: ClearCacheUseCase,
     private val watermarkRepository: WatermarkRepository,
     private val appSettingsRepository: AppSettingsRepository,
+    private val exportPresetRepository: ExportPresetRepository,
     private val appInfo: AppInfo,
     membershipProvider: MembershipProvider,
 ) : ViewModel() {
@@ -197,6 +199,7 @@ constructor(
     fun updateWatermarkConfig(config: WatermarkConfig) {
         viewModelScope.launch {
             watermarkRepository.saveConfig(config)
+            exportPresetRepository.syncActiveSlotWatermark(config)
         }
     }
 
@@ -205,8 +208,16 @@ constructor(
             try {
                 val path = watermarkRepository.saveLogoFile(uri)
                 val current = watermarkConfig.value
-                watermarkRepository.saveConfig(current.copy(logoPath = path))
-                watermarkRepository.pruneOldLogoFiles(keepPath = path)
+                val updated = current.copy(logoPath = path)
+                watermarkRepository.saveConfig(updated)
+                exportPresetRepository.syncActiveSlotWatermark(updated)
+                val slotLogoPaths =
+                    exportPresetRepository
+                        .getSlots()
+                        .map { it.watermarkConfig.logoPath }
+                        .filter { it.isNotBlank() }
+                        .toSet()
+                watermarkRepository.pruneOldLogoFiles(keepPaths = slotLogoPaths + path)
             } catch (_: Exception) {
                 _snackbarMessage.emit(
                     SnackbarEvent(
@@ -220,9 +231,17 @@ constructor(
 
     fun removeLogo() {
         viewModelScope.launch {
-            watermarkRepository.removeLogoFile()
             val current = watermarkConfig.value
-            watermarkRepository.saveConfig(current.copy(logoPath = ""))
+            val updated = current.copy(logoPath = "")
+            watermarkRepository.saveConfig(updated)
+            exportPresetRepository.syncActiveSlotWatermark(updated)
+            val slotLogoPaths =
+                exportPresetRepository
+                    .getSlots()
+                    .map { it.watermarkConfig.logoPath }
+                    .filter { it.isNotBlank() }
+                    .toSet()
+            watermarkRepository.pruneOldLogoFiles(keepPaths = slotLogoPaths)
         }
     }
 

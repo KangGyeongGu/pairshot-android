@@ -124,6 +124,9 @@ fun PairShotNavHost(
                     navController.navigate(Camera(albumId = albumId))
                 },
                 onNavigateToPairPicker = { albumId -> navController.navigate(PairPicker(albumId)) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
                 onNavigateToExportSettings = { ids ->
                     navController.navigate(ExportSettings(ids.joinToString(",")))
                 },
@@ -191,6 +194,7 @@ fun PairShotNavHost(
             PairPreviewRoute(
                 onDismiss = { navController.popBackStack() },
                 onShareSelection = { pairId -> onShareSelection(setOf(pairId)) },
+                onSaveSelectionToDevice = { pairId -> onSaveSelectionToDevice(setOf(pairId)) },
                 onNavigateToAfterCamera = { pairId ->
                     navController.navigate(AfterCamera(initialPairId = pairId))
                 },

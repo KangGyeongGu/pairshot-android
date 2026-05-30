@@ -5,7 +5,7 @@
 
     <string name="paywall_value_unlimited">페어 카드 무제한</string>
     <string name="paywall_value_no_ads">전체 광고 제거</string>
-    <string name="paywall_value_pro_features">전체 기능 액세스</string>
+    <string name="paywall_value_pro_features">합성·워터마크·내보내기 전체 기능 액세스</string>
 
     <string name="paywall_plan_yearly_title">연간 구독</string>
     <string name="paywall_plan_yearly_price">%1$s/년</string>
@@ -14,7 +14,7 @@
 
     <string name="paywall_plan_monthly_title">월간 구독</string>
     <string name="paywall_plan_monthly_price">%1$s/월</string>
-    <string name="paywall_plan_monthly_trial_note">2주 무료 체험 후 자동 결제</string>
+    <string name="paywall_plan_monthly_trial_note">7일 무료 체험 후 자동 결제</string>
 
     <string name="paywall_continue_free">무료 버전으로 계속 (페어 5개/일, 광고 표시)</string>
 

@@ -4,7 +4,9 @@
     <string name="pair_preview_desc_combined_preview">Combined preview</string>
     <string name="pair_preview_desc_close">Close</string>
 
-    <string name="pair_preview_menu_recapture">Recapture</string>
+    <string name="pair_preview_action_delete_after">Delete AFTER</string>
+    <string name="pair_preview_delete_after_title">Delete AFTER photo?</string>
+    <string name="pair_preview_delete_after_body">Only the AFTER photo will be removed from this pair.</string>
 
     <string name="pair_preview_error_compose_failed">Couldn\'t create preview.</string>
     <string name="pair_preview_action_retry">Retry</string>

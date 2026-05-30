@@ -22,6 +22,7 @@ import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
+import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.home.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -140,17 +141,11 @@ constructor(
                 initialValue = emptyList(),
             )
 
-    private val _selectionMode = MutableStateFlow(false)
-    val selectionMode: StateFlow<Boolean> = _selectionMode.asStateFlow()
+    private val _pairSelection = MutableStateFlow(SelectionState())
+    val pairSelection: StateFlow<SelectionState> = _pairSelection.asStateFlow()
 
-    private val _selectedIds = MutableStateFlow<Set<Long>>(emptySet())
-    val selectedIds: StateFlow<Set<Long>> = _selectedIds.asStateFlow()
-
-    private val _albumSelectionMode = MutableStateFlow(false)
-    val albumSelectionMode: StateFlow<Boolean> = _albumSelectionMode.asStateFlow()
-
-    private val _selectedAlbumIds = MutableStateFlow<Set<Long>>(emptySet())
-    val selectedAlbumIds: StateFlow<Set<Long>> = _selectedAlbumIds.asStateFlow()
+    private val _albumSelection = MutableStateFlow(SelectionState())
+    val albumSelection: StateFlow<SelectionState> = _albumSelection.asStateFlow()
 
     private val _currentLocation = MutableStateFlow<LocationResult?>(null)
     val currentLocation: StateFlow<LocationResult?> = _currentLocation.asStateFlow()
@@ -178,52 +173,42 @@ constructor(
     }
 
     fun enterSelectionMode(initialId: Long) {
-        _selectionMode.value = true
-        _selectedIds.value = setOf(initialId)
+        _pairSelection.update { it.enterWith(initialId) }
     }
 
     fun enterSelectionMode() {
         when (_mode.value) {
-            HomeMode.PAIRS -> {
-                _selectionMode.value = true
-                _selectedIds.value = emptySet()
-            }
-
-            HomeMode.ALBUMS -> {
-                _albumSelectionMode.value = true
-                _selectedAlbumIds.value = emptySet()
-            }
+            HomeMode.PAIRS -> _pairSelection.value = SelectionState(isSelectionMode = true)
+            HomeMode.ALBUMS -> _albumSelection.value = SelectionState(isSelectionMode = true)
         }
     }
 
     fun exitSelectionMode() {
-        _selectionMode.value = false
-        _selectedIds.value = emptySet()
+        _pairSelection.value = SelectionState()
     }
 
     fun toggleSelection(id: Long) {
-        _selectedIds.update { current ->
-            if (id in current) current - id else current + id
-        }
+        _pairSelection.update { it.toggle(id) }
     }
 
     fun toggleSelectAll() {
         when {
-            _selectionMode.value -> {
+            _pairSelection.value.isSelectionMode -> {
                 val allIds = pairs.value.map { it.id }.toSet()
-                _selectedIds.value = if (_selectedIds.value == allIds) emptySet() else allIds
+                val current = _pairSelection.value.selectedIds
+                _pairSelection.update { it.replaceIds(if (current == allIds) emptySet() else allIds) }
             }
 
-            _albumSelectionMode.value -> {
+            _albumSelection.value.isSelectionMode -> {
                 val allIds = albums.value.map { it.id }.toSet()
-                _selectedAlbumIds.value =
-                    if (_selectedAlbumIds.value == allIds) emptySet() else allIds
+                val current = _albumSelection.value.selectedIds
+                _albumSelection.update { it.replaceIds(if (current == allIds) emptySet() else allIds) }
             }
         }
     }
 
     fun onPairCardClick(pairId: Long) {
-        if (_selectionMode.value) {
+        if (_pairSelection.value.isSelectionMode) {
             toggleSelection(pairId)
             return
         }
@@ -240,7 +225,7 @@ constructor(
     }
 
     fun onAlbumCardClick(albumId: Long) {
-        if (_albumSelectionMode.value) {
+        if (_albumSelection.value.isSelectionMode) {
             toggleAlbumSelection(albumId)
             return
         }
@@ -250,24 +235,19 @@ constructor(
     }
 
     fun onAlbumLongPress(albumId: Long) {
-        _albumSelectionMode.value = true
-        _selectedAlbumIds.value = setOf(albumId)
+        _albumSelection.update { it.enterWith(albumId) }
     }
 
     fun toggleAlbumSelection(albumId: Long) {
-        _selectedAlbumIds.update { current ->
-            if (albumId in current) current - albumId else current + albumId
-        }
-        if (_selectedAlbumIds.value.isEmpty()) _albumSelectionMode.value = false
+        _albumSelection.update { it.toggle(albumId) }
     }
 
     fun exitAlbumSelectionMode() {
-        _albumSelectionMode.value = false
-        _selectedAlbumIds.value = emptySet()
+        _albumSelection.value = SelectionState()
     }
 
     fun renameSelectedAlbum(newName: String) {
-        val albumId = _selectedAlbumIds.value.singleOrNull() ?: return
+        val albumId = _albumSelection.value.selectedIds.singleOrNull() ?: return
         viewModelScope.launch {
             renameAlbumUseCase(albumId, newName)
             exitAlbumSelectionMode()
@@ -275,7 +255,7 @@ constructor(
     }
 
     fun deleteSelectedAlbums() {
-        val ids = _selectedAlbumIds.value.toList()
+        val ids = _albumSelection.value.selectedIds.toList()
         if (ids.isEmpty()) return
         viewModelScope.launch {
             ids.forEach { deleteAlbumUseCase(it) }
@@ -284,7 +264,7 @@ constructor(
     }
 
     fun deleteSelected() {
-        val ids = _selectedIds.value.toSet()
+        val ids = _pairSelection.value.selectedIds.toSet()
         viewModelScope.launch {
             val toDelete = pairs.value.filter { it.id in ids }
             val result = deletePairsUseCase(toDelete)
@@ -305,7 +285,7 @@ constructor(
     }
 
     fun deleteCombinedOnly() {
-        val ids = _selectedIds.value.toList()
+        val ids = _pairSelection.value.selectedIds.toList()
         if (ids.isEmpty()) return
         viewModelScope.launch {
             deleteCombinedPhotosUseCase(ids)
@@ -315,7 +295,7 @@ constructor(
     }
 
     fun onShareSelection() {
-        val ids = _selectedIds.value.toSet()
+        val ids = _pairSelection.value.selectedIds.toSet()
         if (ids.isEmpty()) return
         viewModelScope.launch {
             _events.emit(HomeEvent.ShareSelected(ids))
@@ -323,7 +303,7 @@ constructor(
     }
 
     fun onSaveToDevice() {
-        val ids = _selectedIds.value.toSet()
+        val ids = _pairSelection.value.selectedIds.toSet()
         if (ids.isEmpty()) return
         viewModelScope.launch {
             _events.emit(HomeEvent.SaveToDevice(ids))
@@ -331,7 +311,7 @@ constructor(
     }
 
     fun onExportSettings() {
-        val ids = _selectedIds.value.toSet()
+        val ids = _pairSelection.value.selectedIds.toSet()
         if (ids.isEmpty()) return
         viewModelScope.launch {
             _events.emit(HomeEvent.NavigateToExportSettings(ids))
@@ -364,7 +344,7 @@ constructor(
 
     fun cleanupStaleSelections() {
         val validIds = pairs.value.map { it.id }.toSet()
-        _selectedIds.update { current -> current.intersect(validIds) }
+        _pairSelection.update { state -> state.replaceIds(state.selectedIds.intersect(validIds)) }
     }
 
     fun refresh() {

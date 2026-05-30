@@ -28,6 +28,8 @@
     <string name="tutorial_msg_export_format">Export as individual images or bundle them into a ZIP file.</string>
     <string name="tutorial_msg_export_watermark">You can apply a watermark to the exported photos.</string>
     <string name="tutorial_msg_export_combine">You can add borders and other composition to the exported photos.</string>
+    <string name="tutorial_msg_export_presets">Save the export options for different situations as presets.</string>
+    <string name="tutorial_msg_export_preset_default_card">Any option change after creation is saved automatically.</string>
 
     <string name="tutorial_button_skip">Skip</string>
     <string name="tutorial_button_next">Next ›</string>

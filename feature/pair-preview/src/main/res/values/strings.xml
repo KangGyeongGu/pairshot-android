@@ -4,7 +4,9 @@
     <string name="pair_preview_desc_combined_preview">합성 미리보기</string>
     <string name="pair_preview_desc_close">닫기</string>
 
-    <string name="pair_preview_menu_recapture">재촬영</string>
+    <string name="pair_preview_action_delete_after">AFTER 삭제</string>
+    <string name="pair_preview_delete_after_title">AFTER 사진을 삭제하시겠어요?</string>
+    <string name="pair_preview_delete_after_body">AFTER 원본 사진만 페어에서 제거됩니다.</string>
 
     <string name="pair_preview_error_compose_failed">미리보기를 만들 수 없습니다.</string>
     <string name="pair_preview_action_retry">다시 시도</string>

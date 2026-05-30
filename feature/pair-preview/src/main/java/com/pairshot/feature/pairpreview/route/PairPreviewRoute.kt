@@ -48,6 +48,7 @@ internal interface PairPreviewRenderEntryPoint {
 fun PairPreviewRoute(
     onDismiss: () -> Unit,
     onShareSelection: (pairId: Long) -> Unit,
+    onSaveSelectionToDevice: (pairId: Long) -> Unit,
     onNavigateToAfterCamera: (pairId: Long) -> Unit,
     onNavigateToBeforeRetake: (pairId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -161,14 +162,31 @@ fun PairPreviewRoute(
                         livePreviewFailed = livePreviewFailed,
                         onLivePreviewRetry = { retryToken += 1 },
                         showDeleteDialog = state.showDeleteDialog,
-                        onClose = onDismiss,
-                        onShareSelection = { onShareSelection(viewModel.pairId) },
-                        onNavigateToAfterCamera = { onNavigateToAfterCamera(viewModel.pairId) },
-                        onNavigateToBeforeRetake = { onNavigateToBeforeRetake(viewModel.pairId) },
+                        showDeleteAfterDialog = state.showDeleteAfterDialog,
+                        onClose = currentOnDismiss,
+                        onShareSelection = {
+                            onShareSelection(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onSaveToDevice = {
+                            onSaveSelectionToDevice(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onNavigateToAfterCamera = {
+                            onNavigateToAfterCamera(viewModel.pairId)
+                            currentOnDismiss()
+                        },
+                        onNavigateToBeforeRetake = {
+                            onNavigateToBeforeRetake(viewModel.pairId)
+                            currentOnDismiss()
+                        },
                         onDeleteRequest = viewModel::showDeleteDialog,
                         onDeleteAll = viewModel::deletePair,
                         onDeleteCombinedOnly = viewModel::deleteCombinedOnly,
                         onDeleteDismiss = viewModel::dismissDeleteDialog,
+                        onDeleteAfterRequest = viewModel::showDeleteAfterDialog,
+                        onDeleteAfterConfirm = viewModel::deleteAfterOnly,
+                        onDeleteAfterDismiss = viewModel::dismissDeleteAfterDialog,
                     )
                 }
             }

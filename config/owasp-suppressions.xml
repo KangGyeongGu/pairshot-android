@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress>
+        <notes><![CDATA[
+        CVE-2020-29582는 Kotlin 1.4.0에서 fixed (임시 디렉터리 권한 취약점).
+        현재 프로젝트는 Kotlin 2.0.20 사용, 빌드 인프라가 만지는 Kotlin 1.7.10/1.8.0/2.0.10도 모두 fix 이후 버전이라 영향 없음.
+        dependency-check의 CPE 매칭이 모든 org.jetbrains.kotlin 산출물을 동일 CPE로 묶어 보고하는 알려진 false positive.
+        ]]></notes>
+        <cpe>cpe:/a:jetbrains:kotlin</cpe>
+        <cve>CVE-2020-29582</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        logback-classic / logback-core 1.3.0은 빌드 인프라(SLF4J 사용 도구)의 transitive 의존성.
+        app/dependencies/releaseRuntimeClasspath.txt에 포함되지 않아 release artifact에 들어가지 않음.
+        production 영향 없음.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/ch\.qos\.logback/.*$</packageUrl>
+        <cve>CVE-2021-42550</cve>
+        <cve>CVE-2023-6378</cve>
+    </suppress>
 </suppressions>

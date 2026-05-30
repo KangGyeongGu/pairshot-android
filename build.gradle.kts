@@ -1,5 +1,6 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
     alias(libs.plugins.bcv)
     alias(libs.plugins.kover)
     alias(libs.plugins.owasp.dependencycheck)
@@ -51,6 +53,18 @@ subprojects {
     if (name != "convention") {
         apply(plugin = "org.jetbrains.kotlinx.kover")
         apply(plugin = "io.gitlab.arturbosch.detekt")
+        apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+        extensions.configure<KtlintExtension> {
+            version.set("0.50.0")
+            android.set(true)
+            ignoreFailures.set(false)
+            enableExperimentalRules.set(false)
+            filter {
+                exclude { it.file.path.contains("/build/") }
+                exclude { it.file.path.contains("/generated/") }
+            }
+        }
 
         extensions.configure<DetektExtension> {
             toolVersion = "1.23.7"

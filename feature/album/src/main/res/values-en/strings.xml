@@ -10,6 +10,7 @@
     <string name="album_menu_delete">Delete album</string>
 
     <string name="album_button_add_pair">Add pair</string>
+    <string name="album_desc_enter_selection">Selection mode</string>
 
     <string name="album_button_remove_from_album">Remove from album</string>
 

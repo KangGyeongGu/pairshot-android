@@ -1,0 +1,17 @@
+package com.pairshot.core.domain.album
+
+import javax.inject.Inject
+
+class AddPairsToAlbumUseCase
+@Inject
+constructor(
+    private val albumRepository: AlbumRepository,
+) {
+    suspend operator fun invoke(
+        albumId: Long,
+        pairIds: List<Long>,
+    ) {
+        if (pairIds.isEmpty()) return
+        albumRepository.addPairs(albumId, pairIds)
+    }
+}

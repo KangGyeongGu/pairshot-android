@@ -14,4 +14,8 @@ interface OnboardingStateRepository {
     suspend fun isTutorialCompleted(): Boolean
 
     suspend fun isExportSettingsTutorialCompleted(): Boolean
+
+    suspend fun isFirstSaveReviewRequested(): Boolean
+
+    suspend fun markFirstSaveReviewRequested()
 }

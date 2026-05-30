@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
+import com.pairshot.core.domain.album.RemovePairsFromAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.ResolvePairNavigationTargetUseCase
@@ -17,6 +19,7 @@ import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.navigation.AlbumDetail
+import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.album.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,8 +73,7 @@ sealed interface AlbumDetailUiState {
     data class Success(
         val album: Album,
         val pairs: List<PhotoPair>,
-        val selectedIds: Set<Long> = emptySet(),
-        val isSelectionMode: Boolean = false,
+        val selection: SelectionState = SelectionState(),
         val showRenameDialog: Boolean = false,
         val showDeleteAlbumDialog: Boolean = false,
         val showDeletePairsDialog: Boolean = false,
@@ -96,11 +98,6 @@ private data class DialogState(
     val showDeletePairs: Boolean = false,
 )
 
-private data class SelectionState(
-    val selectedIds: Set<Long> = emptySet(),
-    val isSelectionMode: Boolean = false,
-)
-
 @HiltViewModel
 class AlbumDetailViewModel
 @Inject
@@ -109,12 +106,17 @@ constructor(
     private val albumRepository: AlbumRepository,
     private val deleteAlbumUseCase: DeleteAlbumUseCase,
     private val renameAlbumUseCase: RenameAlbumUseCase,
+    private val removePairsFromAlbumUseCase: RemovePairsFromAlbumUseCase,
     private val resolvePairNavigationTargetUseCase: ResolvePairNavigationTargetUseCase,
     private val deletePairsUseCase: DeletePairsUseCase,
     private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
     private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
     private val appSettingsRepository: AppSettingsRepository,
+    private val canCreatePairUseCase: CanCreatePairUseCase,
 ) : ViewModel() {
+    suspend fun isCameraEntryAllowed(): Boolean =
+        canCreatePairUseCase() is CanCreatePairUseCase.Result.Allowed
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
@@ -155,8 +157,7 @@ constructor(
                     AlbumDetailUiState.Success(
                         album = phase.album,
                         pairs = phase.pairs,
-                        selectedIds = selection.selectedIds,
-                        isSelectionMode = selection.isSelectionMode,
+                        selection = selection,
                         showRenameDialog = dialogs.showRename,
                         showDeleteAlbumDialog = dialogs.showDeleteAlbum,
                         showDeletePairsDialog = dialogs.showDeletePairs,
@@ -213,7 +214,7 @@ constructor(
 
     fun onPairClick(pairId: Long) {
         if (selectionState.value.isSelectionMode) {
-            toggleSelection(pairId)
+            selectionState.update { it.toggle(pairId) }
             return
         }
         val pair = latestPairs.firstOrNull { it.id == pairId } ?: return
@@ -234,23 +235,11 @@ constructor(
     }
 
     fun onPairLongPress(pairId: Long) {
-        selectionState.update { it.copy(isSelectionMode = true) }
-        toggleSelection(pairId)
+        selectionState.update { it.toggle(pairId) }
     }
 
-    private fun toggleSelection(pairId: Long) {
-        selectionState.update { state ->
-            val updated =
-                if (pairId in state.selectedIds) {
-                    state.selectedIds - pairId
-                } else {
-                    state.selectedIds + pairId
-                }
-            state.copy(
-                selectedIds = updated,
-                isSelectionMode = updated.isNotEmpty(),
-            )
-        }
+    fun enterSelectionMode() {
+        selectionState.value = SelectionState(isSelectionMode = true)
     }
 
     fun exitSelectionMode() {
@@ -280,7 +269,7 @@ constructor(
     fun removeSelectedFromAlbum() {
         val selectedIds = selectionState.value.selectedIds.toList()
         viewModelScope.launch {
-            if (selectedIds.isNotEmpty()) albumRepository.removePairs(albumId, selectedIds)
+            removePairsFromAlbumUseCase(albumId, selectedIds)
             closeSelectionAndDialog()
         }
     }

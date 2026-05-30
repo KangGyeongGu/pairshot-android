@@ -16,54 +16,86 @@ import com.pairshot.core.ui.R as CoreR
 
 @Composable
 fun AlbumSelectionBottomBar(
+    selectedCount: Int,
     onShareClick: () -> Unit,
     onSaveToDeviceClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onExportSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    PairShotActionBar {
+    val hasSelection = selectedCount > 0
+
+    PairShotActionBar(modifier = modifier) {
         PairShotActionBarItem(
             label = stringResource(CoreR.string.common_button_share),
             onClick = onShareClick,
+            enabled = hasSelection,
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Share,
                     contentDescription = stringResource(CoreR.string.common_button_share),
+                    tint =
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ICON_ALPHA)
+                    },
                 )
             },
         )
         PairShotActionBarItem(
             label = stringResource(CoreR.string.common_button_save_to_device),
             onClick = onSaveToDeviceClick,
+            enabled = hasSelection,
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.FileDownload,
                     contentDescription = stringResource(CoreR.string.common_button_save_to_device),
+                    tint =
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ICON_ALPHA)
+                    },
                 )
             },
         )
         PairShotActionBarItem(
             label = stringResource(CoreR.string.common_button_delete),
             onClick = onDeleteClick,
+            enabled = hasSelection,
             labelColor = MaterialTheme.colorScheme.error,
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Delete,
                     contentDescription = stringResource(CoreR.string.common_button_delete),
-                    tint = MaterialTheme.colorScheme.error,
+                    tint =
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.error.copy(alpha = DISABLED_ICON_ALPHA)
+                    },
                 )
             },
         )
         PairShotActionBarItem(
             label = stringResource(CoreR.string.common_button_export_settings),
             onClick = onExportSettingsClick,
+            enabled = hasSelection,
             icon = {
                 Icon(
                     imageVector = Icons.Outlined.Tune,
                     contentDescription = stringResource(CoreR.string.common_button_export_settings),
+                    tint =
+                    if (hasSelection) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ICON_ALPHA)
+                    },
                 )
             },
         )
     }
 }
+
+private const val DISABLED_ICON_ALPHA = 0.38f

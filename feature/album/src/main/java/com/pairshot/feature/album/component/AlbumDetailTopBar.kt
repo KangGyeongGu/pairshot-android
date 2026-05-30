@@ -35,6 +35,7 @@ fun AlbumDetailTopBar(
     selectedCount: Int,
     onNavigateBack: () -> Unit,
     onExitSelection: () -> Unit,
+    onAddPairsClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteAlbumClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -89,6 +90,16 @@ fun AlbumDetailTopBar(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
+                    PairShotTopMenuItem(
+                        text = {
+                            PairShotTopMenuItemText(title = stringResource(R.string.album_button_add_pair))
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onAddPairsClick()
+                        },
+                    )
+                    PairShotTopMenuDivider()
                     PairShotTopMenuItem(
                         text = {
                             PairShotTopMenuItemText(title = stringResource(R.string.album_menu_rename))

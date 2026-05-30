@@ -1,5 +1,7 @@
 package com.pairshot.feature.album.screen
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -17,13 +19,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.model.SortOrder
+import com.pairshot.core.ui.component.PairCardGridSection
 import com.pairshot.feature.album.R
-import com.pairshot.feature.album.component.PairPickerGridSection
 import com.pairshot.feature.album.viewmodel.PairPickerUiState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
@@ -43,11 +47,11 @@ fun PairPickerScreen(
             CenterAlignedTopAppBar(
                 title = {
                     val countLabel =
-                        if (state.selectedIds.isNotEmpty()) {
+                        if (state.selection.hasSelection) {
                             pluralStringResource(
                                 R.plurals.pair_picker_title_selected,
-                                state.selectedIds.size,
-                                state.selectedIds.size,
+                                state.selection.selectedCount,
+                                state.selection.selectedCount,
                             )
                         } else {
                             stringResource(R.string.pair_picker_title)
@@ -79,7 +83,7 @@ fun PairPickerScreen(
             ) {
                 Button(
                     onClick = onConfirm,
-                    enabled = state.selectedIds.isNotEmpty() && !state.isConfirming,
+                    enabled = state.selection.hasSelection && !state.isConfirming,
                     modifier =
                     Modifier
                         .fillMaxWidth()
@@ -96,13 +100,32 @@ fun PairPickerScreen(
             }
         },
     ) { innerPadding ->
-        PairPickerGridSection(
+        if (state.pairs.isEmpty()) {
+            Box(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(R.string.pair_picker_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            return@Scaffold
+        }
+        PairCardGridSection(
             pairs = state.pairs.toImmutableList(),
-            selectedIds = state.selectedIds.toImmutableSet(),
-            alreadyInAlbumIds = state.alreadyInAlbumIds.toImmutableSet(),
-            onToggle = onToggle,
+            selectedIds = state.selection.selectedIds,
+            isSelectionMode = true,
+            sortOrder = SortOrder.DESC,
+            onPairClick = onToggle,
+            disabledIds = state.alreadyInAlbumIds.toImmutableSet(),
+            disabledLabel = stringResource(R.string.pair_picker_already_added),
             contentPadding =
-            androidx.compose.foundation.layout.PaddingValues(
+            PaddingValues(
                 top = innerPadding.calculateTopPadding() + PairShotSpacing.md,
                 bottom = innerPadding.calculateBottomPadding() + PairShotSpacing.md,
                 start = PairShotSpacing.md,

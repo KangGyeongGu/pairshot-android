@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,8 @@ fun PairCard(
     onClick: () -> Unit,
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier,
+    isDisabled: Boolean = false,
+    disabledLabel: String? = null,
 ) {
     val borderModifier =
         if (isSelected) {
@@ -64,6 +67,7 @@ fun PairCard(
             .clip(MaterialTheme.shapes.medium)
             .then(borderModifier)
             .combinedClickable(
+                enabled = !isDisabled,
                 onClick = onClick,
                 onLongClick = onLongPress,
             ),
@@ -98,8 +102,28 @@ fun PairCard(
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
             )
         }
+
+        if (isDisabled) {
+            Box(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = DISABLED_SCRIM_ALPHA)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (disabledLabel != null) {
+                    Text(
+                        text = disabledLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
     }
 }
+
+private const val DISABLED_SCRIM_ALPHA = 0.45f
 
 @Composable
 private fun PairCardSlot(

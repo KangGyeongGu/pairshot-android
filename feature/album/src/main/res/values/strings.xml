@@ -9,6 +9,7 @@
     <string name="album_menu_delete">앨범 삭제</string>
 
     <string name="album_button_add_pair">페어 추가</string>
+    <string name="album_desc_enter_selection">선택 모드</string>
 
     <string name="album_button_remove_from_album">앨범에서 제거</string>
 

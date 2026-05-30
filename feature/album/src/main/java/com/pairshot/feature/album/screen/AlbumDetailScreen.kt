@@ -10,19 +10,20 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.pairshot.core.adsui.component.rememberPairCardNativeAdSlot
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.ui.component.ConfirmActionBottomSheet
+import com.pairshot.core.ui.component.DeletePairsBottomSheet
+import com.pairshot.core.ui.component.PairCardGridSection
+import com.pairshot.feature.album.R
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
 import com.pairshot.feature.album.component.AlbumFilterRow
-import com.pairshot.feature.album.component.AlbumPairGridSection
 import com.pairshot.feature.album.component.AlbumPrimaryActionBar
 import com.pairshot.feature.album.component.AlbumSelectionBottomBar
-import com.pairshot.feature.album.dialog.AlbumDeletePairsDialog
-import com.pairshot.feature.album.dialog.DeleteAlbumDialog
 import com.pairshot.feature.album.dialog.RenameAlbumDialog
 import com.pairshot.feature.album.viewmodel.AlbumDetailUiState
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableSet
 import com.pairshot.core.ui.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +36,7 @@ fun AlbumDetailScreen(
     onExitSelectionMode: () -> Unit,
     onCaptureBeforeClick: () -> Unit,
     onAddPairsClick: () -> Unit,
+    onEnterSelectionMode: () -> Unit,
     onShareClick: () -> Unit,
     onSaveToDeviceClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -61,18 +63,20 @@ fun AlbumDetailScreen(
         topBar = {
             AlbumDetailTopBar(
                 title = uiState.album.name,
-                isSelectionMode = uiState.isSelectionMode,
-                selectedCount = uiState.selectedIds.size,
+                isSelectionMode = uiState.selection.isSelectionMode,
+                selectedCount = uiState.selection.selectedCount,
                 onNavigateBack = onNavigateBack,
                 onExitSelection = onExitSelectionMode,
+                onAddPairsClick = onAddPairsClick,
                 onRenameClick = onRenameClick,
                 onDeleteAlbumClick = onDeleteAlbumClick,
             )
         },
         bottomBar = {
             when {
-                uiState.isSelectionMode -> {
+                uiState.selection.isSelectionMode -> {
                     AlbumSelectionBottomBar(
+                        selectedCount = uiState.selection.selectedCount,
                         onShareClick = onShareClick,
                         onSaveToDeviceClick = onSaveToDeviceClick,
                         onDeleteClick = onDeleteClick,
@@ -100,19 +104,23 @@ fun AlbumDetailScreen(
             )
         } else {
             Column(modifier = Modifier.padding(innerPadding)) {
-                AlbumFilterRow(
-                    sortOrder = uiState.sortOrder,
-                    onToggleSortOrder = onToggleSortOrder,
-                )
+                if (!uiState.selection.isSelectionMode) {
+                    AlbumFilterRow(
+                        sortOrder = uiState.sortOrder,
+                        onToggleSortOrder = onToggleSortOrder,
+                        onEnterSelectionMode = onEnterSelectionMode,
+                    )
+                }
+                val adSlot = rememberPairCardNativeAdSlot()
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    AlbumPairGridSection(
+                    PairCardGridSection(
                         pairs = uiState.pairs.toImmutableList(),
-                        selectedIds = uiState.selectedIds.toImmutableSet(),
-                        isSelectionMode = uiState.isSelectionMode,
+                        selectedIds = uiState.selection.selectedIds,
+                        isSelectionMode = uiState.selection.isSelectionMode,
                         sortOrder = uiState.sortOrder,
                         onPairClick = onPairClick,
                         onPairLongPress = onPairLongPress,
@@ -122,6 +130,9 @@ fun AlbumDetailScreen(
                             start = PairShotSpacing.md,
                             end = PairShotSpacing.md,
                         ),
+                        adFree = adSlot.isAdFree,
+                        onAdSlotCountChange = adSlot::onAdSlotCountChange,
+                        adSlot = { slotIndex -> adSlot.Content(slotIndex) },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -138,22 +149,27 @@ fun AlbumDetailScreen(
     }
 
     if (uiState.showDeleteAlbumDialog) {
-        DeleteAlbumDialog(
+        ConfirmActionBottomSheet(
+            title = stringResource(R.string.album_dialog_delete_title),
+            message = stringResource(R.string.album_dialog_delete_message),
+            confirmLabel = stringResource(CoreR.string.common_button_delete),
             onConfirm = onDeleteAlbumConfirm,
             onDismiss = onDeleteAlbumDismiss,
+            confirmIsDestructive = true,
         )
     }
 
     if (uiState.showDeletePairsDialog) {
         val combinedInSelection =
-            uiState.pairs.count { it.id in uiState.selectedIds && it.hasCombined }
-        AlbumDeletePairsDialog(
-            pairCount = uiState.selectedIds.size,
+            uiState.pairs.count { it.id in uiState.selection.selectedIds && it.hasCombined }
+        DeletePairsBottomSheet(
+            pairCount = uiState.selection.selectedCount,
             combinedCount = combinedInSelection,
-            onRemoveFromAlbum = onRemoveFromAlbum,
             onDeletePairs = onDeletePairs,
             onDeleteCombinedOnly = onDeleteCombinedOnly,
             onDismiss = onDeletePairsDismiss,
+            removeFromAlbumLabel = stringResource(R.string.album_button_remove_from_album),
+            onRemoveFromAlbum = onRemoveFromAlbum,
         )
     }
 }

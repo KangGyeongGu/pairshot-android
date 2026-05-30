@@ -12,7 +12,7 @@ interface WatermarkRepository {
 
     suspend fun saveLogoFile(sourceUri: String): String
 
-    suspend fun pruneOldLogoFiles(keepPath: String)
+    suspend fun pruneOldLogoFiles(keepPaths: Set<String>)
 
     suspend fun removeLogoFile()
 }
