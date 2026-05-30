@@ -103,12 +103,22 @@ constructor(
         watermarkConfig: WatermarkConfig?,
         onProgress: (current: Int, total: Int) -> Unit,
     ): SaveToDeviceResult {
+        val individualsWillRun =
+            (preset.includeBefore || preset.includeAfter) &&
+                needsIndividualDecoration(combineConfig, watermarkConfig)
+        val combinedUnits = if (preset.includeCombined) pairIds.size else 0
+        val beforeUnits = if (preset.includeBefore && individualsWillRun) pairIds.size else 0
+        val afterUnits = if (preset.includeAfter && individualsWillRun) pairIds.size else 0
+        val totalUnits = combinedUnits + beforeUnits + afterUnits
+
         val combinedCount =
             if (preset.includeCombined) {
                 galleryExportRepository.composeCombinedForGallery(
                     pairIds = pairIds,
                     combineConfig = combineConfig,
                     watermarkConfig = watermarkConfig,
+                    progressBase = 0,
+                    progressTotal = totalUnits,
                     onProgress = onProgress,
                 )
             } else {
@@ -116,14 +126,14 @@ constructor(
             }
 
         val individualCount =
-            if ((preset.includeBefore || preset.includeAfter) &&
-                needsIndividualDecoration(combineConfig, watermarkConfig)
-            ) {
+            if (individualsWillRun) {
                 galleryExportRepository.saveDecoratedOriginals(
                     pairIds = pairIds,
                     preset = preset,
                     combineConfig = combineConfig,
                     watermarkConfig = watermarkConfig,
+                    progressBase = combinedUnits,
+                    progressTotal = totalUnits,
                     onProgress = onProgress,
                 )
             } else {

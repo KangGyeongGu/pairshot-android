@@ -9,6 +9,8 @@ interface GalleryExportRepository {
         pairIds: List<Long>,
         combineConfig: CombineConfig,
         watermarkConfig: WatermarkConfig?,
+        progressBase: Int = 0,
+        progressTotal: Int = pairIds.size,
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int
 
@@ -17,6 +19,8 @@ interface GalleryExportRepository {
         preset: ExportPreset,
         combineConfig: CombineConfig,
         watermarkConfig: WatermarkConfig?,
+        progressBase: Int = 0,
+        progressTotal: Int = pairIds.size,
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int
 }

@@ -22,6 +22,7 @@ import com.pairshot.core.storage.MediaStoreManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 class GalleryExportRepositoryImpl
@@ -40,6 +41,8 @@ constructor(
         pairIds: List<Long>,
         combineConfig: CombineConfig,
         watermarkConfig: WatermarkConfig?,
+        progressBase: Int,
+        progressTotal: Int,
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int =
         withContext(Dispatchers.IO) {
@@ -51,7 +54,9 @@ constructor(
                     exportPipeline.processInParallel(
                         total = pairs.size,
                         maxOutputPx = imageQuality.maxOutputPx,
-                        onProgress = onProgress,
+                        onProgress = { current, _ ->
+                            onProgress(progressBase + current, progressTotal)
+                        },
                     ) { index ->
                         val pair = pairs[index]
                         val before = pair.validBeforeUriOrNull()
@@ -95,18 +100,21 @@ constructor(
         preset: ExportPreset,
         combineConfig: CombineConfig,
         watermarkConfig: WatermarkConfig?,
+        progressBase: Int,
+        progressTotal: Int,
         onProgress: (current: Int, total: Int) -> Unit,
     ): Int =
         withContext(Dispatchers.IO) {
             val imageQuality = appSettingsRepository.getCurrent().imageQuality
             val pairs = photoPairDao.getByIds(pairIds)
             val tempDir = shareImagePreparer.prepareTempDir("save_decorated_originals")
+            val processedCount = AtomicInteger(0)
             try {
                 val perPairCounts =
                     exportPipeline.processInParallel(
                         total = pairs.size,
                         maxOutputPx = imageQuality.maxOutputPx,
-                        onProgress = onProgress,
+                        onProgress = { _, _ -> },
                     ) { index ->
                         val pair = pairs[index]
                         val seq = index + 1
@@ -124,6 +132,7 @@ constructor(
                                     watermarkConfig = watermarkConfig,
                                     imageQuality = imageQuality,
                                 )
+                                onProgress(progressBase + processedCount.incrementAndGet(), progressTotal)
                                 localCount++
                             }
                         }
@@ -140,6 +149,7 @@ constructor(
                                     watermarkConfig = watermarkConfig,
                                     imageQuality = imageQuality,
                                 )
+                                onProgress(progressBase + processedCount.incrementAndGet(), progressTotal)
                                 localCount++
                             }
                         }
