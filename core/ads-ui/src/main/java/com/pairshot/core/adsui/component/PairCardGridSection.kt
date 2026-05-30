@@ -1,6 +1,7 @@
-package com.pairshot.feature.home.component
+package com.pairshot.core.adsui.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,22 +19,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.ads.controller.NativeAdPool
 import com.pairshot.core.ads.di.AdsEntryPoint
-import com.pairshot.core.adsui.component.PairShotNativeAdCard
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.domain.pair.PairListItem
 import com.pairshot.core.domain.pair.buildPairListWithAds
-import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.ui.component.PairCard
-import com.pairshot.feature.home.R
-import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
@@ -41,37 +39,28 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private val DateFormatter: DateTimeFormatter =
+private val DefaultDateFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyy. MM. dd", Locale.KOREAN)
 
-private fun Long.toLocalDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+private fun Long.toLocalDate(): LocalDate =
+    Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
 
 @Composable
-private fun formatDateLabel(
-    date: LocalDate,
-    today: LocalDate,
-): String {
-    val base = date.format(DateFormatter)
-    return when (date) {
-        today -> stringResource(R.string.home_date_suffix_today, base)
-        today.minusDays(1) -> stringResource(R.string.home_date_suffix_yesterday, base)
-        else -> base
-    }
-}
-
-@Composable
-fun HomePairGridSection(
+fun PairCardGridSection(
     pairs: ImmutableList<PhotoPair>,
     selectedIds: ImmutableSet<Long>,
-    selectionMode: Boolean,
+    isSelectionMode: Boolean,
     sortOrder: SortOrder,
     onPairClick: (Long) -> Unit,
-    onPairLongClick: (Long) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    firstPairModifier: Modifier = Modifier,
+    onPairLongPress: (Long) -> Unit = {},
+    showAds: Boolean = true,
+    disabledIds: ImmutableSet<Long> = persistentSetOf(),
+    disabledLabel: String? = null,
+    dateHeaderLabel: @Composable (LocalDate) -> String = { it.format(DefaultDateFormatter) },
 ) {
-    val today = remember { LocalDate.now(ZoneId.systemDefault()) }
-
     val sortedPairs =
         remember(pairs, sortOrder) {
             when (sortOrder) {
@@ -80,58 +69,23 @@ fun HomePairGridSection(
             }
         }
 
-    val isInspection = LocalInspectionMode.current
-    val context = LocalContext.current
-    val entryPoint =
-        if (isInspection) {
-            null
-        } else {
-            remember(context) {
-                EntryPointAccessors.fromApplication(
-                    context.applicationContext,
-                    AdsEntryPoint::class.java,
-                )
-            }
-        }
-    val membershipProvider = remember(entryPoint) { entryPoint?.membershipProvider() }
-    val poolProvider = remember(entryPoint) { entryPoint?.nativeAdPoolProvider() }
-    val adFreeFlow = remember(membershipProvider) { membershipProvider?.observe()?.map { it.isAdFree } }
-
-    val isAdFree: Boolean? =
-        if (isInspection) {
-            true
-        } else {
-            adFreeFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
-        }
-
-    val nativeAdPool = remember(poolProvider) { poolProvider?.get() }
-    DisposableEffect(nativeAdPool) {
-        onDispose { nativeAdPool?.close() }
-    }
-    val nativeAds: List<com.google.android.gms.ads.nativead.NativeAd> =
-        nativeAdPool?.observeAds()?.collectAsStateWithLifecycle()?.value ?: emptyList()
+    val adContext = rememberAdContext(enabled = showAds)
+    val firstPairId =
+        remember(sortedPairs) { sortedPairs.firstOrNull()?.id }
 
     val items =
-        remember(sortedPairs, isAdFree) {
+        remember(sortedPairs, adContext.isAdFree) {
             buildPairListWithAds(
                 pairs = sortedPairs,
-                adFree = isAdFree == true,
+                adFree = adContext.isAdFree == true,
                 sectionKeyOf = { it.beforeTimestamp.toLocalDate() },
             )
         }
     val totalAdSlots = remember(items) { items.count { it is PairListItem.Ad } }
-    val firstPairId =
-        remember(items) {
-            items
-                .filterIsInstance<PairListItem.Pair>()
-                .firstOrNull()
-                ?.pair
-                ?.id
-        }
 
-    LaunchedEffect(totalAdSlots, isAdFree) {
-        if (isAdFree == false && totalAdSlots > 0) {
-            nativeAdPool?.ensurePreloaded(totalAdSlots)
+    LaunchedEffect(totalAdSlots, adContext.isAdFree) {
+        if (adContext.isAdFree == false && totalAdSlots > 0) {
+            adContext.pool?.ensurePreloaded(totalAdSlots)
         }
     }
 
@@ -155,7 +109,7 @@ fun HomePairGridSection(
                             span = { GridItemSpan(maxLineSpan) },
                         ) {
                             Text(
-                                text = formatDateLabel(pairDate, today),
+                                text = dateHeaderLabel(pairDate),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier =
@@ -173,27 +127,24 @@ fun HomePairGridSection(
                         span = { GridItemSpan(1) },
                     ) {
                         val anchorModifier =
-                            if (pair.id == firstPairId) {
-                                Modifier.tutorialAnchor(AnchorKey.HOME_PAIR_CARD_FIRST)
-                            } else {
-                                Modifier
-                            }
-                        androidx.compose.foundation.layout
-                            .Box(modifier = anchorModifier) {
-                                PairCard(
-                                    pair = pair,
-                                    isSelected = pair.id in selectedIds,
-                                    isSelectionMode = selectionMode,
-                                    onClick = { onPairClick(pair.id) },
-                                    onLongPress = { onPairLongClick(pair.id) },
-                                )
-                            }
+                            if (pair.id == firstPairId) firstPairModifier else Modifier
+                        Box(modifier = anchorModifier) {
+                            PairCard(
+                                pair = pair,
+                                isSelected = pair.id in selectedIds,
+                                isSelectionMode = isSelectionMode,
+                                isDisabled = pair.id in disabledIds,
+                                disabledLabel = disabledLabel,
+                                onClick = { onPairClick(pair.id) },
+                                onLongPress = { onPairLongPress(pair.id) },
+                            )
+                        }
                     }
                 }
 
                 is PairListItem.Ad -> {
                     val slot = entry.slotIndex
-                    val nativeAd = nativeAds.getOrNull(slot)
+                    val nativeAd = adContext.nativeAds.getOrNull(slot)
                     if (nativeAd != null) {
                         item(
                             key = "ad_$slot",
@@ -206,4 +157,39 @@ fun HomePairGridSection(
             }
         }
     }
+}
+
+private data class AdContext(
+    val isAdFree: Boolean?,
+    val pool: NativeAdPool?,
+    val nativeAds: List<com.google.android.gms.ads.nativead.NativeAd>,
+)
+
+@Composable
+private fun rememberAdContext(enabled: Boolean): AdContext {
+    val isInspection = LocalInspectionMode.current
+    if (!enabled || isInspection) {
+        return AdContext(isAdFree = true, pool = null, nativeAds = emptyList())
+    }
+
+    val context = LocalContext.current
+    val entryPoint =
+        remember(context) {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                AdsEntryPoint::class.java,
+            )
+        }
+    val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
+    val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
+    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
+    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
+
+    val nativeAdPool = remember(poolProvider) { poolProvider.get() }
+    DisposableEffect(nativeAdPool) {
+        onDispose { nativeAdPool.close() }
+    }
+    val nativeAds by nativeAdPool.observeAds().collectAsStateWithLifecycle()
+
+    return AdContext(isAdFree = isAdFree, pool = nativeAdPool, nativeAds = nativeAds)
 }

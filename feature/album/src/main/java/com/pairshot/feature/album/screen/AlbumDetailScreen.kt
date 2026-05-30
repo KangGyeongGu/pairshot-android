@@ -10,11 +10,11 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.pairshot.core.adsui.component.PairCardGridSection
 import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.feature.album.component.AlbumDetailTopBar
 import com.pairshot.feature.album.component.AlbumEmptyActions
 import com.pairshot.feature.album.component.AlbumFilterRow
-import com.pairshot.feature.album.component.AlbumPairGridSection
 import com.pairshot.feature.album.component.AlbumPrimaryActionBar
 import com.pairshot.feature.album.component.AlbumSelectionBottomBar
 import com.pairshot.feature.album.dialog.AlbumDeletePairsDialog
@@ -65,6 +65,7 @@ fun AlbumDetailScreen(
                 selectedCount = uiState.selectedIds.size,
                 onNavigateBack = onNavigateBack,
                 onExitSelection = onExitSelectionMode,
+                onAddPairsClick = onAddPairsClick,
                 onRenameClick = onRenameClick,
                 onDeleteAlbumClick = onDeleteAlbumClick,
             )
@@ -109,7 +110,7 @@ fun AlbumDetailScreen(
                     onRefresh = onRefresh,
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    AlbumPairGridSection(
+                    PairCardGridSection(
                         pairs = uiState.pairs.toImmutableList(),
                         selectedIds = uiState.selectedIds.toImmutableSet(),
                         isSelectionMode = uiState.isSelectionMode,

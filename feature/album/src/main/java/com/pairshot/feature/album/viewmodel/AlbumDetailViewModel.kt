@@ -8,6 +8,7 @@ import com.pairshot.core.domain.album.AlbumRepository
 import com.pairshot.core.domain.album.DeleteAlbumUseCase
 import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
+import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.DeletePairsUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.ResolvePairNavigationTargetUseCase
@@ -114,7 +115,11 @@ constructor(
     private val deleteCombinedPhotosUseCase: DeleteCombinedPhotosUseCase,
     private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
     private val appSettingsRepository: AppSettingsRepository,
+    private val canCreatePairUseCase: CanCreatePairUseCase,
 ) : ViewModel() {
+    suspend fun isCameraEntryAllowed(): Boolean =
+        canCreatePairUseCase() is CanCreatePairUseCase.Result.Allowed
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 

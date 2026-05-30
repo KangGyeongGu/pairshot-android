@@ -8,15 +8,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pairshot.core.navigation.PaywallTrigger
 import com.pairshot.feature.album.screen.AlbumDetailScreen
 import com.pairshot.feature.album.viewmodel.AlbumDetailEvent
 import com.pairshot.feature.album.viewmodel.AlbumDetailUiState
 import com.pairshot.feature.album.viewmodel.AlbumDetailViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun AlbumDetailRoute(
@@ -26,6 +29,7 @@ fun AlbumDetailRoute(
     onNavigateToBeforeRetake: (pairId: Long) -> Unit,
     onNavigateToCamera: (albumId: Long) -> Unit,
     onNavigateToPairPicker: (albumId: Long) -> Unit,
+    onNavigateToPaywall: (PaywallTrigger) -> Unit,
     onNavigateToExportSettings: (pairIds: Set<Long>) -> Unit,
     onShareSelection: (pairIds: Set<Long>) -> Unit,
     onSaveSelectionToDevice: (pairIds: Set<Long>) -> Unit,
@@ -34,6 +38,7 @@ fun AlbumDetailRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
     val currentOnNavigateToPairPreview by rememberUpdatedState(onNavigateToPairPreview)
@@ -41,6 +46,7 @@ fun AlbumDetailRoute(
     val currentOnNavigateToBeforeRetake by rememberUpdatedState(onNavigateToBeforeRetake)
     val currentOnNavigateToCamera by rememberUpdatedState(onNavigateToCamera)
     val currentOnNavigateToPairPicker by rememberUpdatedState(onNavigateToPairPicker)
+    val currentOnNavigateToPaywall by rememberUpdatedState(onNavigateToPaywall)
 
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
@@ -80,7 +86,15 @@ fun AlbumDetailRoute(
                 onPairClick = viewModel::onPairClick,
                 onPairLongPress = viewModel::onPairLongPress,
                 onExitSelectionMode = viewModel::exitSelectionMode,
-                onCaptureBeforeClick = viewModel::onFabClick,
+                onCaptureBeforeClick = {
+                    scope.launch {
+                        if (viewModel.isCameraEntryAllowed()) {
+                            viewModel.onFabClick()
+                        } else {
+                            currentOnNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                        }
+                    }
+                },
                 onAddPairsClick = viewModel::onAddPairsClick,
                 onShareClick = { onShareSelection(state.selectedIds) },
                 onSaveToDeviceClick = { onSaveSelectionToDevice(state.selectedIds) },

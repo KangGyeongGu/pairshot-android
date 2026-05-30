@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.pairshot.core.designsystem.PairShotScreen
 import com.pairshot.core.model.SortOrder
-import com.pairshot.core.ui.component.SortOrderToggleButton
+import com.pairshot.core.ui.component.SortOrderDualLabel
 
 @Composable
 fun AlbumFilterRow(
@@ -25,9 +25,9 @@ fun AlbumFilterRow(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        SortOrderToggleButton(
+        SortOrderDualLabel(
             sortOrder = sortOrder,
-            onToggle = onToggleSortOrder,
+            onSelect = { next -> if (next != sortOrder) onToggleSortOrder() },
         )
     }
 }

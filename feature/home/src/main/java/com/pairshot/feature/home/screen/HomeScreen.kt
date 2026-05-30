@@ -20,8 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.pairshot.core.adsui.component.PairCardGridSection
 import com.pairshot.core.adsui.component.PairShotBannerAd
 import com.pairshot.core.designsystem.PairShotSpacing
+import com.pairshot.core.domain.tutorial.AnchorKey
 import com.pairshot.core.infra.location.LocationResult
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
@@ -33,15 +35,22 @@ import com.pairshot.feature.home.component.HomeAlbumGridSection
 import com.pairshot.feature.home.component.HomeAlbumSelectionBottomBar
 import com.pairshot.feature.home.component.HomeEmptyAction
 import com.pairshot.feature.home.component.HomeFilterRow
-import com.pairshot.feature.home.component.HomePairGridSection
 import com.pairshot.feature.home.component.HomePrimaryActionBar
 import com.pairshot.feature.home.component.HomeSelectionBottomBar
 import com.pairshot.feature.home.component.HomeTopBar
 import com.pairshot.feature.home.dialog.CreateAlbumDialog
 import com.pairshot.feature.home.viewmodel.HomeMode
+import com.pairshot.feature.tutorial.ui.modifier.tutorialAnchor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import com.pairshot.core.ui.R as CoreR
+
+private val HomeDateFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("yyyy. MM. dd", Locale.KOREAN)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -178,6 +187,7 @@ fun HomeScreen(
                         end = PairShotSpacing.md,
                         bottom = PairShotSpacing.sm,
                     )
+                val today = remember { LocalDate.now(ZoneId.systemDefault()) }
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
@@ -185,14 +195,18 @@ fun HomeScreen(
                 ) {
                     when (mode) {
                         HomeMode.PAIRS -> {
-                            HomePairGridSection(
+                            PairCardGridSection(
                                 pairs = pairs,
                                 selectedIds = selectedIds,
-                                selectionMode = selectionMode,
+                                isSelectionMode = selectionMode,
                                 sortOrder = sortOrder,
                                 onPairClick = onPairClick,
-                                onPairLongClick = onPairLongClick,
+                                onPairLongPress = onPairLongClick,
                                 contentPadding = contentPadding,
+                                dateHeaderLabel = { date ->
+                                    formatHomeDateLabel(date = date, today = today)
+                                },
+                                firstPairModifier = Modifier.tutorialAnchor(AnchorKey.HOME_PAIR_CARD_FIRST),
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
@@ -298,5 +312,18 @@ fun HomeScreen(
             },
             onDismiss = { showAlbumRenameDialog = false },
         )
+    }
+}
+
+@Composable
+private fun formatHomeDateLabel(
+    date: LocalDate,
+    today: LocalDate,
+): String {
+    val base = date.format(HomeDateFormatter)
+    return when (date) {
+        today -> stringResource(R.string.home_date_suffix_today, base)
+        today.minusDays(1) -> stringResource(R.string.home_date_suffix_yesterday, base)
+        else -> base
     }
 }

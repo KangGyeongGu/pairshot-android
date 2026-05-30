@@ -124,6 +124,9 @@ fun PairShotNavHost(
                     navController.navigate(Camera(albumId = albumId))
                 },
                 onNavigateToPairPicker = { albumId -> navController.navigate(PairPicker(albumId)) },
+                onNavigateToPaywall = { trigger ->
+                    navController.navigate(Paywall(dismissible = true, trigger = trigger))
+                },
                 onNavigateToExportSettings = { ids ->
                     navController.navigate(ExportSettings(ids.joinToString(",")))
                 },
