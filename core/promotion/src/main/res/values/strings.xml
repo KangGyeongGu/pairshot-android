@@ -8,7 +8,6 @@
     <string name="promotion_dialog_register">등록</string>
     <string name="promotion_dialog_cancel">취소</string>
     <string name="promotion_dialog_registering">코드 활성화 중…</string>
-    <string name="promotion_dialog_need_code">코드가 필요하다면?</string>
 
     <string name="promotion_qr_scanner_title">프로모션 QR 스캔</string>
     <string name="promotion_qr_camera_permission_required">카메라 권한이 필요합니다</string>

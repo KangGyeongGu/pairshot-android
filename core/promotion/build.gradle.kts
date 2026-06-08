@@ -41,11 +41,6 @@ android {
             "PROMOTION_DEVICE_HASH_SALT",
             "\"${localProperties["PROMOTION_DEVICE_HASH_SALT"] ?: ""}\"",
         )
-        buildConfigField(
-            "String",
-            "PROMOTION_INFO_URL",
-            "\"${localProperties["PROMOTION_INFO_URL"] ?: ""}\"",
-        )
     }
 
     packaging {

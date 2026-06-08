@@ -19,9 +19,6 @@ import com.pairshot.core.ui.component.SnackbarVariant
 import com.pairshot.core.ui.text.UiText
 import dagger.hilt.android.EntryPointAccessors
 
-private const val TERMS_URL = "https://pairshot.kangkyeonggu.com/terms"
-private const val PRIVACY_URL = "https://pairshot.kangkyeonggu.com/privacy"
-
 @Composable
 fun PaywallRoute(
     dismissible: Boolean,
@@ -122,8 +119,8 @@ fun PaywallRoute(
         onRestore = viewModel::restore,
         onRetryLoad = viewModel::loadOffers,
         snackbarController = snackbarController,
-        termsUrl = TERMS_URL,
-        privacyUrl = PRIVACY_URL,
+        termsUrl = BuildConfig.TERMS_URL,
+        privacyUrl = BuildConfig.PRIVACY_POLICY_URL,
     )
 }
 
