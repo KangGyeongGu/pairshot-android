@@ -28,8 +28,8 @@ android {
     defaultConfig {
         buildConfigField(
             "String",
-            "PROMOTION_API_BASE_URL",
-            "\"${localProperties["PROMOTION_API_BASE_URL"] ?: ""}\"",
+            "WEB_BASE_URL",
+            "\"${localProperties["WEB_BASE_URL"] ?: ""}\"",
         )
         buildConfigField(
             "String",
@@ -40,11 +40,6 @@ android {
             "String",
             "PROMOTION_DEVICE_HASH_SALT",
             "\"${localProperties["PROMOTION_DEVICE_HASH_SALT"] ?: ""}\"",
-        )
-        buildConfigField(
-            "String",
-            "PROMOTION_INFO_URL",
-            "\"${localProperties["PROMOTION_INFO_URL"] ?: ""}\"",
         )
     }
 

@@ -47,11 +47,9 @@ jobs:
           ADMOB_APP_OPEN: ${{ secrets.ADMOB_APP_OPEN }}
           ADMOB_NATIVE: ${{ secrets.ADMOB_NATIVE }}
           ADMOB_REWARDED: ${{ secrets.ADMOB_REWARDED }}
-          PROMOTION_API_BASE_URL: ${{ secrets.PROMOTION_API_BASE_URL }}
+          WEB_BASE_URL: ${{ secrets.WEB_BASE_URL }}
           PROMOTION_API_AUTH_KEY: ${{ secrets.PROMOTION_API_AUTH_KEY }}
           PROMOTION_DEVICE_HASH_SALT: ${{ secrets.PROMOTION_DEVICE_HASH_SALT }}
-          PROMOTION_INFO_URL: ${{ secrets.PROMOTION_INFO_URL }}
-          PRIVACY_POLICY_URL: ${{ secrets.PRIVACY_POLICY_URL }}
         run: |
           {
             printf 'KEYSTORE_PATH=%s/keystore/upload.jks\n' "$GITHUB_WORKSPACE"
@@ -64,11 +62,9 @@ jobs:
             printf 'ADMOB_APP_OPEN=%s\n' "$ADMOB_APP_OPEN"
             printf 'ADMOB_NATIVE=%s\n' "$ADMOB_NATIVE"
             printf 'ADMOB_REWARDED=%s\n' "$ADMOB_REWARDED"
-            printf 'PROMOTION_API_BASE_URL=%s\n' "$PROMOTION_API_BASE_URL"
+            printf 'WEB_BASE_URL=%s\n' "$WEB_BASE_URL"
             printf 'PROMOTION_API_AUTH_KEY=%s\n' "$PROMOTION_API_AUTH_KEY"
             printf 'PROMOTION_DEVICE_HASH_SALT=%s\n' "$PROMOTION_DEVICE_HASH_SALT"
-            printf 'PROMOTION_INFO_URL=%s\n' "$PROMOTION_INFO_URL"
-            printf 'PRIVACY_POLICY_URL=%s\n' "$PRIVACY_POLICY_URL"
           } > local.properties
 
       - name: Build release bundle (.aab)

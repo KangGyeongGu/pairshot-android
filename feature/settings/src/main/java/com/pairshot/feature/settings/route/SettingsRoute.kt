@@ -41,6 +41,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.pairshot.core.adsui.R as AdsUiR
 
+private const val PRIVACY_PATH = "/privacy"
+
 @Composable
 fun SettingsRoute(
     onNavigateBack: () -> Unit,
@@ -182,7 +184,7 @@ fun SettingsRoute(
         onPrivacyPolicyClick = {
             runCatching {
                 context.startActivity(
-                    Intent(Intent.ACTION_VIEW, BuildConfig.PRIVACY_POLICY_URL.toUri()),
+                    Intent(Intent.ACTION_VIEW, (BuildConfig.WEB_BASE_URL.trimEnd('/') + PRIVACY_PATH).toUri()),
                 )
             }
         },

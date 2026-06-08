@@ -8,7 +8,8 @@ import javax.inject.Singleton
 class BuildConfigPromotionApiConfig
 @Inject
 constructor() : PromotionApiConfig {
-    override val baseUrl: String = BuildConfig.PROMOTION_API_BASE_URL
+    override val baseUrl: String =
+        if (BuildConfig.WEB_BASE_URL.isBlank()) "" else BuildConfig.WEB_BASE_URL.trimEnd('/') + API_PREFIX
     override val membershipPath: String = "/promotion"
     override val activatePath: String = "/promotions/activate"
     override val byIdPath: String = "/promotions"
@@ -19,6 +20,7 @@ constructor() : PromotionApiConfig {
     override val timeoutMillis: Long = DEFAULT_TIMEOUT_MILLIS
 
     private companion object {
+        const val API_PREFIX = "/api/v1/pairshot"
         const val DEFAULT_TIMEOUT_MILLIS = 10_000L
     }
 }

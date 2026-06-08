@@ -20,8 +20,8 @@ android {
     defaultConfig {
         buildConfigField(
             "String",
-            "PRIVACY_POLICY_URL",
-            "\"${localProperties.getProperty("PRIVACY_POLICY_URL") ?: ""}\"",
+            "WEB_BASE_URL",
+            "\"${localProperties.getProperty("WEB_BASE_URL") ?: ""}\"",
         )
     }
 }

@@ -1,8 +1,6 @@
 package com.pairshot.core.promotion.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,13 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.pairshot.core.promotion.BuildConfig
 import com.pairshot.core.promotion.R
 import com.pairshot.core.promotion.domain.ActivationResult
 import com.pairshot.core.promotion.domain.Promotion
@@ -104,31 +100,12 @@ fun PromotionRegisterDialog(
         modifier = modifier,
         onDismissRequest = { if (!isLoading) onDismiss() },
         title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val titleRes =
-                    when (mode) {
-                        RegisterMode.Input -> R.string.promotion_dialog_title
-                        RegisterMode.Scanning -> R.string.promotion_qr_scanner_title
-                    }
-                Text(text = stringResource(titleRes))
-                if (mode == RegisterMode.Input) {
-                    val uriHandler = LocalUriHandler.current
-                    Text(
-                        text = stringResource(R.string.promotion_dialog_need_code),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier =
-                        Modifier.clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                        ) { uriHandler.openUri(BuildConfig.PROMOTION_INFO_URL) },
-                    )
+            val titleRes =
+                when (mode) {
+                    RegisterMode.Input -> R.string.promotion_dialog_title
+                    RegisterMode.Scanning -> R.string.promotion_qr_scanner_title
                 }
-            }
+            Text(text = stringResource(titleRes))
         },
         text = {
             when (mode) {

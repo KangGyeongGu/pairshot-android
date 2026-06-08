@@ -8,7 +8,6 @@
     <string name="promotion_dialog_register">Register</string>
     <string name="promotion_dialog_cancel">Cancel</string>
     <string name="promotion_dialog_registering">Activating code…</string>
-    <string name="promotion_dialog_need_code">Need a code?</string>
 
     <string name="promotion_qr_scanner_title">Scan promotion QR</string>
     <string name="promotion_qr_camera_permission_required">Camera permission required</string>
