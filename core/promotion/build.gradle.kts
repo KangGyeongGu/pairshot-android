@@ -28,8 +28,8 @@ android {
     defaultConfig {
         buildConfigField(
             "String",
-            "PROMOTION_API_BASE_URL",
-            "\"${localProperties["PROMOTION_API_BASE_URL"] ?: ""}\"",
+            "WEB_BASE_URL",
+            "\"${localProperties["WEB_BASE_URL"] ?: ""}\"",
         )
         buildConfigField(
             "String",
