@@ -88,14 +88,6 @@ private fun promoTrailingText(membership: Membership): String? =
             stringResource(R.string.settings_pro_coupon_unlimited)
         }
 
-        !membership.isPro && membership.isAdFree && membership.adFreeExpiresAtEpochMillis != null -> {
-            stringResource(R.string.settings_pro_coupon_expires, formatDate(membership.adFreeExpiresAtEpochMillis!!))
-        }
-
-        !membership.isPro && membership.isAdFree -> {
-            stringResource(R.string.settings_pro_coupon_unlimited)
-        }
-
         else -> {
             null
         }

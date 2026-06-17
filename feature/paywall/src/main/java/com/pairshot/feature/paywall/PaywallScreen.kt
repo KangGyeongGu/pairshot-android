@@ -79,7 +79,7 @@ fun PaywallScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            TopBar(dismissible = dismissible, onDismiss = onDismiss)
+            TopBar(onClose = if (dismissible) onDismiss else onContinueFree)
 
             Column(
                 modifier =
@@ -169,29 +169,22 @@ private fun DisclosureBlock() {
 }
 
 @Composable
-private fun TopBar(
-    dismissible: Boolean,
-    onDismiss: () -> Unit,
-) {
-    if (dismissible) {
-        Box(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = PairShotSpacing.xs, top = PairShotSpacing.xs),
+private fun TopBar(onClose: () -> Unit) {
+    Box(
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(start = PairShotSpacing.xs, top = PairShotSpacing.xs),
+    ) {
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.CenterStart),
         ) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.align(Alignment.CenterStart),
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = stringResource(R.string.paywall_close_content_description),
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = stringResource(R.string.paywall_close_content_description),
+            )
         }
-    } else {
-        Spacer(modifier = Modifier.height(PairShotSpacing.xl))
     }
 }
 

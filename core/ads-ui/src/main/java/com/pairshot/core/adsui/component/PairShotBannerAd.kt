@@ -59,11 +59,11 @@ fun PairShotBannerAd(
         }
     val adsConfig = entryPoint?.let { remember(it) { it.adsConfig() } }
     val membershipProvider = entryPoint?.let { remember(it) { it.membershipProvider() } }
-    val adFreeFlow =
+    val isProFlow =
         membershipProvider?.let {
-            remember(it) { it.observe().map { membership -> membership.isAdFree } }
+            remember(it) { it.observe().map { membership -> membership.isPro } }
         }
-    val isAdFree: Boolean? = adFreeFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
+    val isPro: Boolean? = isProFlow?.collectAsStateWithLifecycle(initialValue = null)?.value
     val tutorialMode = entryPoint?.let { remember(it) { it.tutorialModeProvider() } }
     val isTutorial: Boolean = tutorialMode?.isActive?.collectAsStateWithLifecycle()?.value == true
 
@@ -83,8 +83,8 @@ fun PairShotBannerAd(
             height ?: resolveAdaptiveBannerHeight(activity, adWidth, density)
         }
 
-    val showAd = !inspection && isAdFree == false && !isTutorial
-    val occupiesSlot = inspection || isAdFree == null || showAd
+    val showAd = !inspection && isPro == false && !isTutorial
+    val occupiesSlot = inspection || isPro == null || showAd
 
     val resolvedHeight =
         when {

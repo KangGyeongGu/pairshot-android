@@ -40,7 +40,7 @@ constructor(
     fun ensurePreloaded(targetCount: Int) {
         if (targetCount <= 0) return
         scope.launch {
-            if (membershipProvider.current().isAdFree) return@launch
+            if (membershipProvider.current().isPro) return@launch
 
             val desired = targetCount.coerceAtMost(MAX_POOL_SIZE)
             val currentSize = adsFlow.value.size

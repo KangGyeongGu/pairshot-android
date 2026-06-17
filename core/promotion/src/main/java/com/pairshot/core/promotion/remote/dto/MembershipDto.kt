@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MembershipDto(
     val pro: EntitlementInfoDto,
-    val adFree: EntitlementInfoDto,
     val promotions: List<MembershipPromotionDto>,
 )
 

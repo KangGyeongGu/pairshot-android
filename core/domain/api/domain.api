@@ -247,18 +247,14 @@ public final class com/pairshot/core/domain/export/SaveToDeviceResult$ZipReadyFo
 
 public final class com/pairshot/core/domain/membership/Membership {
 	public static final field Companion Lcom/pairshot/core/domain/membership/Membership$Companion;
-	public fun <init> (ZZLjava/lang/Long;Ljava/lang/Long;)V
+	public fun <init> (ZLjava/lang/Long;)V
 	public final fun component1 ()Z
-	public final fun component2 ()Z
-	public final fun component3 ()Ljava/lang/Long;
-	public final fun component4 ()Ljava/lang/Long;
-	public final fun copy (ZZLjava/lang/Long;Ljava/lang/Long;)Lcom/pairshot/core/domain/membership/Membership;
-	public static synthetic fun copy$default (Lcom/pairshot/core/domain/membership/Membership;ZZLjava/lang/Long;Ljava/lang/Long;ILjava/lang/Object;)Lcom/pairshot/core/domain/membership/Membership;
+	public final fun component2 ()Ljava/lang/Long;
+	public final fun copy (ZLjava/lang/Long;)Lcom/pairshot/core/domain/membership/Membership;
+	public static synthetic fun copy$default (Lcom/pairshot/core/domain/membership/Membership;ZLjava/lang/Long;ILjava/lang/Object;)Lcom/pairshot/core/domain/membership/Membership;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAdFreeExpiresAtEpochMillis ()Ljava/lang/Long;
 	public final fun getProExpiresAtEpochMillis ()Ljava/lang/Long;
 	public fun hashCode ()I
-	public final fun isAdFree ()Z
 	public final fun isPro ()Z
 	public fun toString ()Ljava/lang/String;
 }

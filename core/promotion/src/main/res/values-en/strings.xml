@@ -22,8 +22,6 @@
 
     <string name="promotion_success_pro_days">%1$d-day Pro membership activated</string>
     <string name="promotion_success_pro_unlimited">Unlimited Pro membership activated</string>
-    <string name="promotion_success_adfree_days">%1$d-day ad-free activated</string>
-    <string name="promotion_success_adfree_unlimited">Unlimited ad-free activated</string>
 
     <string name="promotion_list_section_title">My Promotions</string>
     <string name="promotion_list_empty">No promotions registered</string>
@@ -34,7 +32,6 @@
     <string name="promotion_list_unlimited">Unlimited</string>
 
     <string name="promotion_entitlement_pro">Pro</string>
-    <string name="promotion_entitlement_ad_free">Ad-free</string>
 
     <plurals name="promotion_list_days_format">
         <item quantity="one">%1$d day</item>

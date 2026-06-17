@@ -34,15 +34,6 @@ class CanCreatePairUseCaseTest {
         }
 
     @Test
-    fun `ad-free-only user is still limited (ad_free does not grant unlimited pairs)`() =
-        runTest {
-            coEvery { membership.current() } returns adFreeOnlyMembership()
-            every { repository.countCreatedSince(any()) } returns flowOf(CanCreatePairUseCase.FREE_DAILY_LIMIT)
-            val result = useCase() as CanCreatePairUseCase.Result.LimitReached
-            assertEquals(CanCreatePairUseCase.FREE_DAILY_LIMIT, result.limit)
-        }
-
-    @Test
     fun `free user under daily quota can create pair`() =
         runTest {
             coEvery { membership.current() } returns Membership.Free
@@ -104,16 +95,6 @@ class CanCreatePairUseCaseTest {
     private fun proMembership(): Membership =
         Membership(
             isPro = true,
-            isAdFree = true,
             proExpiresAtEpochMillis = null,
-            adFreeExpiresAtEpochMillis = null,
-        )
-
-    private fun adFreeOnlyMembership(): Membership =
-        Membership(
-            isPro = false,
-            isAdFree = true,
-            proExpiresAtEpochMillis = null,
-            adFreeExpiresAtEpochMillis = null,
         )
 }

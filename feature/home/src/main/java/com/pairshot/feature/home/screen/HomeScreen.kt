@@ -201,7 +201,7 @@ fun HomeScreen(
                                 onPairClick = onPairClick,
                                 onPairLongPress = onPairLongClick,
                                 contentPadding = contentPadding,
-                                adFree = adSlot.isAdFree,
+                                isPro = adSlot.isPro,
                                 onAdSlotCountChange = adSlot::onAdSlotCountChange,
                                 adSlot = { slotIndex -> adSlot.Content(slotIndex) },
                                 dateHeaderLabel = { date ->

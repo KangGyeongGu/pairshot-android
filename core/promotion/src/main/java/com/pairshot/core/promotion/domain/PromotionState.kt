@@ -6,8 +6,6 @@ import kotlinx.serialization.Serializable
 data class PromotionState(
     val proActive: Boolean,
     val proExpiresAtEpochMillis: Long?,
-    val adFreeActive: Boolean,
-    val adFreeExpiresAtEpochMillis: Long?,
     val promotions: List<Promotion>,
 ) {
     companion object {
@@ -15,8 +13,6 @@ data class PromotionState(
             PromotionState(
                 proActive = false,
                 proExpiresAtEpochMillis = null,
-                adFreeActive = false,
-                adFreeExpiresAtEpochMillis = null,
                 promotions = emptyList(),
             )
     }

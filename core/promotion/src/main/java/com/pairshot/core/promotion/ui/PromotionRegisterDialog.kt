@@ -277,14 +277,6 @@ private fun SuccessFeedback(
                         stringResource(R.string.promotion_success_pro_unlimited)
                     }
                 }
-
-                PromotionEntitlement.AD_FREE -> {
-                    if (durationDays != null) {
-                        stringResource(R.string.promotion_success_adfree_days, durationDays)
-                    } else {
-                        stringResource(R.string.promotion_success_adfree_unlimited)
-                    }
-                }
             }
         Text(
             text = message,
@@ -378,7 +370,6 @@ private fun PromotionListItemRow(item: Promotion) {
     val entitlementLabel =
         when (item.entitlement) {
             PromotionEntitlement.PRO -> stringResource(R.string.promotion_entitlement_pro)
-            PromotionEntitlement.AD_FREE -> stringResource(R.string.promotion_entitlement_ad_free)
         }
 
     Row(
