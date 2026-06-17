@@ -34,30 +34,26 @@ class MembershipResolverTest {
             resolver().observe().test {
                 val m = awaitItem()
                 assertFalse(m.isPro)
-                assertFalse(m.isAdFree)
                 assertNull(m.proExpiresAtEpochMillis)
-                assertNull(m.adFreeExpiresAtEpochMillis)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `active subscription grants pro and adFree with unlimited expiry`() =
+    fun `active subscription grants pro with unlimited expiry`() =
         runTest {
             every { promotion.observe() } returns flowOf(PromotionState.Empty)
             subFlow.value = SubscriptionStatus.Active("pro", autoRenew = true)
             resolver().observe().test {
                 val m = awaitItem()
                 assertTrue(m.isPro)
-                assertTrue(m.isAdFree)
                 assertNull(m.proExpiresAtEpochMillis)
-                assertNull(m.adFreeExpiresAtEpochMillis)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `pro promotion without subscription grants pro and adFree with promotion expiry`() =
+    fun `pro promotion without subscription grants pro with promotion expiry`() =
         runTest {
             val expiry = 1_700_000_000_000L
             every { promotion.observe() } returns
@@ -65,8 +61,6 @@ class MembershipResolverTest {
                     PromotionState(
                         proActive = true,
                         proExpiresAtEpochMillis = expiry,
-                        adFreeActive = true,
-                        adFreeExpiresAtEpochMillis = expiry,
                         promotions = emptyList(),
                     ),
                 )
@@ -74,40 +68,13 @@ class MembershipResolverTest {
             resolver().observe().test {
                 val m = awaitItem()
                 assertTrue(m.isPro)
-                assertTrue(m.isAdFree)
                 assertEquals(expiry, m.proExpiresAtEpochMillis)
-                assertEquals(expiry, m.adFreeExpiresAtEpochMillis)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `ad_free promotion alone grants adFree but not pro`() =
-        runTest {
-            val expiry = 1_700_000_000_000L
-            every { promotion.observe() } returns
-                flowOf(
-                    PromotionState(
-                        proActive = false,
-                        proExpiresAtEpochMillis = null,
-                        adFreeActive = true,
-                        adFreeExpiresAtEpochMillis = expiry,
-                        promotions = emptyList(),
-                    ),
-                )
-            subFlow.value = SubscriptionStatus.Inactive
-            resolver().observe().test {
-                val m = awaitItem()
-                assertFalse(m.isPro)
-                assertTrue(m.isAdFree)
-                assertNull(m.proExpiresAtEpochMillis)
-                assertEquals(expiry, m.adFreeExpiresAtEpochMillis)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `subscription overrides promotion expiry — both pro and adFree become unlimited`() =
+    fun `subscription overrides promotion expiry — pro becomes unlimited`() =
         runTest {
             val expiry = 1_700_000_000_000L
             every { promotion.observe() } returns
@@ -115,8 +82,6 @@ class MembershipResolverTest {
                     PromotionState(
                         proActive = true,
                         proExpiresAtEpochMillis = expiry,
-                        adFreeActive = true,
-                        adFreeExpiresAtEpochMillis = expiry,
                         promotions = emptyList(),
                     ),
                 )
@@ -124,9 +89,7 @@ class MembershipResolverTest {
             resolver().observe().test {
                 val m = awaitItem()
                 assertTrue(m.isPro)
-                assertTrue(m.isAdFree)
                 assertNull(m.proExpiresAtEpochMillis)
-                assertNull(m.adFreeExpiresAtEpochMillis)
                 cancelAndIgnoreRemainingEvents()
             }
         }

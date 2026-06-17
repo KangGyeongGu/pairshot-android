@@ -48,7 +48,7 @@ fun PairCardGridSection(
     modifier: Modifier = Modifier,
     firstPairModifier: Modifier = Modifier,
     onPairLongPress: (Long) -> Unit = {},
-    adFree: Boolean = true,
+    isPro: Boolean = true,
     disabledIds: ImmutableSet<Long> = persistentSetOf(),
     disabledLabel: String? = null,
     dateHeaderLabel: @Composable (LocalDate) -> String = { it.format(DefaultDateFormatter) },
@@ -68,16 +68,16 @@ fun PairCardGridSection(
         remember(sortedPairs) { sortedPairs.firstOrNull()?.id }
 
     val items =
-        remember(sortedPairs, adFree) {
+        remember(sortedPairs, isPro) {
             buildPairListWithAds(
                 pairs = sortedPairs,
-                adFree = adFree,
+                isPro = isPro,
                 sectionKeyOf = { it.beforeTimestamp.toLocalDate() },
             )
         }
     val totalAdSlots = remember(items) { items.count { it is PairListItem.Ad } }
 
-    LaunchedEffect(totalAdSlots, adFree) {
+    LaunchedEffect(totalAdSlots, isPro) {
         currentOnAdSlotCountChange(totalAdSlots)
     }
 

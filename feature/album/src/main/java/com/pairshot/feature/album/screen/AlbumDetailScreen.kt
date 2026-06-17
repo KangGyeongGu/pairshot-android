@@ -130,7 +130,7 @@ fun AlbumDetailScreen(
                             start = PairShotSpacing.md,
                             end = PairShotSpacing.md,
                         ),
-                        adFree = adSlot.isAdFree,
+                        isPro = adSlot.isPro,
                         onAdSlotCountChange = adSlot::onAdSlotCountChange,
                         adSlot = { slotIndex -> adSlot.Content(slotIndex) },
                         modifier = Modifier.fillMaxSize(),

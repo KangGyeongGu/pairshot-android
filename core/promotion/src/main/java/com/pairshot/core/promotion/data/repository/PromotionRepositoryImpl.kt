@@ -131,8 +131,6 @@ internal fun MembershipDto.toDomain(): PromotionState =
     PromotionState(
         proActive = pro.active,
         proExpiresAtEpochMillis = pro.parseExpiry(),
-        adFreeActive = adFree.active,
-        adFreeExpiresAtEpochMillis = adFree.parseExpiry(),
         promotions = promotions.mapNotNull { it.toDomainOrNull() },
     )
 
@@ -158,7 +156,6 @@ internal fun MembershipPromotionDto.toDomainOrNull(): Promotion? {
 private fun parseEntitlement(raw: String): PromotionEntitlement? =
     when (raw) {
         "pro" -> PromotionEntitlement.PRO
-        "ad_free" -> PromotionEntitlement.AD_FREE
         else -> null
     }
 

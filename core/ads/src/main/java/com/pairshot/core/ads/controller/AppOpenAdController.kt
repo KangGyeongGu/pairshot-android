@@ -55,7 +55,7 @@ constructor(
     fun onForeground(activity: Activity) {
         scope.launch {
             if (tutorialMode.isActive.value) return@launch
-            if (membershipProvider.current().isAdFree) return@launch
+            if (membershipProvider.current().isPro) return@launch
             if (fullscreenAdState.isShowing()) return@launch
             if (isWithinCooldown()) return@launch
 

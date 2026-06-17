@@ -35,13 +35,9 @@ constructor(
         val subActive = sub is SubscriptionStatus.Active
         val isPro = subActive || promo.proActive
         val proExpiry = if (subActive) null else promo.proExpiresAtEpochMillis
-        val isAdFree = isPro || promo.adFreeActive
-        val adFreeExpiry = if (subActive) null else promo.adFreeExpiresAtEpochMillis
         return Membership(
             isPro = isPro,
-            isAdFree = isAdFree,
             proExpiresAtEpochMillis = proExpiry,
-            adFreeExpiresAtEpochMillis = adFreeExpiry,
         )
     }
 }

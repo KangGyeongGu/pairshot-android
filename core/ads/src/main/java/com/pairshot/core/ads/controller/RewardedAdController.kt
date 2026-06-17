@@ -61,7 +61,7 @@ constructor(
                 return@launch
             }
 
-            if (membershipProvider.current().isAdFree) {
+            if (membershipProvider.current().isPro) {
                 gate.unlock(feature)
                 onReward()
                 return@launch

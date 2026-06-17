@@ -8,10 +8,10 @@ private const val MIN_PAIRS_FOR_ADS = 5
 
 fun buildPairListWithAds(
     pairs: List<PhotoPair>,
-    adFree: Boolean,
+    isPro: Boolean,
     sectionKeyOf: (PhotoPair) -> Any? = { null },
 ): List<PairListItem> {
-    if (adFree || pairs.size < MIN_PAIRS_FOR_ADS) {
+    if (isPro || pairs.size < MIN_PAIRS_FOR_ADS) {
         return pairs.map { PairListItem.Pair(it) }
     }
 

@@ -15,7 +15,7 @@ data class Promotion(
 )
 
 @Serializable
-enum class PromotionEntitlement { PRO, AD_FREE }
+enum class PromotionEntitlement { PRO }
 
 @Serializable
 enum class PromotionStatus { UNUSED, ACTIVATED, EXPIRED, REVOKED }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PairCardNativeAdSlot internal constructor(
-    val isAdFree: Boolean,
+    val isPro: Boolean,
     private val pool: NativeAdPool?,
     private val nativeAds: List<com.google.android.gms.ads.nativead.NativeAd>,
     private val onSlotCountChangeAction: (Int) -> Unit,
@@ -38,7 +38,7 @@ fun rememberPairCardNativeAdSlot(): PairCardNativeAdSlot {
     val isInspection = LocalInspectionMode.current
     if (isInspection) {
         return remember {
-            PairCardNativeAdSlot(isAdFree = true, pool = null, nativeAds = emptyList(), onSlotCountChangeAction = {})
+            PairCardNativeAdSlot(isPro = true, pool = null, nativeAds = emptyList(), onSlotCountChangeAction = {})
         }
     }
 
@@ -52,8 +52,8 @@ fun rememberPairCardNativeAdSlot(): PairCardNativeAdSlot {
         }
     val membershipProvider = remember(entryPoint) { entryPoint.membershipProvider() }
     val poolProvider = remember(entryPoint) { entryPoint.nativeAdPoolProvider() }
-    val adFreeFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isAdFree } }
-    val isAdFree: Boolean? by adFreeFlow.collectAsStateWithLifecycle(initialValue = null)
+    val isProFlow = remember(membershipProvider) { membershipProvider.observe().map { it.isPro } }
+    val isPro: Boolean? by isProFlow.collectAsStateWithLifecycle(initialValue = null)
 
     val nativeAdPool = remember(poolProvider) { poolProvider.get() }
     DisposableEffect(nativeAdPool) {
@@ -62,13 +62,13 @@ fun rememberPairCardNativeAdSlot(): PairCardNativeAdSlot {
     val nativeAds by nativeAdPool.observeAds().collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
-    return remember(isAdFree, nativeAdPool, nativeAds) {
+    return remember(isPro, nativeAdPool, nativeAds) {
         PairCardNativeAdSlot(
-            isAdFree = isAdFree == true,
+            isPro = isPro == true,
             pool = nativeAdPool,
             nativeAds = nativeAds,
             onSlotCountChangeAction = { total ->
-                if (isAdFree == false && total > 0) {
+                if (isPro == false && total > 0) {
                     scope.launch { nativeAdPool.ensurePreloaded(total) }
                 }
             },

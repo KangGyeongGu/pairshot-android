@@ -53,7 +53,7 @@ constructor(
                 onFinished()
                 return@launch
             }
-            if (membershipProvider.current().isAdFree) {
+            if (membershipProvider.current().isPro) {
                 onFinished()
                 return@launch
             }
