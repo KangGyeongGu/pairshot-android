@@ -3,6 +3,8 @@ package com.pairshot.core.rendering
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Trace
 import com.pairshot.core.model.CombineConfig
@@ -12,8 +14,10 @@ import com.pairshot.core.model.LabelPositionMode
 import com.pairshot.core.model.RenderProfile
 import com.pairshot.core.model.WatermarkConfig
 import com.pairshot.core.rendering.internal.BorderInsets
+import com.pairshot.core.rendering.internal.LayoutPlacement
 import com.pairshot.core.rendering.internal.VerticalAlignment
 import com.pairshot.core.rendering.internal.calculatePlacement
+import com.pairshot.core.rendering.internal.centerCropRegion
 import com.pairshot.core.rendering.internal.createCanvasBitmap
 import com.pairshot.core.rendering.internal.downscaleIfNeeded
 import com.pairshot.core.rendering.internal.drawBothLabels
@@ -227,24 +231,47 @@ constructor(
                 minOf(wmAfter.width, wmAfter.height),
             )
         val insets = resolveBorderInsets(combineConfig, combineConfig.layout, referenceDim)
-        val placement = calculatePlacement(wmBefore, wmAfter, combineConfig.layout, insets)
+        val placement =
+            calculatePlacement(
+                wmBefore.width,
+                wmBefore.height,
+                wmAfter.width,
+                wmAfter.height,
+                combineConfig.layout,
+                insets,
+            )
 
         val combined = createCanvasBitmap(placement)
         val canvas = Canvas(combined)
         paintBackground(canvas, combineConfig)
 
-        canvas.drawBitmap(wmBefore, placement.beforeLeft.toFloat(), placement.beforeTop.toFloat(), null)
-        canvas.drawBitmap(wmAfter, placement.afterLeft.toFloat(), placement.afterTop.toFloat(), null)
+        val cropPaint = Paint(Paint.FILTER_BITMAP_FLAG)
+        drawIntoCell(canvas, wmBefore, placement.beforeLeft, placement.beforeTop, placement, cropPaint)
+        drawIntoCell(canvas, wmAfter, placement.afterLeft, placement.afterTop, placement, cropPaint)
 
         if (combineConfig.labelEnabled) {
             val isFree = combineConfig.labelPositionMode == LabelPositionMode.FREE
             val cornerPx = resolveCornerPx(combineConfig, referenceDim, isFree)
-            drawBothLabels(canvas, combineConfig, referenceDim, wmBefore, wmAfter, placement, insets, cornerPx)
+            drawBothLabels(canvas, combineConfig, referenceDim, placement, insets, cornerPx)
         }
 
         recycleIntermediateBitmaps(before, wmBefore, after, wmAfter, recycleInputs)
 
         return downscaleIfNeeded(combined, profile.maxOutputPx)
+    }
+
+    private fun drawIntoCell(
+        canvas: Canvas,
+        bitmap: Bitmap,
+        cellLeft: Int,
+        cellTop: Int,
+        placement: LayoutPlacement,
+        paint: Paint,
+    ) {
+        val region = centerCropRegion(bitmap.width, bitmap.height, placement.cellWidth, placement.cellHeight)
+        val src = Rect(region.left, region.top, region.right, region.bottom)
+        val dst = Rect(cellLeft, cellTop, cellLeft + placement.cellWidth, cellTop + placement.cellHeight)
+        canvas.drawBitmap(bitmap, src, dst, paint)
     }
 
     private suspend fun applyWatermarkIfEnabled(

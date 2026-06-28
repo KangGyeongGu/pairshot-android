@@ -18,15 +18,13 @@ internal fun drawBothLabels(
     canvas: Canvas,
     combineConfig: CombineConfig,
     referenceImageDim: Int,
-    wmBefore: Bitmap,
-    wmAfter: Bitmap,
     placement: LayoutPlacement,
     insets: BorderInsets,
     cornerPx: Float,
 ) {
     val fontSize = resolveLabelFontSize(combineConfig, referenceImageDim)
-    val beforeRect = LabelRect(placement.beforeLeft, placement.beforeTop, wmBefore.width, wmBefore.height)
-    val afterRect = LabelRect(placement.afterLeft, placement.afterTop, wmAfter.width, wmAfter.height)
+    val beforeRect = LabelRect(placement.beforeLeft, placement.beforeTop, placement.cellWidth, placement.cellHeight)
+    val afterRect = LabelRect(placement.afterLeft, placement.afterTop, placement.cellWidth, placement.cellHeight)
 
     if (combineConfig.labelPlacement == LabelPlacement.INSIDE_BORDER) {
         drawBorderLabelInRegion(
