@@ -1,6 +1,7 @@
 package com.pairshot.feature.camera.viewmodel
 
 import android.database.sqlite.SQLiteException
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,7 @@ import com.pairshot.core.model.PairStatus
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.navigation.AfterCamera
+import com.pairshot.core.rendering.ExifBitmapLoader
 import com.pairshot.feature.camera.component.ZoomStateHolder
 import com.pairshot.feature.camera.component.ZoomUiState
 import com.pairshot.feature.camera.state.CameraSettingsState
@@ -27,6 +29,7 @@ import com.pairshot.feature.camera.state.CameraSettingsStateHolder
 import com.pairshot.feature.camera.state.CapabilityAdjustment
 import com.pairshot.feature.camera.state.InitialCameraSessionConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -38,6 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.time.Instant
 import java.time.LocalDate
@@ -75,6 +79,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val photoPairRepository: PhotoPairRepository,
     private val getLatestBeforeThumbnailUseCase: GetLatestBeforeThumbnailUseCase,
+    private val exifBitmapLoader: ExifBitmapLoader,
     private val appSettingsRepository: AppSettingsRepository,
     private val cameraSettings: CameraSettingsStateHolder,
     albumRepository: AlbumRepository,
@@ -304,6 +309,12 @@ constructor(
     fun selectIndex(index: Int) {
         _currentIndex.value = index
     }
+
+    /** 스트립 카드용: 원본 EXIF 회전값으로 세로 촬영 여부를 IO 스레드에서 읽는다. */
+    suspend fun readBeforeIsPortrait(uri: String): Boolean =
+        withContext(Dispatchers.IO) {
+            runCatching { exifBitmapLoader.readIsPortrait(Uri.parse(uri)) }.getOrDefault(false)
+        }
 
     fun moveToNext() {
         val photos = unpairedPhotos.value

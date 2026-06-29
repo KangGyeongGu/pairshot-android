@@ -20,4 +20,5 @@ dependencies {
 
     implementation(libs.camerax.compose)
     implementation(libs.camerax.view)
+    implementation(libs.compose.material.icons.extended)
 }

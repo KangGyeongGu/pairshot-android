@@ -92,9 +92,18 @@ constructor(
         }
     }
 
+    /**
+     * 원본 EXIF 회전값으로 "세로로 들고 찍었는지"를 판별한다.
+     * CameraX 촬영본은 가로 버퍼 + 회전태그로 저장되므로 90/270이면 세로, 0/180이면 가로다.
+     */
+    fun readIsPortrait(uri: Uri): Boolean = isPortrait(readExifDegrees(uri))
+
     companion object {
         private const val ROTATE_QUARTER = 90
         private const val ROTATE_HALF = 180
         private const val ROTATE_THREE_QUARTERS = 270
+
+        internal fun isPortrait(exifDegrees: Int): Boolean =
+            exifDegrees == ROTATE_QUARTER || exifDegrees == ROTATE_THREE_QUARTERS
     }
 }

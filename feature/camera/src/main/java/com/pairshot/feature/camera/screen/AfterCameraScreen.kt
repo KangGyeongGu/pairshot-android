@@ -376,6 +376,7 @@ internal fun AfterCameraScreen(
                     } else {
                         StripProgress(completed = completedCount, total = totalPairCount)
                     },
+                    orientationProvider = viewModel::readBeforeIsPortrait,
                 )
 
                 CameraBottomBar(
