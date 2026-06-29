@@ -9,6 +9,8 @@
     <string name="camera_strip_empty">No Before photos yet</string>
     <string name="camera_strip_empty_after">No Before photos to shoot</string>
     <string name="camera_strip_thumbnail_desc">Before thumbnail %1$d</string>
+    <string name="camera_strip_orientation_portrait">Shot in portrait</string>
+    <string name="camera_strip_orientation_landscape">Shot in landscape</string>
     <plurals name="camera_strip_progress">
         <item quantity="one">%1$d / %2$d complete</item>
         <item quantity="other">%1$d / %2$d complete</item>

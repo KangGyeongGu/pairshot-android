@@ -9,6 +9,8 @@
     <string name="camera_strip_empty">아직 촬영된 Before가 없습니다</string>
     <string name="camera_strip_empty_after">촬영할 Before가 없습니다</string>
     <string name="camera_strip_thumbnail_desc">Before 썸네일 %1$d</string>
+    <string name="camera_strip_orientation_portrait">세로로 촬영한 사진</string>
+    <string name="camera_strip_orientation_landscape">가로로 촬영한 사진</string>
     <plurals name="camera_strip_progress">
         <item quantity="other">%1$d / %2$d 완료</item>
     </plurals>

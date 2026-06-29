@@ -24,7 +24,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.StayPrimaryLandscape
+import androidx.compose.material.icons.filled.StayPrimaryPortrait
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +37,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +54,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import com.pairshot.core.designsystem.PairShotBadge
 import com.pairshot.core.designsystem.PairShotCameraTokens
 import com.pairshot.core.designsystem.PairShotIconSize
+import com.pairshot.core.designsystem.PairShotSpacing
 import com.pairshot.core.designsystem.PairShotStroke
 import com.pairshot.core.designsystem.spec.CameraSpec
 import com.pairshot.core.domain.tutorial.AnchorKey
@@ -91,9 +100,11 @@ fun BeforePreviewStrip(
     stripHeight: Dp = BeforeStripHeight,
     allActiveSize: Boolean = false,
     progress: StripProgress? = null,
+    orientationProvider: (suspend (String) -> Boolean)? = null,
 ) {
     val snapEnabled = onSelectIndex != null
     val haptic = LocalHapticFeedback.current
+    val currentOrientationProvider by rememberUpdatedState(orientationProvider)
 
     if (snapEnabled) {
         val snappedIndex by remember(listState) {
@@ -200,15 +211,7 @@ fun BeforePreviewStrip(
                                     MaterialTheme.colorScheme.outlineVariant
                                 }
 
-                            ProfiledAsyncImage(
-                                data = beforeUri,
-                                profile = ImageProfile.THUMBNAIL,
-                                contentDescription =
-                                stringResource(
-                                    R.string.camera_strip_thumbnail_desc,
-                                    index + 1,
-                                ),
-                                contentScale = ContentScale.Crop,
+                            Box(
                                 modifier =
                                 Modifier
                                     .size(width = ACTIVE_CARD_WIDTH, height = ACTIVE_CARD_HEIGHT)
@@ -246,7 +249,37 @@ fun BeforePreviewStrip(
                                             Modifier
                                         },
                                     ),
-                            )
+                            ) {
+                                ProfiledAsyncImage(
+                                    data = beforeUri,
+                                    profile = ImageProfile.THUMBNAIL,
+                                    contentDescription =
+                                    stringResource(
+                                        R.string.camera_strip_thumbnail_desc,
+                                        index + 1,
+                                    ),
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+
+                                if (currentOrientationProvider != null) {
+                                    val isPortrait by produceState<Boolean?>(
+                                        initialValue = null,
+                                        key1 = beforeUri,
+                                    ) {
+                                        value = currentOrientationProvider?.invoke(beforeUri)
+                                    }
+                                    isPortrait?.let { portrait ->
+                                        OrientationBadge(
+                                            isPortrait = portrait,
+                                            modifier =
+                                            Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(PairShotBadge.edgeInset),
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -259,6 +292,32 @@ fun BeforePreviewStrip(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OrientationBadge(
+    isPortrait: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.size(PairShotBadge.size),
+        shape = RoundedCornerShape(PairShotSpacing.sm),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    ) {
+        Icon(
+            imageVector = if (isPortrait) Icons.Filled.StayPrimaryPortrait else Icons.Filled.StayPrimaryLandscape,
+            contentDescription =
+            stringResource(
+                if (isPortrait) {
+                    R.string.camera_strip_orientation_portrait
+                } else {
+                    R.string.camera_strip_orientation_landscape
+                },
+            ),
+            modifier = Modifier.padding(PairShotBadge.iconPadding).size(PairShotBadge.iconSize),
+        )
     }
 }
 
