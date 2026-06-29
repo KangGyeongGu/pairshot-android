@@ -12,8 +12,8 @@
 [![CameraX](https://img.shields.io/badge/CameraX-1.6.0-34A853?style=flat-square&logo=android&logoColor=white)](https://developer.android.com/training/camerax)
 [![License](https://img.shields.io/badge/License-Private-red?style=flat-square)]()
 
-PairShot은 Before·After 사진 촬영·관리·합성·워터마크 삽입·내보내기를 제공하는 Android 애플리케이션입니다.</br>
-각 Before·After 촬영본 페어를 자동으로 묶어 관리하고, 오버레이 가이드·합성·워터마크·압축 내보내기까지 전·후 사진 촬영 워크플로우 전체를 제공합니다.
+비포·애프터 촬영 및 관리 전용 카메라 애플리케이션.</br>
+비포·애프터 촬영 및 관리 보조, 일괄 합성 등 현장 작업자의 번거로운 워크플로우를 개선합니다.
 
 </div>
 
