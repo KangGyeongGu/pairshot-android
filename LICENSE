@@ -1,0 +1,37 @@
+Copyright (c) 2026 NomadLabs. All rights reserved.
+
+본 저작물(Proprietary Software)
+================================
+
+이 저장소에 포함된 모든 소스 코드, 디자인, 문서, 에셋(이하 "본 저작물")의
+저작권은 NomadLabs에 있습니다.
+
+본 저작물은 **열람(viewing) 목적으로만** 공개됩니다. NomadLabs의 사전 서면
+허가 없이 다음 행위를 금합니다.
+
+- 사용(use) 및 실행
+- 복제(copy), 다운로드를 통한 재사용, 저장
+- 수정(modify) 및 2차적 저작물(derivative works) 작성
+- 배포(distribute), 재배포, 공중 송신, 판매
+- 본 저작물의 전부 또는 일부를 다른 프로젝트에 포함
+
+GitHub 이용약관에 따른 저장소 열람 및 포크(fork)는 위 제한을 해제하지
+않으며, 위 행위를 허락하는 어떠한 라이선스도 부여하지 않습니다.
+
+본 저작물은 어떠한 보증도 없이 "있는 그대로(AS IS)" 제공됩니다.
+
+---
+
+Copyright (c) 2026 NomadLabs. All rights reserved.
+
+This repository and all of its contents (source code, design, documentation,
+and assets; collectively, the "Work") are the proprietary property of
+NomadLabs and are protected by copyright law.
+
+The Work is made publicly visible for viewing purposes only. No license or
+right is granted to any person to use, copy, modify, create derivative works
+of, distribute, sublicense, sell, or otherwise exploit the Work, in whole or
+in part, without the prior written permission of NomadLabs. Viewing or forking
+the repository under the GitHub Terms of Service does not grant any such right.
+
+THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
