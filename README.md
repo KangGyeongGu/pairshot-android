@@ -2,7 +2,7 @@
 
 <img src="docs/readme/project-banner.png" alt="PairShot" width="100%" />
 
-<h1>PairShot</h1>
+<h1>PairShot Android</h1>
 <h3>Before·After 촬영 및 관리 애플리케이션</h3>
 
 **[🌐 웹사이트 바로가기](https://pairshot.nomadlabs.kr)** &nbsp;·&nbsp; **[<img src="https://cdn.simpleicons.org/googleplay/34A853" height="14" alt="Google Play"/> 다운로드](https://play.google.com/store/apps/details?id=com.pairshot&pcampaignid=web_share)**
