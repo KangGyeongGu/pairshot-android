@@ -100,7 +100,7 @@ fun BeforePreviewStrip(
     stripHeight: Dp = BeforeStripHeight,
     allActiveSize: Boolean = false,
     progress: StripProgress? = null,
-    orientationProvider: (suspend (String) -> Boolean)? = null,
+    orientationProvider: (suspend (String) -> Boolean?)? = null,
 ) {
     val snapEnabled = onSelectIndex != null
     val haptic = LocalHapticFeedback.current

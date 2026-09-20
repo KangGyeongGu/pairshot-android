@@ -39,17 +39,9 @@ interface CameraSession {
 
     fun setExposureIndex(index: Int)
 
-    fun sensorRotationDegrees(facing: LensFacing): Int
+    suspend fun prepareOverlay(beforePhotoUri: String): OverlayBitmap?
 
-    suspend fun prepareOverlay(
-        beforePhotoUri: String,
-        lensFacing: LensFacing,
-    ): OverlayBitmap?
-
-    suspend fun readBeforeRotation(
-        beforePhotoUri: String,
-        lensFacing: LensFacing,
-    ): Float
+    suspend fun readBeforeRotation(beforePhotoUri: String): Float
 
     fun playShutterSound()
 

@@ -139,7 +139,7 @@ internal fun AfterCameraScreen(
             if (beforeUri == null) {
                 0f
             } else {
-                cameraSession.readBeforeRotation(beforeUri, overlayInputs.lensFacing)
+                cameraSession.readBeforeRotation(beforeUri)
             }
     }
 
@@ -151,7 +151,7 @@ internal fun AfterCameraScreen(
             if (beforeUri == null || !inputs.enabled || inputs.alpha <= 0f) {
                 null
             } else {
-                cameraSession.prepareOverlay(beforeUri, inputs.lensFacing)?.bitmap
+                cameraSession.prepareOverlay(beforeUri)?.bitmap
             }
         val previous = overlayBitmap
         overlayBitmap = next
