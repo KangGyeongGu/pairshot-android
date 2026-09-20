@@ -67,14 +67,13 @@ constructor(
         return sample
     }
 
-    private fun readBitmapBounds(uri: Uri): Pair<Int, Int>? {
+    fun readBitmapBounds(uri: Uri): Pair<Int, Int>? {
         val options =
             BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
-        context.contentResolver.openInputStream(uri)?.use { stream ->
-            BitmapFactory.decodeStream(stream, null, options)
-        } ?: return null
+        val stream = context.contentResolver.openInputStream(uri) ?: return null
+        stream.use { BitmapFactory.decodeStream(it, null, options) }
         if (options.outWidth <= 0 || options.outHeight <= 0) return null
         return options.outWidth to options.outHeight
     }
@@ -93,17 +92,22 @@ constructor(
     }
 
     /**
-     * 원본 EXIF 회전값으로 "세로로 들고 찍었는지"를 판별한다.
-     * CameraX 촬영본은 가로 버퍼 + 회전태그로 저장되므로 90/270이면 세로, 0/180이면 가로다.
+     * 사진의 표시 회전각(0/90/270)을 판정한다. EXIF 보정 결과가 세로면 0(가이드 없음),
+     * 가로면 EXIF 180일 때 270(오른쪽), 그 외 90(왼쪽). 치수 읽기 실패 시 EXIF만으로 폴백.
      */
-    fun readIsPortrait(uri: Uri): Boolean = isPortrait(readExifDegrees(uri))
+    fun readOrientationDegrees(uri: Uri): Float {
+        val exifDegrees = readExifDegrees(uri)
+        val bounds =
+            readBitmapBounds(uri)
+                ?: return OverlayTransformCalculator.fromExifOnly(exifDegrees)
+        return OverlayTransformCalculator.fromImageOrientation(bounds.first, bounds.second, exifDegrees)
+    }
+
+    fun readIsPortrait(uri: Uri): Boolean = readOrientationDegrees(uri) == 0f
 
     companion object {
         private const val ROTATE_QUARTER = 90
         private const val ROTATE_HALF = 180
         private const val ROTATE_THREE_QUARTERS = 270
-
-        internal fun isPortrait(exifDegrees: Int): Boolean =
-            exifDegrees == ROTATE_QUARTER || exifDegrees == ROTATE_THREE_QUARTERS
     }
 }

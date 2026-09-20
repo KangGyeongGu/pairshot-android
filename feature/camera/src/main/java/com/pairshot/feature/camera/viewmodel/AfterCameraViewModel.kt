@@ -29,6 +29,7 @@ import com.pairshot.feature.camera.state.CameraSettingsStateHolder
 import com.pairshot.feature.camera.state.CapabilityAdjustment
 import com.pairshot.feature.camera.state.InitialCameraSessionConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -310,10 +311,12 @@ constructor(
         _currentIndex.value = index
     }
 
-    /** 스트립 카드용: 원본 EXIF 회전값으로 세로 촬영 여부를 IO 스레드에서 읽는다. */
-    suspend fun readBeforeIsPortrait(uri: String): Boolean =
+    /** 스트립 카드용: 세로 촬영 여부를 IO 스레드에서 판정한다. 읽기 실패 시 null(뱃지 미표시). */
+    suspend fun readBeforeIsPortrait(uri: String): Boolean? =
         withContext(Dispatchers.IO) {
-            runCatching { exifBitmapLoader.readIsPortrait(Uri.parse(uri)) }.getOrDefault(false)
+            runCatching { exifBitmapLoader.readIsPortrait(Uri.parse(uri)) }
+                .onFailure { if (it is CancellationException) throw it }
+                .getOrNull()
         }
 
     fun moveToNext() {
