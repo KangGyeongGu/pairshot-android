@@ -1,5 +1,8 @@
 package com.pairshot.feature.album.route
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -8,13 +11,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.navigation.PaywallTrigger
+import com.pairshot.core.ui.addpair.AddPairOpenResult
+import com.pairshot.core.ui.component.AddPairSheet
+import com.pairshot.core.ui.component.AddPairSlot
 import com.pairshot.feature.album.screen.AlbumDetailScreen
 import com.pairshot.feature.album.viewmodel.AlbumDetailEvent
 import com.pairshot.feature.album.viewmodel.AlbumDetailUiState
@@ -39,6 +48,16 @@ fun AlbumDetailRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val addPairState by viewModel.addPairState.collectAsStateWithLifecycle()
+    var pendingAddPairSlot by remember { mutableStateOf<Pair<Long, AddPairSlot>?>(null) }
+    val addPairPickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            val target = pendingAddPairSlot
+            pendingAddPairSlot = null
+            if (uri != null && target != null) {
+                viewModel.setAddPairPhoto(target.first, target.second, uri.toString())
+            }
+        }
 
     val currentOnNavigateBack by rememberUpdatedState(onNavigateBack)
     val currentOnNavigateToPairPreview by rememberUpdatedState(onNavigateToPairPreview)
@@ -96,6 +115,13 @@ fun AlbumDetailRoute(
                     }
                 },
                 onAddPairsClick = viewModel::onAddPairsClick,
+                onAddFromGalleryClick = {
+                    scope.launch {
+                        if (viewModel.openAddPairSheet() == AddPairOpenResult.LIMIT_REACHED) {
+                            currentOnNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                        }
+                    }
+                },
                 onEnterSelectionMode = viewModel::enterSelectionMode,
                 onShareClick = { onShareSelection(state.selection.selectedIds) },
                 onSaveToDeviceClick = { onSaveSelectionToDevice(state.selection.selectedIds) },
@@ -117,5 +143,21 @@ fun AlbumDetailRoute(
                 modifier = modifier,
             )
         }
+    }
+
+    addPairState?.let { sheetState ->
+        AddPairSheet(
+            drafts = sheetState.drafts,
+            isImporting = sheetState.isImporting,
+            showSaveError = sheetState.showSaveError,
+            onPickRequest = { draftId, slot ->
+                pendingAddPairSlot = draftId to slot
+                addPairPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                )
+            },
+            onConfirm = viewModel::confirmAddPair,
+            onDismissRequest = viewModel::dismissAddPairSheet,
+        )
     }
 }

@@ -183,7 +183,7 @@ internal fun CameraScreen(
                             return@launch
                         }
 
-                        CanCreatePairUseCase.Result.Allowed -> {
+                        is CanCreatePairUseCase.Result.Allowed -> {
                             Unit
                         }
                     }

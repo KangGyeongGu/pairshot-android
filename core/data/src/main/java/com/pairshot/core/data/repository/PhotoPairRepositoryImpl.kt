@@ -167,6 +167,7 @@ constructor(
         zoomLevel: Float?,
         albumId: Long?,
         aspectRatio: AspectRatio?,
+        capturedAtMs: Long?,
     ): Long =
         withContext(Dispatchers.IO) {
             val tutorialActive = tutorialMode.isActive.value
@@ -191,7 +192,7 @@ constructor(
                 val entity =
                     PhotoPairEntity(
                         beforePhotoUri = savedUriString,
-                        beforeTimestamp = System.currentTimeMillis(),
+                        beforeTimestamp = capturedAtMs ?: System.currentTimeMillis(),
                         status = PairStatus.BEFORE_ONLY.name,
                         zoomLevel = zoomLevel,
                         aspectRatio = aspectRatio?.name,
@@ -223,6 +224,7 @@ constructor(
     override suspend fun saveAfterPhoto(
         pairId: Long,
         tempFileUri: String,
+        capturedAtMs: Long?,
     ) = withContext(Dispatchers.IO) {
         val tutorialActive = tutorialMode.isActive.value
         try {
@@ -253,11 +255,11 @@ constructor(
                 }
 
             try {
-                val now = System.currentTimeMillis()
+                val timestamp = capturedAtMs ?: System.currentTimeMillis()
                 photoPairDao.update(
                     entity.copy(
                         afterPhotoUri = savedUriString,
-                        afterTimestamp = now,
+                        afterTimestamp = timestamp,
                         status = PairStatus.PAIRED.name,
                     ),
                 )

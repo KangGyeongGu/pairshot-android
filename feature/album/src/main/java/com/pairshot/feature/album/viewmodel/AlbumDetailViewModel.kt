@@ -11,14 +11,19 @@ import com.pairshot.core.domain.album.RenameAlbumUseCase
 import com.pairshot.core.domain.combine.DeleteCombinedPhotosUseCase
 import com.pairshot.core.domain.pair.CanCreatePairUseCase
 import com.pairshot.core.domain.pair.DeletePairsUseCase
+import com.pairshot.core.domain.pair.ImportPairFromGalleryUseCase
 import com.pairshot.core.domain.pair.PairNavigationTarget
 import com.pairshot.core.domain.pair.ResolvePairNavigationTargetUseCase
 import com.pairshot.core.domain.pair.SyncMissingSourcesUseCase
 import com.pairshot.core.domain.settings.AppSettingsRepository
+import com.pairshot.core.domain.tutorial.TutorialModeProvider
 import com.pairshot.core.model.Album
 import com.pairshot.core.model.PhotoPair
 import com.pairshot.core.model.SortOrder
 import com.pairshot.core.navigation.AlbumDetail
+import com.pairshot.core.ui.addpair.AddPairOpenResult
+import com.pairshot.core.ui.addpair.AddPairSheetController
+import com.pairshot.core.ui.component.AddPairSlot
 import com.pairshot.core.ui.state.SelectionState
 import com.pairshot.core.ui.text.UiText
 import com.pairshot.feature.album.R
@@ -99,6 +104,7 @@ private data class DialogState(
 )
 
 @HiltViewModel
+@Suppress("LongParameterList")
 class AlbumDetailViewModel
 @Inject
 constructor(
@@ -113,9 +119,33 @@ constructor(
     private val syncMissingSourcesUseCase: SyncMissingSourcesUseCase,
     private val appSettingsRepository: AppSettingsRepository,
     private val canCreatePairUseCase: CanCreatePairUseCase,
+    importPairFromGalleryUseCase: ImportPairFromGalleryUseCase,
+    private val tutorialModeProvider: TutorialModeProvider,
 ) : ViewModel() {
     suspend fun isCameraEntryAllowed(): Boolean =
         canCreatePairUseCase() is CanCreatePairUseCase.Result.Allowed
+
+    private val addPairSheet = AddPairSheetController(canCreatePairUseCase, importPairFromGalleryUseCase)
+    val addPairState: StateFlow<AddPairSheetController.State?> = addPairSheet.state
+
+    suspend fun openAddPairSheet(): AddPairOpenResult =
+        when {
+            tutorialModeProvider.isActive.value -> AddPairOpenResult.BLOCKED
+            addPairSheet.open() -> AddPairOpenResult.OPENED
+            else -> AddPairOpenResult.LIMIT_REACHED
+        }
+
+    fun setAddPairPhoto(
+        draftId: Long,
+        slot: AddPairSlot,
+        uri: String,
+    ) = addPairSheet.setPhoto(draftId, slot, uri)
+
+    fun dismissAddPairSheet() = addPairSheet.dismiss()
+
+    fun confirmAddPair() {
+        viewModelScope.launch { addPairSheet.confirm(albumId = albumId) }
+    }
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()

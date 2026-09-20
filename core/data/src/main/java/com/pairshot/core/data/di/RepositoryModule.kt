@@ -1,5 +1,6 @@
 package com.pairshot.core.data.di
 
+import com.pairshot.core.data.media.GalleryImageMetadataReaderImpl
 import com.pairshot.core.data.repository.AlbumRepositoryImpl
 import com.pairshot.core.data.repository.AppSettingsRepositoryImpl
 import com.pairshot.core.data.repository.CombineSettingsRepositoryImpl
@@ -15,6 +16,7 @@ import com.pairshot.core.domain.combine.CombineSettingsRepository
 import com.pairshot.core.domain.combine.ExportHistoryRepository
 import com.pairshot.core.domain.export.ExportPresetRepository
 import com.pairshot.core.domain.export.ExportRepository
+import com.pairshot.core.domain.pair.GalleryImageMetadataReader
 import com.pairshot.core.domain.pair.PhotoPairRepository
 import com.pairshot.core.domain.settings.AppSettingsRepository
 import com.pairshot.core.domain.settings.OnboardingStateRepository
@@ -44,6 +46,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPhotoPairRepository(impl: PhotoPairRepositoryImpl): PhotoPairRepository
+
+    @Binds
+    abstract fun bindGalleryImageMetadataReader(impl: GalleryImageMetadataReaderImpl): GalleryImageMetadataReader
 
     @Binds
     @Singleton

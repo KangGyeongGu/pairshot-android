@@ -36,6 +36,7 @@ fun AlbumDetailScreen(
     onExitSelectionMode: () -> Unit,
     onCaptureBeforeClick: () -> Unit,
     onAddPairsClick: () -> Unit,
+    onAddFromGalleryClick: () -> Unit,
     onEnterSelectionMode: () -> Unit,
     onShareClick: () -> Unit,
     onSaveToDeviceClick: () -> Unit,
@@ -68,6 +69,7 @@ fun AlbumDetailScreen(
                 onNavigateBack = onNavigateBack,
                 onExitSelection = onExitSelectionMode,
                 onAddPairsClick = onAddPairsClick,
+                onAddFromGalleryClick = onAddFromGalleryClick,
                 onRenameClick = onRenameClick,
                 onDeleteAlbumClick = onDeleteAlbumClick,
             )

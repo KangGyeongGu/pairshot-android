@@ -28,11 +28,13 @@ interface PhotoPairRepository {
         zoomLevel: Float?,
         albumId: Long? = null,
         aspectRatio: AspectRatio? = null,
+        capturedAtMs: Long? = null,
     ): Long
 
     suspend fun saveAfterPhoto(
         pairId: Long,
         tempFileUri: String,
+        capturedAtMs: Long? = null,
     )
 
     suspend fun replaceBeforePhoto(
