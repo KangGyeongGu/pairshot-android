@@ -89,7 +89,7 @@ constructor(
 
     suspend fun canCreatePair(): CanCreatePairUseCase.Result =
         if (replaceBeforeForPairId != null) {
-            CanCreatePairUseCase.Result.Allowed
+            CanCreatePairUseCase.Result.Allowed(remaining = null)
         } else {
             canCreatePairUseCase()
         }

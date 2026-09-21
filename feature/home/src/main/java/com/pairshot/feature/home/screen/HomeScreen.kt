@@ -84,6 +84,7 @@ fun HomeScreen(
     onConfirmCreateAlbum: (String, String?, Double?, Double?) -> Unit,
     onFetchLocation: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onAddFromGalleryClick: () -> Unit,
     onNavigateToCamera: () -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -121,6 +122,7 @@ fun HomeScreen(
                 if (albumSelection.isSelectionMode) onExitAlbumSelectionMode else onExitSelectionMode,
                 onToggleSelectAll = onToggleSelectAll,
                 onEnterSelectionMode = onEnterSelectionMode,
+                onAddFromGalleryClick = onAddFromGalleryClick,
                 onNavigateToSettings = onNavigateToSettings,
             )
         },

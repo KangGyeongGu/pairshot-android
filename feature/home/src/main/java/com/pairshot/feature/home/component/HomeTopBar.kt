@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ fun HomeTopBar(
     onExitSelectionMode: () -> Unit,
     onToggleSelectAll: () -> Unit,
     onEnterSelectionMode: () -> Unit,
+    onAddFromGalleryClick: () -> Unit,
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -84,6 +86,13 @@ fun HomeTopBar(
                     )
                 }
             } else {
+                IconButton(onClick = onAddFromGalleryClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.AddPhotoAlternate,
+                        contentDescription = stringResource(CoreR.string.addpair_title),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
                 IconButton(
                     onClick = onEnterSelectionMode,
                     modifier = Modifier.tutorialAnchor(AnchorKey.HOME_SELECTION_BUTTON),

@@ -36,6 +36,7 @@ fun AlbumDetailTopBar(
     onNavigateBack: () -> Unit,
     onExitSelection: () -> Unit,
     onAddPairsClick: () -> Unit,
+    onAddFromGalleryClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteAlbumClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -97,6 +98,16 @@ fun AlbumDetailTopBar(
                         onClick = {
                             menuExpanded = false
                             onAddPairsClick()
+                        },
+                    )
+                    PairShotTopMenuDivider()
+                    PairShotTopMenuItem(
+                        text = {
+                            PairShotTopMenuItemText(title = stringResource(CoreR.string.addpair_title))
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            onAddFromGalleryClick()
                         },
                     )
                     PairShotTopMenuDivider()

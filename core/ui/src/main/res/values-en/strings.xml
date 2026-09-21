@@ -55,4 +55,15 @@
     <string name="snackbar_error_share_failed">Share preparation failed. Please try again</string>
     <string name="snackbar_error_file_load_failed">Couldn\'t load the file</string>
 
+    <string name="addpair_title">Add from gallery</string>
+    <string name="addpair_desc_assist">After-capture assistance may be limited for photos added from the gallery</string>
+    <string name="addpair_desc_swipe">Swipe sideways to add more pairs</string>
+    <string name="addpair_label_before">Before</string>
+    <string name="addpair_label_after">After</string>
+    <plurals name="addpair_button_confirm">
+        <item quantity="one">Add %1$d pair</item>
+        <item quantity="other">Add %1$d pairs</item>
+    </plurals>
+    <string name="addpair_error_save_failed">Failed to save some pairs. Please try again</string>
+
 </resources>

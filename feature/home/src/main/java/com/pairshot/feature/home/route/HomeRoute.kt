@@ -1,5 +1,8 @@
 package com.pairshot.feature.home.route
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +16,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pairshot.core.domain.tutorial.TutorialActionIds
 import com.pairshot.core.navigation.PaywallTrigger
+import com.pairshot.core.ui.addpair.AddPairOpenResult
+import com.pairshot.core.ui.component.AddPairSheet
+import com.pairshot.core.ui.component.AddPairSlot
 import com.pairshot.feature.home.screen.HomeScreen
 import com.pairshot.feature.home.viewmodel.HomeEvent
 import com.pairshot.feature.home.viewmodel.HomeViewModel
@@ -55,6 +61,16 @@ fun HomeRoute(
     val isProSubscriber by viewModel.isProSubscriber.collectAsStateWithLifecycle()
 
     var showCreateAlbumDialog by remember { mutableStateOf(false) }
+    val addPairState by viewModel.addPairState.collectAsStateWithLifecycle()
+    var pendingAddPairSlot by remember { mutableStateOf<Pair<Long, AddPairSlot>?>(null) }
+    val addPairPickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            val target = pendingAddPairSlot
+            pendingAddPairSlot = null
+            if (uri != null && target != null) {
+                viewModel.setAddPairPhoto(target.first, target.second, uri.toString())
+            }
+        }
 
     val currentOnNavigateToPairPreview by rememberUpdatedState(onNavigateToPairPreview)
     val currentOnNavigateToAfterCamera by rememberUpdatedState(onNavigateToAfterCamera)
@@ -169,8 +185,31 @@ fun HomeRoute(
                 }
             }
         },
+        onAddFromGalleryClick = {
+            scope.launch {
+                if (viewModel.openAddPairSheet() == AddPairOpenResult.LIMIT_REACHED) {
+                    onNavigateToPaywall(PaywallTrigger.DAILY_LIMIT)
+                }
+            }
+        },
         isRefreshing = isRefreshing,
         onRefresh = viewModel::refresh,
         isProSubscriber = isProSubscriber,
     )
+
+    addPairState?.let { sheetState ->
+        AddPairSheet(
+            drafts = sheetState.drafts,
+            isImporting = sheetState.isImporting,
+            showSaveError = sheetState.showSaveError,
+            onPickRequest = { draftId, slot ->
+                pendingAddPairSlot = draftId to slot
+                addPairPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                )
+            },
+            onConfirm = viewModel::confirmAddPair,
+            onDismissRequest = viewModel::dismissAddPairSheet,
+        )
+    }
 }

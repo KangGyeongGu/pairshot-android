@@ -34,6 +34,23 @@ class CanCreatePairUseCaseTest {
         }
 
     @Test
+    fun `pro user allowed with unlimited remaining`() =
+        runTest {
+            coEvery { membership.current() } returns proMembership()
+            val result = useCase() as CanCreatePairUseCase.Result.Allowed
+            assertEquals(null, result.remaining)
+        }
+
+    @Test
+    fun `free user with three created has two remaining`() =
+        runTest {
+            coEvery { membership.current() } returns Membership.Free
+            every { repository.countCreatedSince(any()) } returns flowOf(3)
+            val result = useCase() as CanCreatePairUseCase.Result.Allowed
+            assertEquals(CanCreatePairUseCase.FREE_DAILY_LIMIT - 3, result.remaining)
+        }
+
+    @Test
     fun `free user under daily quota can create pair`() =
         runTest {
             coEvery { membership.current() } returns Membership.Free

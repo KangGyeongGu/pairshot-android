@@ -31,11 +31,10 @@ import com.pairshot.core.model.CameraCapabilities
 import com.pairshot.core.model.FlashMode
 import com.pairshot.core.model.LensFacing
 import com.pairshot.core.model.ZoomRange
-import com.pairshot.core.rendering.Camera2SensorOrientation
 import com.pairshot.core.rendering.ExifBitmapLoader
-import com.pairshot.core.rendering.OverlayTransformCalculator
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,7 +64,6 @@ constructor(
     @ApplicationContext private val context: Context,
     private val sensorSession: SensorSession,
     private val exifBitmapLoader: ExifBitmapLoader,
-    private val camera2SensorOrientation: Camera2SensorOrientation,
 ) : CameraSession {
     private val _surfaceRequest = MutableStateFlow<SurfaceRequest?>(null)
     override val surfaceRequest: StateFlow<SurfaceRequest?> = _surfaceRequest.asStateFlow()
@@ -364,28 +362,17 @@ constructor(
         camera?.cameraControl?.setExposureCompensationIndex(index)
     }
 
-    override fun sensorRotationDegrees(facing: LensFacing): Int =
-        camera?.cameraInfo?.sensorRotationDegrees ?: camera2SensorOrientation.degrees(facing)
-
-    override suspend fun readBeforeRotation(
-        beforePhotoUri: String,
-        lensFacing: LensFacing,
-    ): Float =
+    override suspend fun readBeforeRotation(beforePhotoUri: String): Float =
         runCatching {
             withContext(Dispatchers.IO) {
-                val uri = Uri.parse(beforePhotoUri)
-                val exifDegrees = exifBitmapLoader.readExifDegrees(uri)
-                val sensor = sensorRotationDegrees(lensFacing)
-                OverlayTransformCalculator.calculate(sensor, exifDegrees)
+                exifBitmapLoader.readOrientationDegrees(Uri.parse(beforePhotoUri))
             }
         }.onFailure { error ->
+            if (error is CancellationException) throw error
             Timber.w(error, "Before rotation read failed: $beforePhotoUri")
         }.getOrDefault(0f)
 
-    override suspend fun prepareOverlay(
-        beforePhotoUri: String,
-        lensFacing: LensFacing,
-    ): OverlayBitmap? =
+    override suspend fun prepareOverlay(beforePhotoUri: String): OverlayBitmap? =
         runCatching {
             withContext(Dispatchers.IO) {
                 val uri = Uri.parse(beforePhotoUri)
@@ -393,9 +380,7 @@ constructor(
                     uri,
                     inSampleSize = OVERLAY_IN_SAMPLE_SIZE
                 )
-                val exifDegrees = exifBitmapLoader.readExifDegrees(uri)
-                val sensor = sensorRotationDegrees(lensFacing)
-                val rotation = OverlayTransformCalculator.calculate(sensor, exifDegrees)
+                val rotation = exifBitmapLoader.readOrientationDegrees(uri)
                 if (rotation == 0f) {
                     OverlayBitmap(source, 0f)
                 } else {
@@ -406,6 +391,7 @@ constructor(
                 }
             }
         }.onFailure { error ->
+            if (error is CancellationException) throw error
             Timber.w(error, "Overlay preparation failed: $beforePhotoUri")
         }.getOrNull()
 
